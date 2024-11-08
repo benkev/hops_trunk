@@ -1,0 +1,6 @@
+edit dup qcode
+sort freq
+sort base 
+sort time
+write sorted.alist
+exit

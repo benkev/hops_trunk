@@ -1,0 +1,73 @@
+\begin{tabbing}
+Titlexxxxxxxxxxxxxxx \= \kill
+\underline{COMMAND} \> {\bf 	edit} \\
+\end{tabbing}
+
+\begin{tabbing}
+Titlexxxxxxxxxxxxxxx \= \kill
+\underline{TYPE} \> {\bf 		Action} \\
+\end{tabbing}
+
+\begin{tabbing}
+Titlexxxxxxxxxxxxxxx \= \kill
+\underline{SYNTAX} \> {\bf 		"edit inputs"} \\
+\> {\bf 		"edit cursor"} \\
+\> {\bf 		"edit duplicates procdate"} \\
+\> {\bf 		"edit duplicates qcode"} \\
+\> {\bf 		"edit duplicates snr"} \\
+\end{tabbing}
+
+\underline{DESCRIPTION}
+\begin{list}{}{\setlength{\leftmargin}{0.5in}
+     \setlength{\rightmargin}{0in}}
+\item
+Sets flags in the data records according to a variety of
+circumstances.  These flags can be selectively unset with
+the "unflag" command.
+\item
+"Edit inputs" sets a flag bit in each data record for each
+data selection input parameter which excludes that data point.
+Thus, a scan may pass the input filter for stations, but fail
+that for baselines.  The baseline bit would be set, but the
+station bit would not.  Any set bit in the flag field causes
+the scan to be flagged (i.e. it will not be plotted or written
+to an output file).
+\item
+"Edit cursor" enables the cursor on an interactive graphics device
+upon which data has been displayed using "plot".  The user may
+type any character (except `x', `X', `a', `A', `b' or `B' ..  see 
+below) on the keyboard to edit out the point nearest the cursor.
+The cursor must be inside the border of a plot, and must be twice 
+as close to the target point than any other point for success.  
+Failure to meet these conditions results in an appropriate error 
+message.    
+\item
+Alternatively, the user may define an area on the plot within which
+all points are to be edited out.  This is accomplished by typing
+`a' or `A' to locate the bottom left corner of a rectangle, and
+`b' or `B' to locate the top right corner. 
+\item
+On devices which are not capable of erasing points from the screen
+(e.g. tektronix emulators), the edited points are marked by being
+overwritten by a solid square.
+\item
+Do not use the mouse buttons on workstation tektronix emulators - 
+these return multiple characters which may confuse the program.
+The cursor editing mode is terminated by typing the character `x' 
+or `X' on the keyboard.
+\item
+"Edit duplicates" removes duplicate scans from the database, 
+ignoring flagged scans.  The term "duplicate" refers to identical
+baseline, scan time, frequency code, experiment number and source.
+The second argument determines which scan aedit will retain.  If
+"procdate" is specified, it will keep the most recent processing.
+If "qcode" is specified, the "best" quality code scan is kept. If
+"snr" is specified, the highest snr scan is kept.
+\item
+WARNING: Since "edit duplicates" ignores flagged scans, unflagging
+data may generate more duplicates.  Similarly, reading in more
+data may do the same.  In such circumstances, the recommended
+course is to "unflag duplicates" and rerun "edit duplicates".
+\end{list}
+\vspace{.2in}
+

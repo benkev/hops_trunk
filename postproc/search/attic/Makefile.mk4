@@ -1,0 +1,41 @@
+## $MK4_DIST_D/src/postproc/search/Makefile
+SHELL := /bin/ksh
+
+##-----------------------------------------------------------------------------
+ifeq "$(MK4_MK_ENV)" ""
+  include $(shell echo $${PWD%/src/*})/cfg/env.mk
+  default $(MAKECMDGOALS) :
+	@mkdir -p $(MK4_MK_BLD_D)
+	@$(MAKE) -f $(MK4_MK_SRC_D)/Makefile -C $(MK4_MK_BLD_D) $(MAKECMDGOALS) 
+
+##-----------------------------------------------------------------------------
+else # ifeq "$(MK4_MK_ENV)" ""
+  include $(MK4_MK_CFG_D)/common.mk
+  include $(MK4_MK_CFG_D)/$(MK4_MK_ARCH).mk 
+
+  ##---------------------------------------------------------------------------
+  language := fortran
+
+  png_lib := $(subst .so,,\
+              $(subst lib,,\
+               $(notdir $(wildcard $(MK4_SYS_LIB_PATH)/*png12.so))))
+
+  ##---------------------------------------------------------------------------
+  ## prg
+  prg := search
+  prg_srcs  := $(strip \
+   clear_srchdata.c  parabola.c        read_data.c       sorter.c\
+   fill_grids.c      parse_cmdline.c   search.c          write_srchdata.c\
+   fit_peaks.c       plot_srchdata.c   sort_data.c\
+  )
+  prg_libs := cpgplot pgplot $(png_lib) afio mk4util X11 m
+  prg_lpath :=  $(MK4_MK_LIB_D) $(PGPLOT_DIR) $(X11_DIR) $(MK4_SYS_LIB_PATH)
+
+  ##
+  ipath := $(MK4_MK_INC_D) $(PGPLOT_DIR)
+
+  ##
+  include $(MK4_MK_CFG_D)/rules.mk 
+
+##-----------------------------------------------------------------------------
+endif # ifeq "$(MK4_MK_ENV)" ""

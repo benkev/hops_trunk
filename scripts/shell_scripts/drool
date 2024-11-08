@@ -1,0 +1,58 @@
+#!/bin/csh -f
+######################################################################
+#
+# This script cleans up the $TRANSFER area, informing the user which
+# failed files it is moving to the $TRANSFER/errors directory, and
+# why "dribble" thinks they failed.  This will suppress annoying
+# error messages in the monitor window.
+#
+# Written by CJL, March 27 1995
+#
+#######################################################################
+set nonomatch
+
+env_check drool
+if ($status != 0) exit (1)
+
+if (`hostname` != $DATAHOST) then
+    echo "drool: You must run this script from $DATAHOST"
+    echo "drool: Rlogin to it if necessary"
+endif
+					# Move to transfer directory
+					# and look for .error files
+if ($?TRANSFER == 1) then
+    if (-d $TRANSFER) then
+        cd $TRANSFER
+    else
+        echo "drool: Transfer area " $TRANSFER " appears not to exist"
+        exit(1)
+    endif
+else
+    echo "drool: TRANSFER environment variable not set, check setup.csh"
+    exit (1)
+endif
+
+set errlist=(*.erro?)
+if ($#errlist == 1) then
+					# This needed 'cos if no .error
+					# files present, value is "*.erro?"
+    if ($errlist:e != "error") then
+	echo "drool: No problem files found in $TRANSFER"
+	exit (0)
+    endif
+endif
+
+foreach errfile ($errlist)
+					# Get error description from
+					# second record (line) of error file
+    set errstring=`awk 'NR==2 {print}' $errfile`
+					# Tell user the problem
+    echo "drool: Root family $errfile:r, $errstring"
+    echo "drool: Moving all $errfile:r files to $TRANSFER/errors"
+					# Do the move itself
+    mv $errfile:r.* $TRANSFER/errors
+    if ($status != 0) then
+	echo "drool: Problem moving $errfile:r family to $TRANSFER/errors"
+    endif
+
+end

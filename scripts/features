@@ -1,0 +1,34 @@
+#
+# features -- turn on feature bit
+# Tue Mar  7 15:28:35 EST 2000
+#
+
+set FB_BIT_SET   = 0x1
+set FB_BIT_CLEAR = 0x2
+
+if( ${#argv} != 3 ) then
+	echo ""
+	echo "USAGE:  features  su#  0|1 feature_bit"
+	echo "	0 == clear feature bit"
+	echo "	1 ==   set feature bit"
+else
+	set su         = $1
+
+	if( $2 == "1" ) then
+#		SET the feature bit
+		set state = $FB_BIT_SET
+	else
+#		CLEAR the feature bit
+		set state = $FB_BIT_CLEAR
+	endif
+
+    set featurebit = $3
+
+	echo "sendnote tx${su} 0x00000010 0x53554d20 0 0 0 0x00000000 0 0 0 0 0 0 0 0x98 0x00070300 \
+			0 0 0 0 0 0 0 \
+			0x03000036 0 1 0x01020001 0x34 0x14 0x18 0 0x20 1 1 ${state} 0 0 ${featurebit} 0"
+
+	sendnote tx${su} 0x00000010 0x53554d20 0 0 0 0x00000000 0 0 0 0 0 0 0 0x98 0x00070300 \
+			0 0 0 0 0 0 0 \
+			0x03000036 0 1 0x01020001 0x34 0x14 0x18 0 0x20 1 1 ${state} 0 0 ${featurebit} 0
+endif

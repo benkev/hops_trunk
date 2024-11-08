@@ -1,0 +1,22 @@
+#!/bin/ksh
+# $MK4_DIST_D/src/scripts/share/runmailers
+
+me="`basename $0`"
+
+#-------------------------------------------------------------------------------
+. $MK4_CONF_D/mk4.conf
+
+#-------------------------------------------------------------------------------
+control_hosts="cc0 cc1"
+crate_hosts="cr0 cr1"
+playback_hosts="pu0 pu1 pu2 pu3 pu4 pu5 pu6 pu7 pu8 pu9 pua pub puc pud
+ pue puf"
+all_hosts="$control_hosts $crate_hosts $playback_hosts"
+
+#-------------------------------------------------------------------------------
+for virtual_host in $all_hosts ; do
+   eval real_host=\$mk4_$virtual_host
+   [ -z "$real_host" ] && continue
+   eval \$mk4_${virtual_host}_rsh txm </dev/null >$TMP/txm-$real_host.log 2>&1 &
+   eval \$mk4_${virtual_host}_rsh rxm </dev/null >$TMP/rxm-$real_host.log 2>&1 &
+done

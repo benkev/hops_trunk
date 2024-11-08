@@ -1,0 +1,46 @@
+*Sample lvex file
+*
+*Example of VEX log summary file.
+*
+*ARW 991105
+*
+*-----------------------------------------------------------------------------------------------
+$LVEX_REV;
+*-----------------------------------------------------------------------------------------------
+*
+rev = 1.0
+*
+*-----------------------------------------------------------------------------------------------
+$LOG;                                 *station logs
+*-----------------------------------------------------------------------------------------------
+*
+  def E;   *Effelsberg
+    monitor_trk_override = 16 : 17 ;  *use these monitor tracks for whole experiment
+	scan 185-234200;                  *scan-ID must match ovex scan-ID
+	  VSN=RRL00700;                   *check_code=B250
+	  head_pos = -271 um;
+	  start_tape = 1998y185d23h42m15s :  4421 ft :   0 in/sec ;
+	  stop_tape  = 1998y185d23h45m10s :  7821 ft ;
+	  source = 3C273 : 1998y185d23h42m00s ;
+	endscan;
+	*
+    scan 185-234800;                  *scan-ID must match ovex scan-ID
+	  VSN=RRL00700;
+	  head_pos = -271 um;
+	  start_tape = 1998y185d23h48m15s :  7821 ft :   0 in/sec ;
+	  stop_tape  = 1998y185d23h52m10s :  9056 ft ;
+	  source = 3C345
+	endscan;
+  enddef;
+*
+*
+  def Y;   *VLA
+    scan 185-234200;                  *scan-ID must match ovex scan-ID
+	  VSN=HS000700;                   *check_code=A51C
+	  head_pos = -271 um;
+	  start_tape = 1998y185d23h42m10s :  4400 ft :   0 in/sec ;
+	  stop_tape  = 1998y185d23h45m12s :  7801 ft ;
+	  source = 3C273 : 1998y185d23h42m03s ;
+	endscan;
+  enddef;
+*

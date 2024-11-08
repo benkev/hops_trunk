@@ -1,0 +1,58 @@
+#!/bin/csh -f
+#
+# This sub-script does the coherence time interpolation, filling
+# in coherence times for scans that have no coherent detection,
+# based on scans nearby in time which have been coherence-analyzed
+# by cofit in an earlier step.  Called from mmreduce.
+#
+# Written by CJL, 22 February 1996
+#################################################################
+
+					# Skip option
+if (-e $1.cmlist) then
+    echo "mmreduce: A coterp output file already exists.  If you want"
+    echo "mmreduce: to use it, you should skip this step.  If not, the existing"
+    echo "mmreduce: file will be overwritten"
+    skipask
+    if ($status == 1) exit (0)
+endif
+					# Simple invocation of coterp, writing
+					# plottable station-based zenith cotime 
+					# information into ctplot file
+echo "mmreduce: Generating the coherence time interpolated dataset."
+coterp -o $1.cmlist -p $1.ctplot $1.cofitf $1.mlistf
+if ($status != 0) then
+    echo "mmreduce: Error return from coterp!  Sorry, but I have to stop here."
+    exit (1)
+endif
+					# Ask the user if graphical output needed
+while (1)
+    echo "mmreduce: Coterp completed successfully, and results were written out"
+    echo "mmreduce: Do you want to examine the station-based coherence times? (y/n): \c"
+    set reply=$<
+    if ($reply == "y" || $reply == "Y") then
+	echo "mmreduce: Your options are:"
+	echo "mmreduce:     1. X-Window interactive graphics"
+	echo "mmreduce:     2. Postscript hardcopy graphics"
+	echo "mmreduce: Pick a number from 1 to 2: \c"
+	set reply=$<
+	if ($reply == 1) then
+	    cotplot -x $1.ctplot
+	else if ($reply == 2) then
+	    cotplot -d $1.ps/ps $1.ctplot
+	    if ($status == 0) then
+	        echo "mmreduce: Printing coherence data on postscript printer"
+	        lpps $1.ps
+	    endif
+	else
+	    echo "mmreduce: Invalid response, let's go over that again, shall we?"
+	    continue
+	endif
+	break
+    else if ($reply == "n" && $reply == "N") then
+	break
+    else
+	echo "mmreduce: Please answer 'y' or 'n'"
+    endif
+end
+

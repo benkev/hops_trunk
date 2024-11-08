@@ -1,0 +1,5 @@
+gcc -W -Wall -O3 -D_FILE_OFFSET_BITS=64 vlbi0.c -lm
+cp a.out vlbi0
+
+
+

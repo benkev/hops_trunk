@@ -1,0 +1,49 @@
+#!/usr/bin/csh
+source /correlator/prog/mk4_setup.csh
+echo ' '
+echo 'This script does the prep work to run geo_export on euler'
+echo ' '
+echo 'Be sure to run it after ftping over the export file from ccc to /euler3'
+echo ' '
+if ($1 == "") then
+  echo 'To run,  enter geo.prep <experiment number> <experiment name>'
+  echo ' '
+  exit (1)
+endif
+if ($2 == "") then
+  echo 'To run,  enter geo.prep <experiment number> <experiment name>'
+  echo ' '
+  exit (1)
+endif
+echo 'Experiment number given is > \c'; echo $1
+echo 'Experiment name given is > \c'; echo $2
+echo ' '
+echo 'Have you copied over the export file? (y/n) '
+echo ' '
+set answer=$<
+if ($answer == "y") then
+  cd /euler1/export
+  mkdir $2
+  cd $2
+  cp /users5/bec/correlator_reports/$2.corr $2.report
+  cp /users4/drs/$2/$2.skd $2.skd
+  chmod 777 $2.report
+  chmod 777 $2.skd 
+  cd /euler3
+  gunzip $2.tar.gz
+  cd /euler1/export/$2
+  tar xvf /euler3/$2.tar
+  alist -o atest /euler1/export/$2/$1
+  cd /euler3
+  gzip $2.tar
+  cd /euler1/export/$2
+  mv /euler3/$2.tar.gz /euler1/export/$2
+  echo ' '
+  echo 'Now make a psfile from the atest file to check data completeness '
+  echo ' '
+endif
+if ($answer == "n") then
+  echo 'OK - exiting now ...'
+  exit (1)
+endif
+echo 'Bye '

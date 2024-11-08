@@ -1,0 +1,131 @@
+Requirements of an IO Library for the CCF/Schedule File Format
+--------------------------------------------------------------
+
+The Mk4 correlator control file (CCF) format devised at Haystack, with 
+input from various groups around the world, will likely become the
+basis for the format of schedule and configuration files used at
+various stages in various VLBI systems.  It is to be hoped that with
+suitable communication, the number of variants of the format will
+be minimized, and that many key sections of the format will be
+common across all applications.  This commonality benefits users
+because they only need to learn a single format, and potentially
+benefits programmers because the same code can be reused in different
+projects.  
+
+The CCF format is extremely flexible, by design, a feature which
+is a necessary part of any multi-project format.  This flexibility,
+however, places a burden on parsing software, which must interpret
+and enforce rules and conventions, and resolve conflicts permitted
+by the format.  Examples include duplicate keywords, contradictory
+keyword assignments, legal and illegal keyword values and names,
+and so on.  The software must check for completeness and consistency,
+handle arbitrary statement order, sort and organize the information,
+and present the information to the application programmer in a
+convenient form.  Such a piece of software will be complex, and will
+benefit from a proper design effort.
+
+The purpose of this document is to define the requirements
+of a software IO library which will fulfill the CCF formatting and
+parsing needs of all projects which use the format, with a view
+to facilitating joint development of the code.
+
+The most important requirement is that any shared software must be
+understandable and maintainable independently by each group.  It is
+unacceptable for any group to be dependent on the resources of any
+other group in order to conduct, possibly urgent, debugging efforts.
+This requirement means that the code must be written in C, which is
+the lowest common denominator across the programmers of all interested
+groups.  Obviously, the C code must conform to accepted conventions,
+avoid machine dependencies, and be well written and documented.
+
+A design concept which has proved effective, and has led to maintainable
+code at Haystack within the HOPS package, is to have an IO library which
+acts as a translator between a defined disk format and a defined memory
+format.  The definition of the memory format is in terms of a C structure,
+the names of whose members remain stable as data formats and software
+systems evolve.  In this way, one can add information to a format with
+little or no impact on existing application code, since all the structure
+member references are unchanged.  The programmer merely calls a library
+routine which says "read this file for me", and gets back a memory
+structure which is completely filled in and sanitized, ready for use.
+Similarly, the programmer may fill in such a structure appropriately,
+then make a single call to the library to write a complete CCF to disk.
+The library would enforce conventions and rules, and produce a legal
+CCF from the furnished information.
+
+A similar scheme is proposed for the Mk4 CCF IO library to be written 
+and shared across groups.  The first step in the IO library design is 
+the definition of the memory format.  A requirement of this memory format 
+is that it be extensible, and that it provides a convenient vehicle from 
+which the application programmer can extract information.  It is proposed 
+that the bulk of the design effort for this memory format should take 
+place at Haystack.  The product would be a header file containing 
+structure definitions.
+
+Requirements placed on the parsing software include, but are not limited
+to, the following:
+
+1. Parsing of each "$" section must be encapsulated in a separate section
+   of code, so that the entire library is constructed in modular fashion
+   section by section.  This facilitates the provision of code for
+   special sections by individual groups without impacting the rest of
+   the community.
+
+2. Scoping rules for "$" sections and def-enddef pairs must be enforced
+   by the library.  Syntax validity checking extends beyond semicolon
+   delimited statements.
+
+3. Enforcement of valid keywords and values from a master list.  The list
+   would be a separate header file defining keyword names, data formats,
+   and allowable ranges.
+
+4. Resolution of references to both internal and external information.
+   For example, the memory representation of the schedule section should
+   probably have all references to modes and station characteristics
+   resolved, with the information placed in the structure (probably as
+   pointers to the relevant memory representations of the mode and
+   station structures).  The application programmer should not have to
+   "look things up" from another section of the file, or from an
+   external database.
+
+5. Generation of error messages and states under a variety of error
+   conditions, including possibly obscure internal inconsistencies in the
+   file (how far should this go?  Should the library know whether, for
+   example, record_density=56000 bpi is compatible with record_transport=Mk3?).
+
+6. Comment fields must be carried along with the files, so that programs
+   can be written which modify these files yet preserve comments.  This
+   provision also allows for machine-generated comments.
+
+Others?
+
+
+--------------------------------------------------------------------------
+Upon preliminary consideration of implementation issues, a conceptual
+"software gap" has become apparent to me.  The difficulty arises from the
+very elegance and compactness which makes the currently defined format
+so attractive.  In a nutshell, the memory-based translation of the format
+will either need a distressing amount of interpretation by application
+software **after** the IO library has read it in, or the IO library will
+need to incorporate an intelligent algorithm, the nature of which has yet
+to be defined, to convert a more straightforward memory image into an
+acceptably compact disk version of the file.
+
+The only way to resolve this problem in a satisfactory manner is to have
+the IO library maintain all the reference information (from which it can
+reconstruct any "clever" use of the disk format by a user), while at the
+same time dereferencing all the detailed information into a standardized
+structure (defined to make space for all conceivable parameter settings),
+for use by application programs.  There will still be a problem if the
+application wishes to alter settings and write out a new file.  The 
+application will want to modify the parameters only, and will not want
+to decide where the parameter statement goes in the corresponding disk
+file (i.e. as a primitive, or as part of a reference).  It seems that
+each parameter will need a tag of some sort attached to it, which specifies
+its origin.  Difficulties can arise if you change a parameter, and the IO
+library decides that the parameter originated in a reference, so that 
+the referred-to section needs to be modified.  Any other references to
+that section will then be compromised.  The IO library needs to detect 
+this, and decide whether to instead make it a primitive parameter, or
+create a new def-enddef pair with the modified parameter, or what.  This
+is non-trivial.

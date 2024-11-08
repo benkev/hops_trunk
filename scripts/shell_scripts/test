@@ -1,0 +1,26 @@
+#/bin/csh -f
+
+set renamerr=("Failure in dribble script"\
+                "Problem with unix directory for CI files"\
+                "Malformed root file name in dribble script"\
+                "Requested root file not found by renamer"\
+                "Garbage root file contents"\
+                "Mismatch between root info and corel names"\
+                "Garbage in corel file(s)"\
+                "Mismatch between root info and fringe names"\
+                "Problem in rename figuring out file sizes"\
+                "Problem in rename figuring out free disk space"\
+                "Not enough space to receive renamed files"\
+                "Problem in rename creating mv command file"\
+                "Error return from move command")
+set test1=(string1 \
+		string2 \
+		string3)
+set test2=5
+
+echo $test2 >! test.out
+echo $renamerr[$test2] >> test.out
+echo "first=$renamerr[1]"
+echo "second=$renamerr[2]"
+echo "third=$renamerr[7]"
+

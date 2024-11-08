@@ -1,0 +1,30 @@
+#
+# $Id: Makefile_am 775 2012-08-29 15:16:54Z gbc $
+#
+
+SUBDIRS =
+
+if HAVE_GSL
+if HAVE_FFTW
+
+noinst_HEADERS = anoise.h
+bin_PROGRAMS = anoise
+
+LFILE = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
+GPROF = -Dprofile=static
+GFLAG =
+
+anoise_SOURCES = anoise.c anoise_maker.c quant_hacker.c \
+                 anoise_common.c anoise_station.c anoise_extend.c \
+                 anoise_describe.c
+anoise_CFLAGS = @FFTW3_CFLAGS@ $(AM_CFLAGS)
+anoise_CPPFLAGS = $(LFILE) $(GPROF)
+anoise_LDFLAGS = $(GFLAG)
+anoise_LDADD = @GSL_LIBS@ @RT_LIBS@ @FFTW3_LIBS@
+
+endif #HAVE_FFTW
+endif #HAVE_GSL
+
+#
+# eof
+#

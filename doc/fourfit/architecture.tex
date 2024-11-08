@@ -1,0 +1,100 @@
+\subsection{control files}
+Internally, the control files are implemented as a chained list of
+structures, which are created and appended in the order that the control
+file information
+is encountered by the program (i.e. default control file first, then the
+main control file, then any \textbf{set} commands.) The control block structures
+each have four selectors, which control whether or not a particular
+block will be applied to data. The selectors are (baseline, source, frequency
+group, and time range), with wildcard matching allowed. A fifth 
+"pseudo-selector" is a single-character station code such as K. It is expanded
+internally into two identical parameter blocks, one matching baseline K? and the
+next matching ?K. In addition to the selectors there are many parameters
+that can be applied to the data, such as filtering parameters, calibration
+corrections, or search ranges.
+
+The control file is parsed by a finite-state machine, which can at times
+react to errant input files so as to produce syntax error messages 
+that are a little hard to interpret. The offending input line is always
+printed, though, to help the user zero in on the problem.
+
+The principal routines used in the control file parsing are:
+\begin{itemize}
+\item create\_fsm -- sets up a structure with the finite-state-machine information
+containing the semantics of the control file commands
+\item parse\_cmdline -- parses the command line options
+\item parse\_control\_file -- high level routine that reads the control file, sets up
+the fsm, uses lex, and invokes the parser
+\item lex -- does a lexical analysis, changing keywords into tokenized information
+\item parser -- does the heavy lifting of applying the fsm semantics to the tokenized
+output of lex, in order to create c\_blocks
+\end{itemize}
+
+\subsection{fringe search}
+The fringe search in \textit{fourfit} is a two-stage process:
+
+\begin{enumerate}
+\item Search over a large 3-dimensional grid of (singleband delay,
+multiband delay, delay-rate) to find the approximate location of
+the maximum of the delay resolution function.
+
+\item Form a 5x5x5 cube of correlation amplitude 
+values centered on the location found in the grid search, and
+perform a 3 dimensional interpolation to find the peak value.
+Note: this section describes the \textit{simultaneous} interpolation,
+not the now-deprecated \textit{iterative} interpolation.
+\end{enumerate}
+
+\subsubsection{grid search}
+A search is made through a large number of grid points
+in a 3-dimensional volume with axes of singleband delay,
+multiband delay, and delay-rate. The function being maximized
+is the coherent sum of all of the correlator output
+complex visibility points over frequency and time. The grid points are
+evenly spaced, which allows the search to be done efficiently via
+FFT's. For example, along the delay-rate axis the transform
+of the complex phasors converts from a function of time
+to a function of fringe frequency. The best fit can be found
+by inspecting the fringe frequency values to find the maximum.
+Similar conjugate searches in the delay domains are done: the
+cross-power spectral points within the channels determine the
+singleband delay peak, and the phases across the different
+channels determine the multiband delay peak.
+\subsubsection{interpolation}
+Once the location of the maximum grid point is known, then an
+interpolation step refines the values in the neighborhood of
+that (singleband delay, multiband delay, delay-rate) triple.
+In the interpolation step a direct summation of the complex visibility
+values is performed, by rotating the data by a complex phase 
+factor (see next section). This factor incorporates the effect of the offsets
+along each of the three axes of a 5x5x5 cube, which is centered
+on the values (sbd, mbd, dr) from the grid search.
+After the cube is formed, the 3 coordinates of the maximum
+of the visibility magnitude is found via iterative application
+of a simultaneous 3-D interpolation. The iteration step is implemented
+by searching for the maximum of an interpolated 11x11x11 cube
+of visibility magnitudes. Each iteration has a 11x11x11 cube that
+is a factor of 5 smaller, until all 3 coordinate spacings are
+less than 0.0001 of the original 5x5x5 spacing.
+\subsubsection{complex phase factor}
+In the interpolation of the best-fit (mbd, sbd, dr) values and also
+in the plotting of the data as fit by the program, there is
+a complex rotation applied to the data. This factor has
+the form $e^{-i 2 \pi \theta}$, where $\theta$ is given by
+\begin{equation}
+        \theta = f \Delta t \dot{\tau} + (f - f_{ref}) \tau_{mb} + b \tau_{sb}
+\end{equation}
+where:
+
+\begin{tabular}{ll}
+    $f$         & frequency of a data point \\
+    $f_{ref}$   & reference frequency \\
+    $\Delta t$  & offset in time of data from ref. time \\
+    $\dot{\tau}$ & residual delay rate \\
+    $\tau_{mb}$ & residual multiband delay \\
+    $\tau_{sb}$ & residual singleband delay \\
+    $b$         & (0.25, 0, -0.25) for (usb, dsb, lsb) data \\
+\end{tabular}
+\subsubsection{program structure}
+The overall program structure can be seen in the calling
+graphs of Appendix \ref{app:callinggraphs}.

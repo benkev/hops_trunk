@@ -1,0 +1,1254 @@
+
+
+98-04-14 08:39                  mk4_files.doc                  Page    1
+
+
+Mk4 File Format Definitions -- Strawman Plan, CJL July 16 1996
+--------------------------------------------------------------
+
+
+This document defines the detailed file and record formats to be used for
+the Mk4 correlator system.  In its strawman version, it includes some
+text justifying format choices, which will be removed as the document
+evolves to its final form.
+
+GENERAL CONSIDERATIONS
+----------------------
+
+Before defining record formats in detail, we first describe features
+common to all records and files in the Mk4 system.
+
+RECORD IDENTIFICATION
+---------------------
+
+In order to facilitate the reading and decoding of Mk4 binary files, all
+data records will be "typed".  This is done, with one notable exception,
+in the Mk3 system.  For Mk4, we need to devise a typing scheme that allows
+format evolution, and which is distinct from the Mk3 system to avoid
+possible confusion.  Each will have, in the first 8 bytes, ascii characters
+which uniquely identify the record type, and which tell the IO software
+exactly how to handle it.  The use of ascii information rather than
+binary integers allows pure ascii records (such as those contemplated for
+the greppable type-4 files) to be typed in a uniform manner, yet carries
+no penalty.  This 8-byte header will contain 2 fields.  The first 3 bytes
+contain the record type number, which in Mk4 cannot exceed 999.  The
+next 2 bytes contain a format version number, up to 99.  These two 
+numbers will be formatted with leading zeros.  The remaining 3 bytes are
+reserved for future use, and will normally be blank filled.  However, in
+a few cases of binary variable length records, binary information needed 
+to calculate the record length is stored there.
+
+1. Record types
+---------------
+
+For simplicity, and to make it easier for programmers to remember what
+file type they are dealing with, the record type numbers will be equal
+to the file type number x 100 (currently 0 through 4) plus some offset.  Thus
+a record type 145 is immediately recognizable as belonging to a type-1
+(corel) file.  The only exception to this rule is the type-000 record,
+which is the first record of every file regardless of file type.
+The offsets will be organized into logical groupings.
+Where it makes sense, all records dealing with a particular aspect of
+the data will be sequentially numbered.  When a new aspect of the data
+is encountered, the record type will jump to the next multiple of 10.
+To avoid confusion between file types and record types, offsets below 10 are 
+not allowed in root files.  Permissible record type numbers are therefore:
+
+Type-0 (root) files:    010 to 099
+Type-1 (corel) files:   100 to 199
+Type-2 (fringe) files:  200 to 299
+Type-3 (sudata) files:  300 to 399
+Type-4 (log) files:     400 to 499
+
+
+
+
+
+
+
+98-04-14 08:39                  mk4_files.doc                  Page    2
+
+
+
+This scheme allows ample expansion for both record and file types, is
+sharply distinct from the Mk3 convention to avoid confusion, and is
+reasonably obvious and logical to the programmer.
+
+The type-0 files pertain to a single scan, where the term "scan" normally
+refers to a contiguous observation of a single source with a set of 
+telescopes, which does not span a tape pass boundary.  This definition
+can be modified by concatenating data with an as-yet unspecified program,
+provided the correlator model is continuous between the joined segments
+(in other words, tape pass boundaries can be erased in postprocessing,
+in principle, and the file format conventions are not a limitation in
+this regard).
+
+The type-1 and type-2 files "belong" to the associated type-0 file, and
+pertain to a single baseline within the scan.  In addition, the type-2 files
+pertain to a single frequency group for the baseline.  There may be many
+type-1 and type-2 files for a given baseline, corresponding to different
+correlations and/or fringe fits.  Each file has a unique file number within
+the fileset, embedded in the filename.
+
+The type-3 and type-4 files also "belong" to the associated type-0 file,
+but pertain to a single station within the scan.  There may be multiple
+type-3 files per station (corresponding to multiple correlations), but
+only one type-4 file per station.
+
+
+
+2. Format version number
+------------------------
+
+The 2-digit format version number allows a mechanism for evolution of the
+file format in response to unforseen needs with minimal modifications to
+previously written software.  The IO software will pick up this number, and
+copy the record into the memory structure appropriate to the
+record type and version.  Most of the structure elements will have unchanged
+names from previous versions, so software downstream of the IO library
+will in general not care what the version number was.  To implement a new
+format version, all that must be done is to update the header file containing
+the structure definitions, and write code to process the newly-introduced
+fields.  Applications will include a structure definition that incorporates
+a superset of all fields from all version numbers, and the IO library will
+have to fill the fields appropriately.  In general, this will prevent the
+use of simple HOPS Mk3-style memory overlays into structures for version 
+numbers greater than 0, but the CPU overhead of explicitly filling structure 
+elements should be minimal.  While updating the IO library for a new 
+version number may be non-trivial, it needs to be done in only one place,
+not in each application.
+
+The ease with which this can be done at the application level (where most 
+of the complexity lies) should encourage elegant and complete solutions to 
+file-format related difficulties, rather than counterintuitive and complicating 
+workarounds.
+
+The rationale for carrying a format version number with records instead of
+files is that you don't want to increment a file version number for each
+
+
+
+
+
+
+
+98-04-14 08:39                  mk4_files.doc                  Page    3
+
+
+small modification to some obscure record.  Record version control also
+increases flexibility, allowing one to transparently mix record version
+numbers in files, though in practise this will seldom occur.
+
+3. Continuation number vs. variable record lengths
+--------------------------------------------------
+
+Certain types of information have variable space requirements.  There are 
+two ways this might be handled.  The Mk3 system uses fixed-length 256-byte
+records, and stacks records using record continuation numbers.  Under
+UNIX, we have the freedom to use variable-length records with little
+penalty in code complexity.  After some deliberation, the decision was
+made to move away from continuation numbers and toward variable-length
+records for Mk4.  The majority of records nevertheless remain fixed-length
+simply because the amount of information needed is invariant.
+
+FILE IDENTIFICATION
+-------------------
+
+In order to facilitate consistency checks of data files, and to ease
+programmatic manipulations for filesets, it has been decided to place a
+special file identification record at the beginning of each file.  This
+record will be typed in the same way as all other Mk4 records.  The
+record type will be 000, and the record length will be fixed at 64 bytes.  
+For various reasons, it is desirable for this record to be entirely ascii, 
+not least because then it is trivial to generate a greppable and 
+user-comprehensible summary of many data files.  The proposed format of 
+the type 000 record is as follows.  All fields are ascii.
+
+Field    Length    Description
+------------------------------
+Type     3         Fixed at 000
+Version  2         Normal meaning
+Unused   3         Spaces
+Date     14        " yyddd-hhmmss ", original file creation date.
+                   Note preceding/trailing space
+Name     32        Filename relative to data directory, preceded by
+                   a space, NULL-padded.  With current unix correlator
+                   filenaming conventions, the maximum length of a
+                   name starting with the experiment directory is 31
+                   characters.
+Unused   12        NULLs.
+
+
+RECORD FORMATS
+--------------
+
+The Mk3 record formats were heavily influenced by the programming convenience
+of IO blocks consisting of a uniform data type, such as I*4 or R*8, which
+mapped simply onto equivalenced FORTRAN arrays.  This technique is superseded
+by C structures, eliminating the need to group quantities by data type in the
+records.  Instead, for Mk4 the records are organized by function, with typically
+well-mixed data types within each record.  This has the desirable attribute
+that the use of particular record types will tend to be localized within
+application programs, enhancing readability and maintainability.  For this
+reason, the potentially attractive option of retaining the Mk3 formats where
+
+
+
+
+
+
+
+98-04-14 08:39                  mk4_files.doc                  Page    4
+
+
+possible was rejected.
+
+DATA ALIGNMENT
+--------------
+
+In the record definitions below, care has been taken to ensure that variables
+are properly aligned.  This means that if a variable occupies n bytes, the
+location of the variable within the record is an integral number times n
+bytes from the start of the record.  In a few places, padding is used.  This 
+practise, which causes some rearrangement of variables from the order in which 
+they might otherwise have been stored, ensures that it will always be possible 
+to map a copy of the record format on disk directly onto a C structure.  In
+addition, record lengths are kept to a multiple of the largest data type in
+the file, which is 8 bytes for type 0 files, 4 bytes for type 1 files, and
+8 bytes for type 2 files.  If these steps were not taken, the C compiler 
+would insert padding into structures based on machine dependent memory 
+alignment restrictions, destroying correspondence between memory structures 
+and disk formats and necessitating an extra record encoding/decoding step in 
+the IO software.  The record length restriction ensures that a structure
+pointer is not set to an address which leads to a data alignment error for
+one or more of the structure elements.
+
+
+Type-0 (root) file record formats
+----------------------------------
+
+A fundamental change from Mk3 to Mk4 is the shift from a primarily baseline-based
+system to a primarily station-based system.  Since the root file contains much
+information that is required or generated at correlation time, this shift
+to a station-based architecture must be reflected in the file format.  In order
+to maximize the benefits of such an approach, an attempt has been made to
+remove all baseline dependencies from the root, which now contains only
+scan-wide information, followed by multiple station blocks.  Much of the necessary
+baseline-dependent information, which is generated only when the baselines
+are physically formed by the correlator, is now stored in the
+baseline-specific type-1, and after fringe-fitting, type-2 files.  It is 
+thought that this practise yields a cleaner and philosophically more pleasing 
+overall design.
+
+Global information will be stored in type 01x records, while station-specific
+information will be stored in type 02x records.  The overall organization
+of the root is as follows:
+
+NOTE:  THIS FILE IS BEING REPLACED BY THE CONCATENATION OF OBSVEX, SUVEX AND
+COVEX FILES.  THE MODEL SPLINE COEFFICIENTS HAVE BEEN MOVED TO THE TYPE 3
+(SUDATA) FILES.  THE REST OF THE INFORMATION BELOW IS AVAILABLE FROM THE VEX
+ROOT BY THE USE OF A VEX LIBRARY PARSER CALL.
+
+****   Type 000 record         Standard for all Mk4 files
+****   Type 010 record          General correlator/scan/misc information
+****   Type 011 record          Source information, including everything we
+****                           know about the source, with a comment field
+****   Type 020 records Channel-independent station information
+****   Type 021 records Barrel-roll specification for station
+****   Type 022 records Channel-dependent information for station
+****   
+
+
+
+
+
+
+
+98-04-14 08:39                  mk4_files.doc                  Page    5
+
+
+****   There are one each of the type 010 and 011 records, multiple type-020
+****   and type 021 records, and multiple type-022 records per type-020.
+****   
+****   Type 010 (general fileset information) record format:
+****   
+****   Field            type            bytes   Description
+****   -----           ----            -----   -----------
+****   Type             ascii           3       010
+****   Version          ascii           2       0-99
+****   Unused           ascii           3       Spaces
+****   Lastfile i*2             2       Last file # of fileset (updated)
+****   Expt.            i*2             2       Experiment number
+****   Program          ascii           32      Observing program name
+****   Correlator id    ascii           8       Correlator identification
+****   Corel rev.       ascii           4       Correlator software revision level
+****   EOP              r*8 x 6         48      Earth orientation parameters (fixed
+****                                           for entire experiment, with rate)
+****   Nstat_exp        i*2             2       Number of stations in experiment
+****   Nstat_root       i*2             2       Number of stations in this root
+****   Stations x 32
+****           ID       ascii           1       Schedule-file letter code
+****           ID2      ascii           2       International 2-char id
+****           Name     ascii           8       Full 8-char name, space padded
+****           Unused   ascii           1       Null
+****   
+****   Record length is fixed at 492 bytes.  The array of station names
+****   is filled in only for those stations present in this root.  The position
+****   in this table need not correspond to the position of the corresponding station
+****   block (set of type-020, type 021, and multiple type-022 records).
+****   
+****   Type 011 (source information) record format:
+****   
+****   Field            type            bytes   Description
+****   -----           ----            -----   -----------
+****   Type             ascii           3       011
+****   Version          ascii           2       0-99
+****   Unused           ascii           3       Spaces
+****   Source name      ascii           8       Standard source name
+****   Alias            ascii           8       Source name alias
+****   Source type      ascii           8       Quasar, star, SNR etc.
+****   Flux             r*4             4       Jy, nominal continuum strength
+****   Spectrum r*4             4       Nominal spectral index
+****   Flux_freq        r*4             4       Ref freq for flux, alpha, in GHz
+****   Line peak        r*4             4       Jy, nominal line peak strength
+****   Coord 1950       coord           16      B1950   h  m  s  d  m  s
+****                                                   i2 i2 r4 i2 i2 r4
+****   Coord 2000       coord           16      J2000
+****   Coord date       coord           16      At observe date (ref. J2000)
+****   PM RA            r*4             4       Proper motion RA (rad/sec)
+****   PM Dec           r*4             4       Proper motion Dec (rad/sec)
+****   Pul_phase        r*8 x 4         32      rotational phase polynomial coeffs
+****   Pul-epoch        r*8             8       Epoch for above polynomial
+****   Pul-dispersion   r*4             4       Dispersion measure
+****   Orbit            ??              ??      Orbital parameters if source
+****                                       is satellite
+****   
+
+
+
+
+
+
+
+98-04-14 08:39                  mk4_files.doc                  Page    6
+
+
+****   Record length is fixed at 148 + ?? bytes.  In general, not all this information
+****   will be filled in, but the space is reserved just in case.  The flux density
+****   and spectral information may be useful for postprocessing.
+****   
+****   Type 020 (station information) record format:
+****   
+****   Field            type            bytes   Description
+****   -----           ----            -----   -----------
+****   Type             ascii           3       020
+****   Version          ascii           2       0-99
+****   Unused           ascii           3       Spaces
+****   ID               ascii           1       CCF letter code
+****   ID2      ascii           2       International 2-char id
+****   Name     ascii           8       Full 8-char name, space padded
+****   Unused   ascii           1       Null
+****   Tape label       ascii           8       Standard tape label
+****   Occucode ascii           8       Occupation code
+****   Scan start       date            12      Nominal start time
+****   Duration i*2             2       Nominal duration (sec)
+****   Footage          i*2             2       Nominal starting tape footage
+****   Pass             i*2             2       Starting pass number
+****   Channels i*2             2       Number of sideband/channels
+****   Coord            r*8 x 3         24      X, Y, Z for station (meters)
+****   Clock synch      r*8             8       Microsec
+****   Clock rate       r*4             4       sec/sec
+****   Clock epoch      date            12      Reference for synch and rate
+****   Inst. delay      r*8             8       Instrumental delay (usec)
+****   Zatm delay       r*4             4       Zenith atmos. delay (usec)
+****   Model time       date            12      Reference time for 1st spline
+****   Model interval   r*4             4       Spline interval in seconds (rec time)
+****   Nsplines i*4             4       Number of splines in scan
+****   
+****   Record length is fixed at 136 bytes.  There is one type-020 record per
+****   station.
+****   
+****   Type 021 (barrel roll specification) record format:
+****   
+****   Field            type            bytes   Description
+****   -----           ----            -----   -----------
+****   Type             ascii           3       021
+****   Version          ascii           2       0-99
+****   Unused           ascii           3       Spaces
+****   Period           i*4             4       Roll period in frames
+****   Reinit           r*4             4       Sequence reinitialization (secs)
+****   Roll x 128
+****       head i*1             1       Headstack (1-4)
+****       hometrk i*1          1       Home position of roll sequence
+****       seq. i*1             16      Roll track position sequence
+****   
+****   Record length is fixed at 2320 bytes.  There is one type-021 record
+****   per station.
+****   
+****   Type 022 (channel information) record format:
+****   
+****   Field            type            bytes   Description
+****   -----           ----            -----   -----------
+
+
+
+
+
+
+
+98-04-14 08:39                  mk4_files.doc                  Page    7
+
+
+****   Type             ascii           3       022
+****   Version          ascii           2       0-99
+****   Unused           ascii           3       Spaces
+****   Station ID       ascii           2       Same as ID field in 020 record
+****   Channel ID       ascii           8       From VEX file
+****   Band ID          ascii           2       From VEX file
+****   Polarization     ascii           2       From VEX file
+****   Sideband ascii           2       From VEX file
+****   LO Freq          r*8             8       MHz Sky freq at DC, +/- for sband
+****   LO Offset        r*8             8       MHz
+****   Pcal freq        r*8             8       1st pcal freq (sky freq MHz)
+****   Pcal spacing     r*4             4       Spacing between pcal tones (MHz)
+****   Tape speed       r*4             4       ips
+****   Tape dir i*4             4       Forward (1) or reverse (2)
+****   Modulate i*4             4       Pseudo-random data modulation (y/n)
+****   Sample rate      r*4             4       Msample/sec
+****   Bits/sample      i*4             4       1 or 2
+****   Sign bits        i*1x4x4         16      track#, bitpos, headstack, remapped
+****   Mag. bits        i*1x4x4         16      track, formatter or recorder remap
+****                                           for up to 4 tracks.
+****   Delay splines    r*8 x 6 x n     48 x n  Set of 6 coeffs for n time intervals
+****   Phase splines    r*8 x 6 x n     48 x n  Set of 6 coeffs for n time intervals
+****   
+****   Record length is variable at 104 + 96n bytes.  There are many type-022 records
+****   for each station.
+****   
+
+Type-1 (corel) file record formats
+----------------------------------
+
+Similar to Mk3, each correlator output record will correspond to a single AP
+for a single channel, with multiple lags.  The records will be variable-length,
+with the length determined by the number of lags present.  There may be "raw" 
+format correlator output records which have scrambled lag and bitcount fields.
+Each type-1 file will have, as the first record after the type 000 record, a
+record which contains pertinent file-wide information, and eliminates the
+current "orphan" potential of the current Mk3 system.  Mk4 correlator files
+will be dependent on the root file for the correct interpretation of their
+contents, but not for the mere identification of the data.  The general
+organization of a type-1 file will be as follows:
+
+Type 000 record         Standard for all Mk4 files
+Type 100 record         Identifies data by baseline, parent root, correlation
+                        time, etc.  Specifies how many data records of what
+                        type are present.  After reading the type 100 record,
+                        the program should be able to perform many consistency
+                        checks on the root contents and the data records.
+Type 101 records        Track-specific correlator hardware configuration
+                        information similar to what goes into the Mk3
+                        type-2000 record and cross-reference table.
+                        There is one type-101 record for each index number.
+                        Needed for correct interpretation of the type 110
+                        and type 120 records.
+Type 110 records        These records contain the raw data dumped directly
+                        from the correlator crate controller.  The lag data
+                        in these records is not in an order suitable for
+
+
+
+
+
+
+
+98-04-14 08:39                  mk4_files.doc                  Page    8
+
+
+                        immediate analysis.  Type 110 records need to be
+                        processed into type 120 records before proceeding.
+                        Generally, type 110 and type 120 records will not
+                        both exist in the same file.
+Type 120 records        Correlation lag data records for various modes.  The
+                        different modes may involve inclusion or exclusion
+                        of bitcounts by lag, autocorrelations, and so on.
+                        There is only one mode per file.
+
+Because of the presence of variable length records, the type 100 record must
+precede all type 101, 110 and 120 records.  For simplicity, the number of lags 
+(and correlator blocks) must be constant in any given type-1 file.  There is 
+one type 100 record, multiple type 101 records, and multiple type 110/120 records 
+per type 101 record.  Some of the information in the type 100 record may not be 
+available until the rest of the file is written, necessitating re-writing of 
+that record.
+
+Type 100 (general data description) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       100
+Version         ascii           2       0-99
+Unused          ascii           3       Spaces
+Baseline        ascii           2       Standard baseline id
+Filenum         i*2             2       Fileset file number
+parent          ascii           34      Root file name, null terminated
+Qcode           ascii           2       Correlation "quality", criteria TBD
+Percent done    r*4             4       0-100% of scheduled data processed
+start           date            12      Time of 1st AP
+stop            date            12      Time of last AP
+ndrec           i*4             4       Total no of data records in file
+cflength        i*2             2       Length of correlator frame (msec)
+aplength        i*2             2       Length of AP (msec)
+Mode            i*4             4       Correlation mode bits
+lags            i*4             4       Number of lags/type-120 record
+nindex          i*4             4       Number if index numbers present
+blocks          i*2             2       Number of blocks per index number
+rectype         i*2             2       Type 110, 120, or both
+
+Record length is fixed at 100 bytes.  This record can be thought of as a
+"consistency control" record, which should be examined to make sure that
+the data are what you think they should be.  The IO library should do
+most of this checking, and raise the alarm to the application programmer
+when discrepancies are found.  Global hardware configuration information
+is also stored here.
+
+Type 101 (index number parameter) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       101
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Index           i*4             4       Index number
+Procdate        date            12      correlation time
+
+
+
+
+
+
+
+98-04-14 08:39                  mk4_files.doc                  Page    9
+
+
+Ref. fgroup     ascii           2       from ccf, e.g. X1
+Rem. fgroup     ascii           2       from ccf, e.g. X3
+Polarization    ascii           2       RR, LL, RL, LR
+Corr. board     i*2             2       Correlator board serial #
+Corr. slot      i*2             2       Correlator board slot
+Ref channel     i*2             2       SU output channel numbers
+Rem channel     i*2             2       
+Delay offset    i*2             2       Sample periods added to apriori delay
+gate on         r*4             4       Pulsar gate on in periods
+gate off        r*4             4       Pulsar gate off in periods
+Post mortem     i*4             4       Up to 32 1-bit flags
+Block table     i*4         4*blocks    One entry per block in snake
+
+Record length is variable at 52+(4*blocks). There are i records, where i is
+given by (high index - low index + 1).  This record describes channel-by-channel
+hardware configuration information for this correlation.
+Each 'Block table' entry consists of 3 bytes of static configuration
+information followed by the block number on the correlator board; order
+of entries is from head of snake to tail of snake.
+
+Some information in the type 101 records is analogous to that in the 
+type-2000 records of the Mk3 system.  The Mk4 scheme helps isolate 
+baseline-dependent information in the baseline-dependent type-1 files, and 
+helps prevent excessive file sizes for the primarily station-based type-0 
+root files.  Type-1 files are not intended to be made standalone by this change.
+
+
+Type 110 (raw correlator data) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       110
+Version         ascii           2       0-99
+Unused          ascii           3       Spaces
+Unused          ascii           2       Padding for alignment
+Baseline        ascii           2       Standard baseline id
+Filenum         i*2             2       Fileset file number
+rootcode        ascii           6       Standard root suffix
+Index           i*4             4       Index into type 101 record
+AP              i*4             4       Accumulation period number
+Flag            i*4             4       Up to 32 correlation flags
+Status          i*4             4       Up to 32 status bits
+Bitshift        r*4             4       Bit shift rate
+Fbit            r*4             4       Fractional bitshift at AP center
+Raw corr data   array      66*4*Blocks  Counts from corresponding corr block
+
+where 'Raw corr data' array element is:
+Right cell data i*4           33*4      In order read from correlator chip.
+                                        33rd element is Global Validity Count
+Left cell data  i*4           33*4      In order read from correlator chip.
+                                        33rd element is Global Validity Count
+
+Record length is variable at 44+(66*4*Blocks) bytes.  Minimum record length
+is 312 bytes, and the maximum overhead of the auxiliary information is
+13%.  For comparison, the equivalent overhead in Mk3 is 50%.
+
+
+
+
+
+
+
+
+98-04-14 08:39                  mk4_files.doc                  Page   10
+
+
+
+Type 120 (sorted lag data) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       120
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Unused          ascii           2       Padding for alignment
+Baseline        ascii           2       Standard baseline id
+Filenum         i*2             2       Fileset file number
+rootcode        ascii           6       Standard root suffix
+Index           i*4             4       Index into type 101 record
+AP              i*4             4       Accumulation period number
+Flag            i*4             4       Up to 32 correlation flags
+Status          i*4             4       Up to 32 status bits
+Bitshift        r*4             4       Bit shift rate
+Fbit            r*4             4       Fractional bitshift at AP center
+lagdata         array        variable   Correlation counts
+
+where lagdata can have any one of three structures:
+1. COUNTS_PER_LAG format, lagdata is an array of size nlags, each element
+having the structure below.
+coscor          i*4             4       Cosine correlation count
+cosbits         i*4             4       Cosine total bit count
+sincor          i*4             4       Sine correlation count
+sinbits         i*4             4       Sine total bit count
+
+2. COUNTS_GLOBAL format, lagdata is a structure containing an array as shown
+below.
+cosbits         i*4             4       Cosine total bit count
+sinbits         i*4             4       Sine total bit count
+array[nlags], each element is:
+        coscor  i*4             4       Cosine correlation count
+        sincor  i*4             4       Sine correlation count
+
+3. AUTO_CORR format, lagdata is an array of size nlags. each element
+having the structure below.
+coscor          i*4             4       Cosine correlation count
+cosbits         i*4             4       Cosine total bit count
+
+Record length is variable, depending on the number of lags and the mode.
+Only one mode, and therefore one lagdata format, is present in any given file.
+
+
+The perhaps controversial inclusion of file identification information in
+the type-110/120 records is intended to provide easy "idiot-proofing" of the
+system.  Put a simple consistency check in the IO library, and you'll never
+have to worry about APs getting misplaced again.  The cost is 10 bytes per
+record, typically under 6 percent.
+
+
+Type-2 (fringe) file record formats (caution ... data alignment not yet done)
+-----------------------------------
+
+DON'T SETTLE THESE FORMATS WITHOUT DISCUSSIONS WITH MA + ARCHINAL
+
+
+
+
+
+
+
+98-04-14 08:39                  mk4_files.doc                  Page   11
+
+
+
+Type 2 files may in general consist of several logically distinct sections.
+In the current Mk3 system, there are two such sections, namely the binary
+fringe search results section (with some auxiliary root information), and
+an ascii "fringe plot" section which displays the results pseudo-graphically.
+One can imagine other possible sections, such as fringe-rate/delay
+amplitude arrays, and postscript graphics.  The Mk4 record typing
+convention should be used to accomodate these different sections.
+
+To a degree, Mk3 type-2 files are standalone entities, in that much processing
+can be done on their contents without having to access the root file.
+However, there are still many cases where the root information is still
+needed.  A philosophical question which needs to be answered for Mk4 is
+whether this standalone quality is something of value.  If so, it should
+be extended to eliminate any significant dependence on the root.  If not,
+much duplication of root information can be removed.
+
+The arguments one way or the other can be briefly stated.  Inclusion of
+sufficient information in the type-2 files for them to be completely
+standalone represents a convenience for writers of postprocessing
+software, such as "alist", "fringex", and the like.  These writers would
+then no longer need to read the root files, and would no longer incur
+the IO overhead of reading them.  The disadvantage is that users would
+be encouraged to break the integrity of filesets by moving around just
+the type-2 files they need.  This would be undesirable from the point of
+view of data management, and would increase the potential for confusion.
+For example, such users would typically leave behind the type-4 files which
+may contain information vital to their subsequent analysis.
+
+The following file formats reflect my judgement that the advantages of
+file independence outweigh the dangers of fileset fragmentation.  The
+latter can be minimised by provision of convenient utilities which
+allow users to move filesets around without dealing directly with the
+type-2 files.
+
+The basic pattern is for type 200 through type 208 records to contain
+information progressively less generic, and progressively more specific
+to the fringe fit process that generated the type-2 file.  The progression
+goes from baseline-independent information from the root in the type 200
+record to the final fringe-fit solution values in the type 208 record.
+This helps to avoid jumping around between record types are we progress
+through the fourfit code.  Various processed versions of the input data 
+records are stored in record types 210 to 212, and user-oriented 
+graphical output information is stored in records 220 and higher.
+
+
+Type 200 (fileset information) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       200
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Release         ascii           10      Correlator software release id
+Experiment      i*2             2       Experiment number
+Program         ascii           20      Observing program name
+
+
+
+
+
+
+
+98-04-14 08:39                  mk4_files.doc                  Page   12
+
+
+Scantime        date            10      Scan time to 1 second
+Sample rate     i*2             2       kbits/sec
+PRT             date            10      Processing reference time
+Source          ascii           8       Source name
+R.A.            r*8             8       of epoch
+Dec             r*8             8       of epoch
+Epoch of ra/dec i*2             2       1950 or 2000
+R.A. of date    r*8             8
+Dec. of date    r*8             8
+GHA             r*8             8       Greenwich hour angle (deg)
+R.A. rate       r*8             8       Proper motion
+Dec. rate       r*8             8       Proper motion
+Polar motion    r*8 x 2         16      Polar motion
+GST at epoch    r*8             8       
+GST rate        r*8             8
+Pulsar phase    r*8 x 4         32      Polynomial of pulse timing
+Pulsar epoch    r*8             8       reference time for polynomial
+Dispersion      r*8             8       Pulsar dispersion measure
+
+Record length is fixed at 206 bytes.  This record contains all the
+baseline-independent root-related information.
+
+Type 201 (baseline information) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       201
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Ref name        ascii           8       Station names
+Rem name        ascii           8       
+Ref tape        ascii           8       Tape ids
+Rem tape        ascii           8       
+Ref xpos        r*8             8       Station X coords (meters)
+Rem xpos        r*8             8       
+Ref ypos        r*8             8       Station Y coords (meters)
+Rem ypos        r*8             8       
+Ref zpos        r*8             8       Station Z coords (meters)
+Rem zpos        r*8             8       
+Baseline X      r*8             8       Baseline X length (meters)
+Baseline Y      r*8             8       Baseline Y length (meters)
+Baseline Z      r*8             8       Baseline Z length (meters)
+Baseline len.   r*8             8       Baseline length (meters)
+U               r*8             8       fringes/arcsec E-W at 1GHz
+V               r*8             8       fringes/arcsec N-S at 1GHz
+UF              r*8             8       mHz/arcsec/GHz in R.A.
+VF              r*8             8       mHz/arcsec/GHz in dec.
+Adelay          r*8             8       Total apriori delay (usec)
+Arate           r*8             8       Total apriori rate (usec/sec)
+Aaccel          r*8             8       Total apriori acceleration (usec/sec/sec)
+Ref clock       r*4             4       Clock offsets (usec)
+Rem clock       r*4             4       
+Ref clockrate   r*4             4       Clock rates (sec/sec)
+Rem clockrate   r*4             4       
+Ref idelay      r*4             4       Instrumental delays (usec)
+Rem idelay      r*4             4       
+
+
+
+
+
+
+
+98-04-14 08:39                  mk4_files.doc                  Page   13
+
+
+Ref zatm del.   r*4             4       Zenith atmospheric delay (nsec)
+Rem zatm del.   r*4             4       
+Ref elev        r*4             4       Elevation of source
+Rem elev        r*4             4
+Ref az          r*4             4       Azimuth of source
+Rem az          r*4             4       
+
+Record length is fixed at 222 bytes.  This record contains baseline
+dependent root information, independent of fourfit parameters.
+
+Type 202 record format:
+
+A merged copy of (possibly multiple) corel file type 101 records, with only those
+index numbers used in the fringe fit represented.  When the data come from
+multiple corel files, the merging operation must resolve conflicts (or
+maybe fourfit should just refuse to run in case of conflict).  Record length
+will be variable, and will depend on number of index numbers processed.
+
+Type 204 (execution setup) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       204
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Control file    ascii           110     Control file full pathname
+ffcf_date       date            10      Control file modification date
+Override        ascii           128     Command line override parms
+
+Record length is fixed at 256 bytes.  The strings are null-terminated.  If
+they overflow, the strings are set to null.  This record is just a tracer
+of the execution parameters for possible subsequent human intervention.
+
+Type 205 (fourfit setup) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       205
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+FPT             date            10      Fourfit processing time
+Epoch           date            10      Reference time for delay/rate etc.
+Offset          r*4             4       Epoch offset from central time (sec)
+ffmode          ascii           6       Fourfit execution modes
+ffversion       ascii           6       Fourfit program version
+Search parm     r*4 x 6         24      SBD, MBD, Rate windows
+Filters         r*4 x 8(?)      32      Filter thresholds
+Start           date            10      Start of requested data span
+Stop            date            10      End of requested data span
+Channels        i*2 x 12 x 32   384     Requested channels/sbands
+Ref freq        r*8             8       Fourfit reference frequency
+nchans          i*2             2       Number of channels
+
+Record length is fixed at 524 bytes.  This record describes the setup
+of the fourfit execution, independent of the AP data.
+
+
+
+
+
+
+
+
+98-04-14 08:39                  mk4_files.doc                  Page   14
+
+
+Type 206 (data filtering) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       206
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Start           date            10      Time of 1st valid ap
+Stop            date            10      Time of last valid ap
+Accepted        i*2 x 2 x 16    64      APs accepted by channel/sband
+Intg time       r*4             4       Effective integration time (secs)
+Accept ratio    r*4             4       % ratio of min/max data accepted
+discard         r*4             4       % of data discarded
+xerror          i*2 x 2 x 16    64      Discards due to X parity error
+yerror          i*2 x 2 x 16    64      Discards due to Y parity error
+suppress        i*2 x 2 x 16    64      Discards due to correlate suppress
+ppupdate        i*2 x 2 x 16    64      Discards due to ppupdate
+xslip           i*2 x 2 x 16    64      Discards due to X slip sync
+yslip           i*2 x 2 x 16    64      Discards due to Y slip sync
+badsync         i*2 x 2 x 16    64      Discards due to bad synch
+ratesize        i*2             2       Size of fringe rate transform
+MBD size        i*2             2       Size of MBD transform
+SBD size        i*2             2       Size of SBD transform
+
+Record length is fixed at 556 bytes.  This record describes the data
+filtering action taken by fourfit in detail.  The AP flagging criteria
+for Mk4 will undoubtedly be different, but this is a start.  Info is
+much more detailed than Mk3, since records are kept by channel/sband.
+We have the space, but will we ever need to track things this well?
+The record also describes the array sizes that fourfit decided to use.
+
+Type 207 (phasecal and error rate) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       207
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Pcal ampl.      r*4 x 4 x 16    256     Pcal amp by sband, ref/remote
+Pcal phase      r*4 x 4 x 16    256     Pcal phases
+Pcal freq       r*4 x 4 x 16    256     Pcal frequencies
+pcalrate ref    r*4             4       Pcal rate reference station
+pcalrate rem    r*4             4       Pcal rate remote station
+errorate        r*4 x 4 x 16    256     Error rates by sband, ref/remote
+
+Record length is fixed at 1038 bytes.  The phasecal and errorate
+numbers are as used by fourfit after extraction from the type-3 files,
+and interpretation in terms of the fourfit input parameters.  Errorates
+are by channel, translated from track error rates by some algorithm.
+(Alternatively, maybe they should be by track, and reported by 
+track and channel on the fringeplot.  Somewhere in here we need a
+track/channel translation table).
+
+Type 208 (solution parameter)record format:
+
+Field           type            bytes   Description
+
+
+
+
+
+
+
+98-04-14 08:39                  mk4_files.doc                  Page   15
+
+
+-----           ----            -----   -----------
+Type            ascii           3       208
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Quality         ascii           1       Fringe quality 0 to 9
+Errorcode       ascii           1       Similar to current letter codes
+Tape qcode      ascii           8       Backwards compatibility?
+Obs. delay      r*8             8       Total group delay (usec)
+Obs. rate       r*8             8       Total rate (usec/sec)
+Obs. sbdelay    r*8             8       Total sband delay (usec)
+Obs. delay c.   r*8             8       Total group delay central epoch (usec)
+Obs. rate c.    r*8             8       Total rate central epoch (usec/sec)
+Obs. sbdelay c. r*8             8       Total sband delay central epoch (usec)
+Resid. delay    r*4             4       MBD residual to model (usec)
+Resid rate      r*4             4       Rate resid to model (usec/sec)
+Resid sbd       r*4             4       SBD residual to model (usec)
+MBD error       r*4             4       MBD error calc'd from data (usec)
+SBD error       r*4             4       SBD error calc'd from data (usec)
+Rate error      r*4             4       Rate error calc'd from data (usec/sec)
+ambig.          r*4             4       Group delay ambiguity (usec)
+Coh ampl.       r*4             4       Coherent amplitude (corr. coeff.)
+Inc ampl. 1     r*4             4       Amp. from incoherent segment addition
+Inc ampl. 2     r*4             4       Amp. from incoherent channel addition
+SNR             r*4             4       SNR in sigmas
+Prob. false     r*4             4       Probability of false detection
+totphase        r*4             4       Total observed fringe phase (deg)
+totphase_cen    r*4             4       Total phase central epoch (deg)
+totphase_ec     r*4             4       Total earth-centered fringe phase (deg)
+resphase_ec     r*4             4       Residual earth-centered phase (deg)
+
+Record length is fixed at 128 bytes.  This record contains the essentials of
+the fringe fit solution.
+
+Type 210 (channel data) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       210
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Amp-phase       r*4 x 2 x 16    128     Amp/phase by channel resid to model
+
+Record length is fixed at 134 bytes.  The entries are equivalent to the entries
+in the Mk3 type-4500 record.
+
+Type 211 (data slices) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       211
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Rate spectrum   r*4 x r         4r      Rate spectrum at peak
+MBD function    r*4 x m         4m      MBD resolution function at peak
+SBD function    r*4 x s         4s      SBD function at peak
+Xpower total    r*4 x s         4s      Crosspower spectrum avg'd across chans
+
+
+
+
+
+
+
+98-04-14 08:39                  mk4_files.doc                  Page   16
+
+
+Xpower chans    r*4 x s x c     4sc     Xpower spectra for each freq channel
+MBD solutions   r*4 x s         4s      Best MBD values for each SBD chan.
+Rate spectrum   r*4 x r x s     4sr     Rate spectra at best MBD for each SBD chan.
+
+The numbers r, m, s and c are the sizes of the rate spectrum, multiband delay
+function, singleband delay function, and channel array, respectively.  The numbers
+r, m and s can be found in the type 205 record, and the number c can be found
+in the type 204 record.  Record length is variable, given by 
+4*(r + m + s*(3+c+r)) + 6 bytes.  This record gives the information required to 
+reconstruct everything that appears in the upper graphical portion of the Mk3 
+fringe plot, plus some additional information.  It can be used to generate 
+high-resolution graphics by a suitable program.
+
+Type 212 (AP data) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       212
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+channel         i*2             2       Channel number for this record
+SBD chan        i*2             2       SBD chan. no. for this record
+data            r*4 x 3 x a     12a     Amp, phase, pcal phase by a.p.
+
+The number a is the number of APs in the processed data span.  Record length 
+is variable, given by 10 + 12*a.  There are multiple type-212 records.  
+The data are rotated to the fourfit solution, unless additional SBD channels 
+are dumped in which case those records are rotated to the center of the SBD 
+channel in question.
+
+Type 220 (fringe plot) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       220
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Fringe plot     ascii           15360   Standard fringe plot image
+
+Record length is fixed at 15366 bytes.  This is simply a record-typed version
+of the Mk3 fringe plot image.
+
+Type 221 (postscript plot) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       221
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Post. plot      ascii           ??      High-res postscript graphics of fringe
+
+
+Type 3 (Station unit data) file record formats
+-----------------------------------------------------------
+
+The type 3 files contain station-specific information for each of the
+
+
+
+
+
+
+
+98-04-14 08:39                  mk4_files.doc                  Page   17
+
+
+stations involved in the scan.  They are created by genaroot, which
+writes the type 300 and 301/2 records.  These contain the delay and phase
+spline polynomials which describe the correlator model, and which drive
+the station unit in its delay compensation and frame header construction.
+The files are appended to by the station unit manager software during or
+after the correlation, with information on track error rates, state 
+counts, and extracted phasecal values in type 304, 306 and 308 records
+respectively.
+
+Type 300 (station ID and model parameter) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       300
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Id              ascii           1       1-char vex letter code
+Intl_id         ascii           2       2-char international station code
+Name            ascii           32      Full station name
+Unused          ascii           1       Padding for alignment
+Model_date      date            12      Start time for 1st spline
+Model interval  r*4             4       Spline interval in seconds
+Nsplines        i*2             2       Number of splines in scan
+
+Record length is fixed at 64 bytes.
+
+Type 301 (delay polynomial coefficient) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       301
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Interval        i*2             2       Sequential model interval number
+Chan_id         ascii           32      Frequency channel identifier
+Unused          ascii           6       Padding for alignment
+Delay_spline    r*8 x 6         48      Delay spline coefficients
+
+Record length is fixed at 58 bytes.
+
+Type 302 (phase polynomial coefficient) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       302
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Interval        i*2             2       Sequential model interval number
+Chan_id         ascii           32      Frequency channel identifier
+Unused          ascii           6       Padding for alignment
+Phase_spline    r*8 x 6         48      Phase spline coefficients
+
+Record length is fixed at 96 bytes.
+
+Type 303 ("raw" track error statistics) record format:
+
+
+
+
+
+
+
+
+98-04-14 08:39                  mk4_files.doc                  Page   18
+
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       303
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Format TBD (PAH/SRS)
+
+Type 304 ("cooked" track error statistics) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       304
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Time            date            12      Start time of current error stats
+Duration        r*4             4       Duration of current error stats (sec)
+Statistics x 64
+   Error_rate   r*4             4       Fraction
+   Frames       i*4             4       Count
+   Bad_frames   i*4             4       Count
+   Slip_sync    i*4             4       Count
+   Missing_sync i*4             4       Count
+   CRC_error    i*4             4       Count
+
+Record length is fixed at 1560 bytes.
+
+Type 305 ("raw" state count) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       305
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Format TBD (PAH/SRS)
+
+Type 306 ("cooked" state count) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       306
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Time            date            12      Start time of current counts
+Duration        r*4             4       Duration of current counts (sec)
+Stcount x 16
+    Chan_id     ascii           32      Frequency channel identifier
+    Bigpos      i*4             4       Count of big positive voltage samples
+    Pos         i*4             4       Count of small positive voltage samples
+    Neg         i*4             4       Count of small negative voltage samples
+    Bigneg      i*4             4       Count of big negative voltage samples
+
+Record length is fixed at 792 bytes.
+
+Type 307 ("raw" phase cal value) record format:
+
+Field           type            bytes   Description
+
+
+
+
+
+
+
+98-04-14 08:39                  mk4_files.doc                  Page   19
+
+
+-----           ----            -----   -----------
+Type            ascii           3       307
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Format TBD (ARW).
+
+
+Type 308 ("cooked" phase cal value) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       308
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Time            date            12      Start time of pcal average
+Duration        r*4             4       Duration of pcal average (sec)
+Pcal x 16
+    Chan_id     ascii           32      Frequency channel identifier
+    Freq        r*4             4       frequency (Hz rel. to chan freq)
+    Real        r*4             4       Phasecal vector
+    Imaginary   r*4             4       Phasecal vector
+
+Record length is fixed at 728 bytes.
+
+
+Type 4 (Log) file record formats
+--------------------------------
+
+Is record typing necessary?  Just in case, the ascii record typing
+field makes it possible.  Here is a possible format definition:
+
+Type 400 record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       400
+Version         ascii           2       0-99 
+Unused          ascii           3       Spaces
+Program         ascii           10      Originating program name, preceding space
+COT             ascii           14      " yyddd-hhmmss "
+Keyword         ascii           10      Trailing space
+Message         ascii           <215    Arbitrary string, newline terminated
+
+Record length <= 256 bytes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

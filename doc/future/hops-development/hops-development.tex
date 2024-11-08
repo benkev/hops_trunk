@@ -1,0 +1,168 @@
+\batchmode
+%\documentclass[letterpaper,oneside]{article}
+% letterpaper,10pt,oneside,onecolumn,final
+\documentclass[hidelinks]{article}
+
+\usepackage{cmap}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\input glyphtounicode
+\pdfgentounicode=1
+
+\usepackage[english]{babel}
+\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+\addbibresource{hops-development.bib}
+
+\usepackage{adjustbox}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{subcaption}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{csquotes}
+\usepackage{textcomp}
+\usepackage{outlines}
+\usepackage{enumitem}
+\usepackage{marginnote}
+\usepackage{soul}
+
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+\usepackage{placeins}
+
+\let\Oldsection\section
+\renewcommand{\section}{\FloatBarrier\Oldsection}
+
+\let\Oldsubsection\subsection
+\renewcommand{\subsection}{\FloatBarrier\Oldsubsection}
+
+\let\Oldsubsubsection\subsubsection
+\renewcommand{\subsubsection}{\FloatBarrier\Oldsubsubsection}
+
+\makeatletter
+\newcommand\urlfootnote@[1]{\footnote{\url@{#1}}}
+\DeclareRobustCommand{\urlfootnote}{\hyper@normalise\urlfootnote@}
+\makeatother
+
+\usepackage{listings}
+\usepackage{color}
+
+%\usepackage{lineno}
+%\linenumbers
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\definecolor{lightgray}{gray}{0.75}
+
+\lstset{
+basicstyle=\scriptsize\ttfamily,
+columns=flexible,
+upquote=true,
+breaklines=true,
+backgroundcolor = \color{lightgray},
+escapeinside={(*@}{@*)}
+}
+
+\usepackage{tabularx}
+    \newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shapes.geometric, arrows}
+\pgfplotsset{compat=1.11}
+% but see adjustments below
+\usepackage[margin=0.9in]{geometry}
+
+
+
+
+
+\newcommand\tikzmark[2]{%
+  \tikz[remember picture,overlay]\node[arrow,draw] (#1) {#2};}
+
+
+%\usepackage[printwatermark]{xwatermark}
+%\newwatermark[pages=2-30,color=gray!25,angle=45,scale=5,xpos=0,ypos=0]{DRAFT}
+
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\@verbatim}
+  {\verbatim@font}
+  {\verbatim@font\tiny}
+  {}{}
+\makeatother
+
+\usepackage{ifthen}
+
+\let\endtitlepage\relax
+
+\newcommand{\FIXME}[1]{{\bf {\color{red} #1}}}
+\newcommand{\nuHOPS}{{\bf {\color{dkgreen} (new)HOPS}}}
+
+% Title Page
+\title{ \textbf{HOPS MSRI Development Notes} }
+\author{
+\large Geoff Crew and John Barrett \\
+\Large MIT Haystack Observatory}
+\date{Version 0.1, \today}
+
+\addtolength{\oddsidemargin}{.20in}
+\addtolength{\evensidemargin}{.20in}
+\addtolength{\textwidth}{-.50in}
+\addtolength{\topmargin}{.100in}
+\addtolength{\textheight}{-.100in}
+
+
+\begin{document}
+\maketitle
+
+%\vspace{1.5in}
+
+\tiny
+\tableofcontents
+\normalsize
+\newpage
+%\listoffigures
+%\newpage
+%\listoftables
+%\newpage
+
+% introductory material
+\input{introduction}
+
+% the clean outline
+\input{designoutline}
+% the more verbose version
+\input{designdetails}
+
+% the tables of effort with time
+\input{detailedtimeline}
+
+%
+% above to be deleted after merger
+%
+\newpage
+\addtocounter{section}{1}
+\renewcommand{\refname}{\thesection. References}
+
+\bibstyle{plainurl}
+%\section{References}
+%% increment reference section number
+\label{sec:references}
+
+%\printbibliography[title={\ref{sec:reference} References}]
+\printbibliography
+%\bibliography{hops-development}
+%\bibliographystyle{plain}
+
+
+\end{document}

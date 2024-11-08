@@ -1,0 +1,126 @@
+#! /bin/csh -b
+#
+# This C-shell script performs a tar tape archive of an experiment.  The
+# single argument is the directory under $CORDATA to be archived, normally
+# just the experiment number.  It performs an alist of the data, either
+# creating or appending to a file of the form "Aname", where "name" is the
+# argument supplied to the script.  Then it attempts to perform the tar
+# tape creation or update.  Detection of the need for an update as opposed
+# to a creation is via the existence or nonexistence of a file named
+# "archive.log" in the experiment directory.  Such a file is created upon
+# successful completion of this script.  
+#
+# If for some reason the script fails, up to two temporary files will be
+# left in the experiment directory, from which diagnostic information may
+# be extracted.  They are of the form "alist.nnnn" and "archive.nnnn",
+# where "nnnn" is a process id number.  The existence of such files
+# indicates a problem which should be resolved before attempting a new
+# archive.
+#
+# Written by CJL, 12th January 1993
+#
+#######################################################################
+
+					# Default tape drive ... should be 
+					# more elegant than this
+set tdrive="/dev/rmt/4mn"
+					# Check for sensible arguments
+if ($1 == "") then
+    echo "Usage: archive nnnn, where 'nnnn' is an experiment number"
+    exit (1)
+else if ($2 != "") then
+    echo "Too many arguments."
+    echo "Usage: archive nnnn, where 'nnnn' is an experiment number"
+    exit (1)
+endif
+					# More sanity checks
+if ( -d $CORDATA/$1 ) cd $CORDATA/$1
+else 
+    echo "Directory " $CORDATA/$1 "does not exist!"
+    exit (1)
+endif
+if ( (-e alist.err) || (-e archive.err)) then
+    echo "ERROR:  The files 'alist.err' and/or 'archive.err' are"
+    echo "present in the selected experiment directory, indicating"
+    echo "that a previous execution of the 'archive' command failed."
+    echo "Inspect the contents of these files, fix the problem, and"
+    echo "delete them before reattempting an archive.\n\nABORT."
+    exit (1)
+endif
+
+					# Do an alist of all the data
+					# currently on the disk, and keep
+					# the result in a temporary file
+					# until we get a bit further
+echo "Performing 'alist' of all data on disk ... \c"
+alist -o alist.err . >! alist.log
+echo "done\n"
+					# Logging info ... different for first
+					# execution of archive script
+if ( -e archive.log ) then
+    set archtype="cont"
+    cat $DOC/continuation >>! archive.err
+    echo "\nPlease insert correct experiment tape into dopey's DAT drive now,"
+    echo "AFTER MAKING A COPY.  An archive failure could destroy information"
+    echo "on the tape."
+else
+    set archtype="new"
+    cp $DOC/start_archive archive.err
+    echo "\nPlease insert blank tape into dopey's DAT drive now"
+endif
+					# For tracking purposes
+date >>! archive.err
+					# Log of alist must follow header info
+echo "\nLog of alist run:" >>! archive.err
+cat alist.log >>! archive.err
+echo "\n" >>! archive.err
+rm -f alist.log
+					# Prepare for the tape operation
+					# Allow for user abort, and check
+					# for valid tape device
+set reply="x"
+while ($reply != "")
+    echo "Press <return> when ready or hit 'q <return>' to abort :\c"
+    set reply=$<
+    if ($reply == "q") then
+        rm -f alist.err archive.err
+        exit (1)
+    endif
+    mt -t $tdrive rew			# Test for response of drive
+    if ($status != 0) then
+        echo "Tape drive not ready yet."
+        set reply="x"
+    endif
+end
+					# Do it, and send verbose tar output
+					# to the log file
+echo "\nLog of tar operation:" >>! archive.err
+echo "\nPerforming tar archive, this may take a while ..."
+if ($archtype == "cont") tar uvhf $tdrive . >>&! archive.err
+if ($archtype == "new") tar cvhf $tdrive . >>&! archive.err
+					# tar does not appear to set the status
+					# variable properly, so must detect
+					# errors by looking for last file name
+					# in the verbose output.
+grep 'archive.err' archive.err > /dev/null
+if ($status != 0) then
+    echo "TAR COMMAND TERMINATES WITH ERROR STATUS."
+    echo "Check alist.err and archive.err for clues"
+    echo "Data files NOT removed ... ABORT."
+    exit (1)
+endif
+					# No point wasting time here ... 
+					# quietly eject tape in background
+(mt -t $tdrive offl &) >& /dev/null
+
+					# Finally update the Annnn file
+echo "Updating " A$1 "file"
+cat alist.err >>! A$1
+rm -f alist.err
+
+echo "Archive complete at " `date` >>! archive.err
+					# Copy information to permanent logfile
+cat archive.err >>! archive.log
+rm -f archive.err
+
+echo "\nArchiving process complete.\n"

@@ -1,0 +1,495 @@
+#!/usr/bin/tclsh 
+# tuba 
+# Manipulate ASCII tape library 
+# Revised:  2001 July 16, JAB 
+# 
+proc labvsn { } { ;# Print VSN barcode (alias permanent) label 
+  global me msglev lapr vsn crc type sn owner env 
+  if { $msglev < 2 } { puts "$me DEBUG label $vsn $crc $type $sn $owner " } 
+  if { $env(BCPRINT) == "/dev/null" } { 
+    puts "$me WARNING:  No barcode printer available " } 
+  # Units are 8/mm 
+# puts $lapr "^XA^CWJ,R:JBG.FNT^XZ" ;# Font JBG.FNT to be called "J" 
+# puts $lapr "^XA^CWJ,R:COURBD.FNT^XZ" ;# Font COURBD.FNT to be called "J" 
+  puts $lapr "^XA^CWJ,E:GHC.FNT^XZ" ;# Font GHC.FNT to be called "J" 
+  puts $lapr "^XA^LH0,0" ;# Start of label, reference position 0 0 
+  puts $lapr "^MD10" ;# Set media darkness to 10 + 10 = 20 for resin ribbon 
+      # Comment out the preceding line if the printer has a wax ribbon 
+# puts $lapr "^FO72,32^A0,N,104"   ;# Start at 72 32, font "0", 104 ?? 
+# puts $lapr "^FO72,32^A1,N,104"   ;# Start at 72 32, font "1", 104 ?? 
+# puts $lapr "^FO72,24^AJ,128,88"  ;# Start at 72 24, font "J", 128 x 88 
+# puts $lapr "^FO104,32^AG,120,40" ;# Start at 104 32, font "G", 120 x 40 
+  puts $lapr "^FO72,24^AJ,128,104" ;# Start at 72 24, font "J", 128 x 104 
+  puts $lapr "^FD$vsn $crc ^FS" ;# Print VSN CRC big 
+  puts $lapr "^FO128,136^BY3,3.0^B3N,Y,104,N" ;# Start at 128 136, 
+      # set narrow bar to 3 dots, wide/narrow ratio to 3.0, 
+      # select barcode 39, normal orientation, calculate check digit, 
+      # 104 high, no ASCII interpretation 
+  puts $lapr "^FD$vsn ^FS" ;# Barcode VSN<space> 
+# puts $lapr "^FO104,248^A0,N,48" ;# Start at 104 248, font "0", 48 high 
+  puts $lapr "^FO88,248^AJ,48,48" ;# Start at 88 248, font "J", 48 x 48 
+  puts $lapr "^FD$type / $sn / $owner ^FS" ;# Print type / serialnumber / owner 
+  puts $lapr "^XZ" ;# End of this label 
+  flush $lapr 
+} ;# End of labvsn 
+# 
+proc lablib { } { ;# Print library (text) label 
+  global me msglev lapr fslot tno exno vsn crc type sn owner env 
+  if { $msglev < 2 } { 
+    puts "$me DEBUG label $fslot $tno $exno $vsn $crc $type $sn $owner " } 
+  if { $env(BCPRINT) == "/dev/null" } { 
+    puts "$me WARNING:  No label printer available " } 
+  # Units are 8/mm 
+  puts $lapr "^XA^CWJ,E:GHC.FNT^XZ" ;# Font GHC.FNT to be called "J" 
+  puts $lapr "^XA^LH0,0" ;# Start of label, reference position 0 0 
+  puts $lapr "^MD10" ;# Set media darkness to 10 + 10 = 20 for resin ribbon 
+      # Comment out the preceding line if the printer has a wax ribbon 
+# puts $lapr "^FO120,32^CF0,N,48" ;# Start at 120 32, default font 0, 48 high 
+  puts $lapr "^FO120,32^CFJ,48,48" ;# Start at 120 32, default font J, 48 x 48 
+  puts $lapr "^FD$env(SITE) Mark-4 Tape Library ^FS" ;# Print this 
+  puts $lapr "^FO192,88" ;# Start at 192 88 
+  puts $lapr "^FDSlot  $fslot ^FS" ;# Print slot 
+  puts $lapr "^FO192,136" ;# Start at 192 136 
+  puts $lapr "^FDTape#  $tno / $exno ^FS" ;# Print tape / experiment number 
+  puts $lapr "^FO192,184" ;# Start at 192 184 
+  puts $lapr "^FDLabel  $vsn / $crc ^FS" ;# Print label (VSN) 
+  puts $lapr "^FO88,240" ;# Start at 88 240 
+  puts $lapr "^FD$type / $sn / $owner ^FS" ;# Print type / serial number /owner 
+  puts $lapr "^XZ" ;# End of this label 
+  flush $lapr 
+} ;# End of lablib 
+# 
+proc bumpsl { sl } { ;# Increment to next empty slot 
+  global filel line lineno len msglev me 
+  findit $filel $sl 0 
+  if { $len < 0 } { 
+    puts "$me ERROR:  Can't find slot $sl " 
+    return XX000 } 
+  for { set i 0 } { $i < 9614 } { incr i } { ;# Number of slots 417 * 23 
+    set len [ gets $filel line ] ;# Read next line 
+    if { $len < 0 } { break } ;# EOF? 
+    incr lineno 
+    if { $len == 0 } { continue } 
+    set nsl [ lindex $line 0 ] 
+    if { [ lindex $line 1 ] == "---------" } { break } 
+    if { $msglev < 2 } { puts "$me WARNING skipping slot $nsl " } 
+  } ;# End of for i slots 
+  if { $i >= 9614 || $len < 0 } { 
+    puts "$me ERROR:  No empty slot found " 
+    return XX000 } 
+  if { $msglev < 1 } { puts "$me DEBUG next slot $nsl " } 
+  return $nsl 
+} ;# End of bumpsl 
+# 
+proc findit { file it tn } { ;# Search through file, try to find it in token tn 
+  global line lineno len cn msglev me 
+  seek $file 0 ;# Rewind 
+  set lineno 0 ;# Count lines 
+  while { 1 } { ;# Loop until break 
+    set len [ gets $file line ] 
+    if { $len < 0 } { break } ;# EOF? 
+    incr lineno 
+    if { $tn < 0 } { 
+      if { [ set cn [ string first $it $line ] ] > 0 } { break } 
+    } elseif { [ lindex $line $tn ] == $it } { 
+      set cn [ string first $it $line ] 
+      break } 
+  } ;# End of while loop until break 
+  if { $msglev < 1 && $len > 0 } { puts "$me DEBUG found $line " } 
+  if { $msglev < 1 } { ;# Debuggery? 
+    puts "$me DEBUG lineno = $lineno  len = $len  cn = $cn " } 
+} ;# End of findit 
+#
+# ### Start of main program ### 
+set msglev 1 ;# Message level for debuggery 
+set me [ string range $argv0 [ expr 1 + [ string last "/" $argv0 ] ] end ] 
+    # My name 
+if { [ array get env TAPELIB ] == "" } { 
+  set env(TAPELIB) /correlator/tapelib 
+  puts "$me WARNING:  env(TAPELIB) set to $env(TAPELIB) " } 
+if { [ array get env TAPEINFO ] == "" } { 
+  set env(TAPEINFO) $env(TAPELIB)/tapeinfo 
+  puts "$me WARNING:  env(TAPEINFO) set to $env(TAPEINFO) " } 
+if { [ array get env BIN ] == "" } { 
+  set env(BIN) /correlator/prog/bin/linux ;# (!) 
+  puts "$me WARNING:  env(BIN) set to $env(BIN) " } 
+if { [ array get env BCPRINT ] == "" } { 
+  set env(BCPRINT) /dev/lp1 
+  puts "$me WARNING:  env(BCPRINT) set to $env(BCPRINT) " } 
+if { [ array get env SITE ] == "" } { 
+  set env(SITE) Haystack 
+  puts "$me WARNING:  env(SITE) set to $env(SITE) " } 
+set filel [ open $env(TAPELIB)/slots.txt r+ ] ;# Library 
+if { $msglev < 1 } { puts "$me DEBUG slots.txt filel = $filel opened " } 
+set filei [ open $env(TAPELIB)/inventory.txt r+ ] ;# Inventory 
+if { $msglev < 1 } { puts "$me DEBUG inventory.txt filei = $filei opened " } 
+set scrtch  [ exec date +%y%m%d ] ;# No ' ' [y]yymmdd format 
+set strt [ expr [ string length $scrtch ] - 6 ] 
+set dat [ string range $scrtch $strt end ] ;# yymmdd format 
+set scrtch [ exec date +%y%j ] ;# [y]yyddd format 
+set strt [ expr [ string length $scrtch ] - 5 ] 
+set dat2 [ string range $scrtch $strt end ] ;# yyddd format 
+if { $msglev < 1 } { puts "$me DEBUG date in|out is $dat or $dat2 " } 
+if { $msglev < 0 } { ;# Debuggery? 
+  set lapr stdout ;# Yes 
+} else { set lapr [ open $env(BCPRINT) w ] } ;# Normal 
+    # The Tcl manual does not say what open returns on failure 
+if { $msglev < 1 } { puts "$me DEBUG lapr is $lapr " } 
+puts " Call me $me.  I manipulate the VLBI tape library. "  
+puts            " Type LE to enter tapes into library, " 
+puts            "      LR to remove tapes from library, " 
+puts            "      PL to print library labels, " 
+puts            "      PP to print VSN labels, "
+puts            "      PB to print both labels, or " 
+puts -nonewline "      FT to find tapes: " 
+flush stdout 
+gets stdin ans 
+set mod [ string toupper $ans ] 
+if { $msglev < 1 } { puts "$me DEBUG mod = $mod " } 
+if { $mod == "LR" } { ;# Library remove? 
+  puts -nonewline " Type experiment number: " 
+  flush stdout 
+  gets stdin exno 
+  if { $exno == "" } { set exno "-" } 
+  puts -nonewline " Whither (1- or 2-char station code)? " 
+  flush stdout 
+  gets stdin wto ;# Preserve case 
+  if { $wto == "" } { set wto "-" } 
+  puts -nonewline " Print VSN labels (Y or N)? " 
+  flush stdout 
+  gets stdin ans 
+  set yon [ string toupper $ans ] 
+  while { 1 } { ;# Loop until break 
+    puts -nonewline " Type VSN or slot or :: to end: " 
+    flush stdout 
+    gets stdin ans 
+    set vsnsl [ string toupper $ans ] 
+    set slen [ string length $vsnsl ] 
+    if { $slen < 5 } { return } ;# Assume ::? 
+    if { $msglev < 1 } { puts "$me DEBUG vsnsl = $vsnsl " } 
+    if { $slen == 5 } { ;# Slot? 
+      findit $filel $vsnsl 0 
+    } elseif { $slen >= 8 && $slen <= 10 } { ;# VSN? 
+      if { [ string index $vsnsl 8 ] == " " } { ;# Space? 
+        eval findit $filel [ lindex $vsnsl 0 ] 3 ;# Yes, assume OK 
+      } else { ;# Nope 
+        puts "$me ERROR:  Need CRC after VSN; try again " 
+        continue } 
+    } elseif { $slen == 13 } { ;# Assume VSN,CRC 
+      set anss [ split $vsnsl " ," ] ;# Split at comma, if any 
+      set vsnt [ lindex $anss 0 ] ;# Temporary VSN candidate 
+      set crct [ lindex $anss 1 ] ;# Temporary CRC candidate 
+      if { $msglev < 1 } { puts "$me DEBUG vsnt = $vsnt  crct = $crct " } 
+      if { [ string length $vsnt ] != 8 || [ string length $crct ] != 4 } { 
+          # Lengths OK? 
+        puts "$me ERROR:  Wrong length VSN or CRC, try again " ;# Nope 
+        continue 
+      } elseif { $crct == [ exec crcc $vsnt ] } { ;# Check CRC 
+        findit $filel $vsnt 3 ;# CRC OK 
+      } else { ;# Failed CRC check 
+        puts "$me ERROR:  Wrong VSN or CRC, try again " 
+        continue } 
+    } else { ;# Neither is an error
+      puts "$me ERROR:  Unknown string, try again " 
+      continue } 
+    if { $len <= 0 } { ;# Found? 
+      puts "$me ERROR:  Can't find $vsnsl in library, try again " 
+      continue ;# Not found 
+    } elseif { [ lindex $line 1 ] == "---------" } { ;# Empty? 
+      puts "$me ERROR:  Slot with $vsnsl seems to be empty, try again " 
+      continue } 
+    if { $exno != [ lindex $line 2 ] } { ;# Correct experiment?
+      puts "$me ERROR:  Wrong experiment number (or something), try again " 
+      continue } 
+    puts -nonewline "$me removing $line " 
+    flush stdout 
+    set line2 [ lreplace $line 1 6 --------- ---- -------- - " " " " ]
+    set line3 [ eval format \
+        \" %6.5s %11.9s %6.4s %9.8s %2.1s %7.5s %10.10s\" $line2 ]
+    seek $filel [ expr -1 - $len ] current ;# To start of line in filel 
+    # Delay the puts $filel until after check in $filei 
+    set vsn [ lindex $line 3 ] 
+    findit $filei $vsn 0 ;# Find corresponding line in inventory 
+    if { $len < 0 } { ;# Found? 
+      puts " ERROR "
+      puts "$me ERROR:  $vsn not found in inventory, try again " 
+      continue } 
+    puts $filel $line3 ;# Now replace line in filel 
+    seek $filei [ expr 10 - $len ] current ;# To start of L 
+    puts -nonewline $filei $wto ;# Overwrite L in filei 
+    findit $filei $vsn 0 ;# Redo because $wto can be 1 or 2 chars 
+    seek $filei [ expr 84 - $len ] current ;# To start of out date 
+    puts -nonewline $filei $dat ;# Overwrite out date in filei 
+    puts " OK " 
+    if { $yon == "Y" } { ;# Print vsn label? 
+      set crc   [ exec crcc $vsn ] ;# CRC 
+      set type  [ string range $line 15 22 ] ;# Brand and model
+      set sn    [ string range $line 29 42 ] ;# Serial number 
+      set owner [ string range $line 67 69 ] ;# Owner 
+      labvsn } ;# Print VSN label 
+    # Rename file $vsn in $env(TAPEINFO) 
+    if { ! [ file isfile $env(TAPEINFO)/$vsn ] } { 
+      puts "$me WARNING:  File $vsn not in $env(TAPEINFO) " 
+    } else { 
+      for { set i 1 } { $i < 100 } { incr i } { 
+        set num [ format "%.2d" $i ] 
+        if { ! [ file isfile $env(TAPEINFO)/$vsn.$num ] } { break } } 
+      if { $i >= 100 } { 
+        puts "$me ERROR:  $i $env(TAPEINFO)/$vsn.$num " 
+        continue; } 
+      if { $msglev < 1 } { puts "$me DEBUG mv $vsn to $vsn.$num " } 
+      exec mv $env(TAPEINFO)/$vsn $env(TAPEINFO)/$vsn.$num } 
+    puts " OK " 
+  } ;# End of while loop until break 
+} elseif { $mod == "LE" } { ;# Library enter 
+  puts -nonewline " Type experiment number: " 
+  flush stdout 
+  gets stdin exno 
+  if { $exno == "" } { set exno "-" } 
+  puts -nonewline " Type A for automatic slot assignment, M for manual: " 
+  flush stdout 
+  gets stdin ans 
+  set am [ string toupper $ans ] 
+  if { $am == "A" } { ;# Automatic? 
+    while { 1 } { ;# Loop until break 
+      puts -nonewline " Type starting slot: " 
+      flush stdout 
+      gets stdin ans 
+      set fslot [ string toupper $ans ] 
+      if { [ string length $fslot ] < 4 } { return } ;# Assume :: 
+      findit $filel $fslot 0 
+      if { $len < 0 } { ;# Found? 
+        puts "$me ERROR:  Can't find slot $fslot " 
+        continue } 
+      if { $len > 0 && [ lindex $line 1 ] != "---------" } { ;# Empty? 
+        set fslot [ bumpsl $fslot ] } ;# No.  Find an empty slot 
+      if { [ string first "XX" $fslot ] >= 0 } { 
+        puts "$me ERROR:  No available slot found " 
+        continue } 
+      break } ;# OK 
+  } ;# End of if automatic 
+  puts -nonewline " Print VSN labels (Y or N)? " 
+  flush stdout 
+  gets stdin ans 
+  set yon [ string toupper $ans ] 
+  puts -nonewline " Print library labels (Y or N)? " 
+  flush stdout 
+  gets stdin ans 
+  set yonl [ string toupper $ans ] 
+  puts " Below type VSN and tapenumber, either order, with return after each. " 
+  puts " VSN is 8 chars, tapenumber is 9 or 10 chars including a minus (-). " 
+  while { 1 } { ;# Loop until break 
+    if { $am != "A" } { ;# Not automatic slot? 
+      puts -nonewline " Type slot or :: to end: " 
+      flush stdout 
+      gets stdin ans 
+      if { [ string length $ans ] < 4 } { return } ;# Assume ::? 
+      set fslot [ string toupper $ans ] 
+      findit $filel $fslot 0 
+      if { $len <= 0 } { 
+        puts "$me ERROR:  Can't find slot $fslot " 
+        continue } 
+      if { [ lindex $line 1 ] != "---------" } { 
+        puts "$me ERROR:  slot $fslot is not empty " 
+        continue } 
+    } ;# End of if not automatic slot 
+    puts -nonewline " Type VSN and tapenumber or :: to end: " 
+    set vsn "" 
+    set crc "" 
+    set tno "" 
+    while { 1 } { ;# Loop until break 
+      flush stdout 
+      gets stdin ansx 
+      set ans [ string toupper $ansx ] 
+      set len [ string length $ans ] 
+      if { $len < 4 } { return } ;# Assume :: 
+      if { $len == 8 } { ;# Assume VSN? 
+        if { $crc != "" } { ;# Got CRC? 
+          if { $crc == [ exec crcc $ans ] } { ;# Yes.  Correct? 
+            set vsn $ans ;# Yes, got good VSN and crc 
+          } else { ;# Incorrect VSN or CRC 
+            puts "$me ERROR:  Wrong VSN or CRC, try again " } 
+        } else { ;# No CRC yet 
+          set vsn $ans } ;# CRC needed 
+      } elseif { $len == 4 } { ;# Assume CRC? 
+        if { $vsn != "" } { ;# Yes.  Got VSN? 
+          if { $ans == [ exec crcc $vsn ] } { ;# Yes.  Correct? 
+            set crc $ans ;# Yes.  Good CRC 
+          } else { ;# Incorrect VSN or CRC 
+            puts "$me ERROR:  Wrong CRC or VSN, try again " } 
+        } else { ;# No VSN yet 
+          set crc $ans } ;# VSN needed (and check crc) 
+      } elseif { $len == 13 } { ;# Assume VSN,CRC 
+        set anss [ split $ans " ," ] ;# Split at comma, if any 
+        set vsnt [ lindex $anss 0 ] ;# Temporary VSN candidate 
+        set crct [ lindex $anss 1 ] ;# Temporary CRC candidate 
+        if { $msglev < 1 } { puts "$me DEBUG vsnt = $vsnt  crct = $crct " } 
+        if { [ string length $vsnt ] != 8 || [ string length $crct ] != 4 } { 
+            # Lengths OK? 
+          puts "$me ERROR:  Wrong length VSN or CRC, try again " ;# Nope 
+        } elseif { $crct == [ exec crcc $vsnt ] } { ;# OK, check CRC 
+          set vsn $vsnt ;# OK, we have a good VSN 
+          set crc $crct ;# And CRC 
+        } else { ;# Failed CRC check 
+          puts "$me ERROR:  Wrong VSN or CRC, try again " } 
+      } elseif { $len >= 9 && $len <= 11 } { 
+        if { [ string index $ans 8 ] == " " } { ;# Space? 
+          set vsn [ lindex $ans 0 ] ;# OK.  Set VSN with no space 
+          set crc [ exec crcc $vsn ] ;# CRC not needed in this case 
+        } elseif { [ set mc [ string first "-" $ans ] ] > 2 } { ;# Tape number? 
+          set tno [ string range $ans 0 [ expr $mc + 4 ] ] 
+              # Yes.  No further checks.  This assumes 4-digit time  
+        } else { ;# Some error 
+          puts "$me ERROR:  Wrong something, try again " } 
+      } else { ;# Some error 
+        puts "$me ERROR:  Unknown string, try again " } 
+      # Checks and comments before looping: 
+      if { $vsn == "" } { ;# Got VSN? 
+        puts -nonewline "  Need VSN " ;# Nope 
+      } elseif { $crc == "" } { puts -nonewline "  Need CRC " } 
+      if { $tno == "" } { puts -nonewline "  Need Tapenumber " } 
+      # We're done if all three are not null 
+      if { $vsn != "" && $crc != "" && $tno != "" } { break } 
+          # Out of while loop until break 
+    } ;# End of while loop until break 
+    if { $msglev < 1 } { puts "$me DEBUG vsn = $vsn  tno = $tno " } 
+    findit $filel $vsn -1 ;# Anywhere in the filel? 
+    if { $len < 0 } { ;# Found? (Not found is OK, found is not OK) 
+      puts -nonewline "$me assigning  $fslot  $tno  $exno  $vsn  C  $dat2 " 
+      flush stdout 
+      findit $filei $vsn 0 ;# Find corresponding line in inventory 
+      if { $len < 0 } { ;# Found? 
+        puts " ERROR " 
+        puts "$me ERROR:  $vsn not found in inventory, try again " 
+        continue } 
+      set type  [ string range $line 15 22 ] ;# Brand and model 
+      set sn    [ string range $line 29 42 ] ;# Serial number 
+      set owner [ string range $line 67 69 ] ;# Owner 
+      seek $filei [ expr 10 - $len ] current ;# To start of L 
+      puts -nonewline $filei KL ;# Overwrite L in filei 
+      seek $filei 64 current ;# To start of in date 
+      puts -nonewline $filei $dat ;# Overwrite in date 
+      set line3 [ format " %6.5s %11.9s %6.4s %9.8s %2.1s %7.5s %10.10s" \
+          $fslot $tno $exno $vsn C $dat2 $type ] 
+      findit $filel $fslot 0 ;# Find this slot in library 
+      seek $filel [ expr -1 - $len ] current ;# To start of line in filel 
+      puts $filel $line3 ;# Replace line 
+      puts " OK " 
+      if { $yon  == "Y" } { labvsn } ;# Print VSN label? 
+      if { $yonl == "Y" } { lablib } ;# Print library label? 
+      if { $am == "A" } { ;# Automatic slot assignment? 
+        set fslot [ bumpsl $fslot ] ;# To next empty slot 
+        if { [ string first "XX" $fslot ] >= 0 } { 
+          puts "$me ERROR:  No available slot found " 
+          break } } 
+      continue } 
+    # Come here only on error 
+    set wslot [ lindex $line 0 ] 
+    puts "$me ERROR:  Tape $vsn is already in library slot $wslot " 
+  } ;# End of while loop until break 
+} elseif { $mod == "PL" || $mod == "PB" } { 
+      # Print library label (only) or both labels 
+  # Tapes must be in both inventory and library for these cases 
+  while { 1 } { ;# Loop until break 
+    puts -nonewline " Type VSN, tape number, slot, or :: to end: " 
+    flush stdout 
+    gets stdin ansx 
+    set slen [ string length $ansx ] 
+    if { $slen < 5 } { return } ;# Assume ::? 
+    if { $slen > 8 && $slen < 11 && [ string index $ansx 8 ] == " " } { 
+        ;# VSN with space? 
+      set ans [ string toupper [ lindex $ansx 0 ] ] ;# Drop space if any 
+    } elseif { [ set mc [ string first "-" $ansx ] ] > 2 } { ;# Tape number? 
+      set ans [ string toupper [ string range $ansx 0 [ expr $mc + 4 ] ] ] 
+          # Yes.  No further checks.  This assumes 4-digit time  
+    } else { ;# Other 
+      set ans [ string toupper [ lindex $ansx 0 ] ] } ;# Drop space 
+    findit $filel $ans -1 ;# Find $ans anywhere in library 
+    if { $len <= 0 } { 
+      puts "$me ERROR:  Can't find $ans in library " 
+      continue } ;# Not found 
+    if { $msglev < 1 } { puts "$me DEBUG line = $line " } 
+    set fslot [ lindex $line 0 ] ;# Slot 
+    set tno   [ lindex $line 1 ] ;# Tapenumber 
+    set exno  [ lindex $line 2 ] ;# Experiment number 
+    set vsn   [ lindex $line 3 ] ;# VSN 
+    if { $vsn == "--------" } { ;# Tape? 
+      puts "$me ERROR:  No tape in that slot " 
+      continue } ;# No tape 
+    set crc [ exec crcc $vsn ] ;# CRC 
+    findit $filei $vsn 0 ;# Find this line in inventory 
+    if { $len <= 0 } { 
+      puts "$me ERROR:  Can't find $vsn in inventory " 
+      continue } ;# Not found 
+    set type  [ string range $line 15 22 ] ;# Brand and model 
+    set sn    [ string range $line 29 42 ] ;# Serial number 
+    set owner [ string range $line 67 69 ] ;# Owner 
+    lablib ;# Print library label 
+    if { $mod == "PB" } { labvsn } ;# Print VSN label also? 
+  } ;# End of while loop until break 
+} elseif { $mod == "PP" } { ;# Print VSN label (only) 
+  # Note that this tape is not necessarily in the library 
+  # (But it must be in the inventory) 
+  while { 1 } { ;# Loop until break 
+    puts -nonewline " Type VSN, tape number, slot, or :: to end: " 
+    flush stdout 
+    gets stdin ansx 
+    set slen [ string length $ansx ] 
+    if { $slen < 5 } { return } ;# Assume :: 
+    if { $slen > 8 && $slen < 11 && [ string index $ansx 8 ] == " " } { 
+        ;# VSN with space? 
+      set vsnt [ string toupper [ lindex $ansx 0 ] ] ;# Drop space if any 
+    } elseif { [ set mc [ string first "-" $ansx ] ] > 2 } { ;# Tape number? 
+      set vsnt [ string toupper [ string range $ansx 0 [ expr $mc + 4 ] ] ] 
+          # Yes.  No further checks.  This assumes 4-digit time  
+    } else { ;# Other 
+      set vsnt [ string toupper [ lindex $ansx 0 ] ] } ;# Drop space 
+    findit $filel $vsnt -1 ;# Anywhere in library? 
+    if { $len <= 0 } { ;# Found? 
+      set vsn $vsnt ;# No (but that's OK) 
+    } else { set vsn [ lindex $line 3 ] } ;# Found 
+    if { $msglev < 1 } { puts "$me DEBUG vsn = $vsn " } 
+    findit $filei $vsn 0 ;# Find this line in inventory 
+    if { $len <= 0 } { 
+      puts "$me ERROR:  Can't find $vsn in inventory " 
+      continue } ;# Not found 
+    set crc   [ exec crcc $vsn ] ;# CRC 
+    set type  [ string range $line 15 22 ] ;# Brand and model 
+    set sn    [ string range $line 29 42 ] ;# Serial number 
+    set owner [ string range $line 67 69 ] ;# Owner 
+    labvsn ;# Print VSN label 
+  } ;# End of while loop until break 
+} elseif { $mod == "FT" } { ;# Find tape? 
+  while { 1 } { ;# Loop until break 
+    puts -nonewline " Type VSN, tape number, slot, or :: to end: " 
+    flush stdout 
+    gets stdin ansx 
+    set slen [ string length $ansx ] 
+    if { $slen < 5 } { return } ;# Assume :: 
+    if { $slen > 8 && $slen < 11 && [ string index $ansx 8 ] == " " } { 
+        ;# VSN with space? 
+      set vsnt [ string toupper [ lindex $ansx 0 ] ] ;# Drop space if any 
+    } elseif { [ set mc [ string first "-" $ansx ] ] > 2 } { ;# Tape number? 
+      set vsnt [ string toupper [ string range $ansx 0 [ expr $mc + 4 ] ] ] 
+          # Yes.  No further checks.  This assumes 4-digit time  
+    } else { ;# Other 
+      set vsnt [ string toupper [ lindex $ansx 0 ] ] } ;# Drop space 
+    findit $filel $vsnt -1 ;# Anywhere in library? 
+    if { $len > 0 } { ;# Found in library? 
+      puts $line ;# Yes, found 
+      set vsn [ lindex $line 3 ] ;# VSN 
+      if { $vsn != "--------" } { 
+        findit $filei $vsn 0 ;# In inventory?  
+      } else { set len -1 } 
+    } else { 
+      puts " Not found in library " 
+      findit $filei $vsnt -1 } 
+    if { $len > 0 } { ;# Found in inventory? 
+      puts $line ;# Yes, found 
+    } else { puts " Not found in inventory " } 
+  } ;# End of while loop until break 
+} else { ;# Not LE, LR, PL, PP, PB, nor FT is an error 
+  puts "$me ERROR:  Must be LE, LR, PL, PP, or PB " } 
+return 
+# End of main = tuba 
+

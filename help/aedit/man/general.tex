@@ -1,0 +1,261 @@
+
+\begin{center}
+\LARGE\bf
+\underline{AEDIT version 4.1}
+
+\Large\rm
+A program for editing, manipulating, visualizing and summarizing
+MkIII/IV A-file format data
+\vspace{.4in}
+
+by \\
+Colin Lonsdale \\
+Haystack Observatory \\
+\vspace{.3in}
+
+\em September 1994
+
+\begin{center}
+\large\bf
+\underline{New in 4.1}
+\end{center}
+
+Previous to this release of aedit, there were three types of A-file lines, 
+corresponding to the three types of binary data files, root (type 0), 
+corel (type 1) and fringe (type 2).  I have now added two new types of A-file 
+lines.  They are type 3 (closure triangle) and type 4 (closure quad) lines, 
+and they can be formed only by combining multiple type 2 (fringe) lines.  In 
+this release of aedit I have implemented full support for type 3 lines only.  
+Type 4 support will be added later at lower priority.  Closure triangle data 
+can now be read, written, filtered, plotted, and interactively edited in much 
+the same way as type 2 data.  You can get closure triangle data into aedit 
+two ways.  First, you can read it in from a disk file using the standard read 
+command.  Alternatively, you can read in some type 2, baseline data, and use 
+the new close command to compute closure triangle data from the type 2 data.  
+Either way, the closure data are fully plottable and manipulable.  It is 
+important to note that aedit is (and should remain) the only HOPS program 
+capable of generating closure data.  All closure triangle data in HOPS must 
+ultimately originate from the close command in aedit operating on type 2 data, 
+though it can be read, written and manipulated by aedit and other programs.
+
+
+Because the data types are fundamentally different, type-3 closure triangle 
+data and type-2 baseline data are stored internally in separate arrays.  They 
+should also be stored on disk in separate files, so there is now a new twrite 
+command (analogous to the existing write command), which writes out only closure 
+triangle data.  If you really want to keep your baseline and closure data in one 
+file, you can concatenate them and aedit will swallow the resulting file.  However, 
+since other HOPS programs (such as average) will be expecting one or the other, 
+and not both, it will probably be easier to keep them separate.
+
+To accommodate closure triangle data, there are a couple of new filters you can 
+set.  First, you can specify the closure triangles you want with the triangles 
+command (station order is irrelevant), and second, you can specify a range of 
+bispectral SNRs, using bsnrmin and bsnrmax.  The bispectral SNR calculated by 
+the close command is the theoretical one based on the individual baseline SNRs.  
+If the data come from a file instead, the bispectrum SNR may have been calculated 
+differently (e.g. by program average).  Certain filters do not apply to certain data 
+types, and are simply ignored.  For example, saying triangles ABC; edit inputs will 
+have no effect on baseline (types 1 and 2) data.  All of the (relevant) filters 
+familiar to you for baseline data, such as stations, quality code and so on work 
+for closure triangle data.
+
+There are some new options to the edit command which permit you to control the 
+consistency of related baseline and triangle datasets.  The edit close triangles 
+command removes triangle records which do not have all three legs of the triangle 
+present in the baseline dataset.  The edit close baselines command, conversely, 
+removes all baseline records which do not participate in at least one valid 
+triangle record.  Just typing edit close does both operations, and ensures a 
+fully consistent set of baselines and triangles.  The unflag command has been 
+enhanced to accommodate the new types of flagging made possible by these filtering 
+and editing changes.  Aedit makes no attempt to detect triangle redundancies 
+(i.e. it will generate and/or accept N(N-1)(N-2)/6 triangles for N stations).  
+While this may result in excessive amounts of closure triangle data for large 
+experiments, it is necessary in order to preserve information in the low 
+SNR case (where the triangles are not fully redundant), and besides simplifies 
+what is already some quite convoluted logic for handling arbitrary input closure 
+data files.
+
+There have been a number of minor enhancements to the way various commands function.  
+In all cases, these changes should cause no problems for existing aedit users.
+
+
+
+\begin{center}
+\large\bf
+\underline{New in 4.0}
+\end{center}
+
+There have been many enhancements in ``aedit" since the release 3.0
+in March 1992, some of which are major.  Below is a list of the most 
+important enhancements.  The detailed documentation of the individual 
+commands covers the numerous other, more minor changes.
+
+\begin{enumerate}
+\item Full support is now available for all three types of data record,
+0, 1 and 2.  This applies to filtering, sorting, and other operations.
+Two new ``edit" options are now available which remove data records
+which lack parent or child data records (e.g. if a root record has no
+associated corel or fringe records in the database, it can be edited
+out with the command ``edit parents").  The ``family" sort option causes
+data records to be grouped by root family when writing the data to disk
+(normally, all type 2 records are written, then all type 1's, then all
+type 0's).
+\item Aedit now has significant experiment summary capabilities.  The
+command ``ccread" causes a specified correlator control file to be read
+into memory, after which one may invoke the ``psplot" command.  This is
+a highly interactive experiment status browser and data editor, which
+uses color-coded rectangles to represent data records.  You can tag or
+edit data based on quality code, scantime or baseline, or by clicking on
+individual data cells, and you can of course pop up fringe plots by 
+clicking on any cell.  The display is intended to visually assist 
+diagnosis of experiment-wide problems, among other things.
+\item In order to circumvent the problem of limited numbers of parameters
+in the standard A-file format, ``aedit" now supports parameter extraction
+directly from the type-2 data files on disk.  Depending on circumstances,
+you can now extract, plot, and write out any of a wide range of parameters.
+You can also filter the data on the basis of the values of extracted parameters.
+Phasecal information is now accessible only through the extracted
+parameters.  The relevant commands are ``parameter", ``pwrite", ``plist"
+and ``prange".
+\item Plotting within ``aedit" has been improved significantly.  It is now
+possible to plot any quantity, including extracted parameters if present,
+against any other quantity (provided it makes rudimentary sense .. you
+cannot plot closure rate versus baseline SNR, for example).  Specification
+of the output device has been simplified for a subset of devices.  All
+plots remain fully active, in the sense that on appropriate devices you can
+edit data with the interactive cursor, or pop up fringe plots on Xwindow
+devices.  New commands of relevance include ``xscale", ``yscale", ``reference"
+and ``remote".
+\item Along with all other MkIV programs, ``aedit" supports the new version 2
+A-file format.  This format features a somewhat more useful mix of quantities,
+with additional precision in many cases, and is to be preferred where
+possible.  ``Aedit" can write the data out in any A-file format (see the
+command ``outversion").
+\end{enumerate}
+
+\begin{center}
+\Large\bf
+\underline{GENERAL DESCRIPTION OF AEDIT}
+\end{center}
+
+The program ``aedit" is a general purpose A-file manipulation
+program.  The information present in one or more A-files may
+be plotted, filtered, sorted and edited in a variety of ways, 
+before being written out in the form of a new A-file.  The user
+interface to the program is presently implemented only for
+ASCII terminals, but many functions of the program interact
+with the user via a graphical interface.
+
+Commands are given to aedit by keyboard, and a full minimum
+match capability is supported for all aedit names.  Multiple
+commands are allowed on one input line, the only requirement
+being that commands are separated by the semicolon ``;" 
+character.  Commands typically consist of the command name
+followed by 0 or more arguments.  The arguments are separated
+from the command name and each other by either spaces or
+commas.  Aedit can handle long lines, but it is of course bad
+practice to wrap lines on terminals in general.  Upwards of
+about 250 characters may start to cause problems even for aedit.
+In general, aedit is not case sensitive.  Case sensitivity
+is needed for UNIX filenames and for certain quantities from 
+A-files (station codes, frequency codes, source names).
+
+Aedit uses the concept of inputs.  That is, you set up
+certain variables in the program that determine how the ``action"
+commands will behave.  Most of the commands that aedit
+understands are of the input-setting variety.  Many are quite
+particular about syntax, and will complain if the user types
+nonsense (e.g. timerange).  At any time, the current state of
+the input parameters can be listed on the screen with the
+command ``inputs".
+
+When aedit reads data from an A-file, it parses the ascii
+information and stores it as binary data in memory.  This allows
+very rapid manipulation of the data once read in, with
+seemingly complex tasks appearing to be instantaneous.  There
+is a flag field associated with each A-file line in memory,
+and these flags are manipulated by the edit and unflag commands.
+A full description of the data currently in memory can be
+obtained with the ``summary" command.  This is essential when
+deciding on plotting and editing options.  The ``write" command
+ignores flagged data, permitting aedit to be used as a simple
+and efficient filtering program.
+
+A command ``run" is available, which provides a flexible and 
+general command file capability.  Nesting of command files to a 
+depth of 10 is allowed.  The ``run" command executes in batch mode, 
+and cursor operations are therefore disabled.
+
+Aedit features a shell escape.  By starting an input line with the
+character ``!", you can access standard UNIX commands outside of
+aedit.  You can escape to a complete new shell by typing ``!csh" or
+``!sh", and when you have finished, return to aedit where you left
+off by typing cntl-D.  This feature is useful for spooling plot
+files to a printer, preparing run files, running ``alist" to prepare
+new data for aedit, and any other tasks that you wish to perform
+without terminating the aedit session.
+
+Plotting is implemented by using the PGPLOT package from CalTech.
+The output device may be specified with the ``device" command, or
+you may leave ``device" at the default value (``?"), which will
+cause PGPLOT to query you for a device at the time of plotting.
+Your response will then be automatically entered into the ``device"
+input.  A list of available device types can be obtained by responding
+with a query.  For more information of devices, see ``help device"
+
+Aedit comes with full on-line help.  In general, the syntax is
+``help command", but just ``help" will work.
+
+The command line for aedit is ``aedit [-x] [-r filename] [-f filename]",
+where ``-x",``-r", and ``-f" are optional.  The ``-x" option means start
+up the xwindow interface (not yet supported).  The ``-r" option means
+execute the specified run file on startup, and must be immediately
+followed by the name of a file containing valid aedit commands.  The ``-f" 
+option means ``read this(ese) data file(s) on startup", and must be 
+immediately followed by a standard, wildcardable UNIX filename specifier 
+or specifiers.  In this way, you can read many files at once into aedit
+without going through a laborious one-at-a-time ``read" cycle within
+the program. If specified, the ``-f" flag must be the last flag.
+
+Below is a list of all current aedit commands:
+
+\begin{verbatim}
+Action commands:
+----------------
+batch        clear       close       edit         exit
+fplot        help        inputs      nobatch      parameter
+plist        plot        pwrite      read         run
+setyear      sort        summary     twrite       unflag
+unsort       write       zoom
+
+
+Plot control commands:
+----------------------
+grid         xscale      yscale      axis         mode
+reference    remote
+
+
+Data selection commands:
+------------------------
+baselines    bsnrmin     bsnrmax     experiment  fraction
+frequencies  length      nfreq       prange      procrange
+qcodes       snrmax      snrmin      sources     stations
+timerange    triangles   type
+
+
+Experiment overview commands/parameters
+---------------------------------------
+schedread    psplot      psfile
+
+
+IO control commands:
+--------------------
+device       outversion
+
+\end{verbatim}
+
+For further information, see the individual help files for the
+above commands.
+
+\newpage

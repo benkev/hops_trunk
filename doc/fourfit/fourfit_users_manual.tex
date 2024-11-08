@@ -1,0 +1,108 @@
+\batchmode
+\documentclass{article}
+
+
+% Notes to potential editors:
+% 1. Please don't change the line wrapping.  Exactly one sentence per line!
+% 2. Update "date" and "version" below with each update
+% 3. Notation :
+%       Program names and other text to be typed by user or returned by the computer in {\tt }
+%       Variables or arguments in {\em } or in $<$ $>$
+
+\usepackage{fullpage}
+\usepackage{graphicx}
+\usepackage{fancyvrb}
+\usepackage{url}
+\usepackage{color}
+\usepackage[T1]{fontenc}
+\definecolor{darkblue}{rgb}{0,0.2,0.4}
+\usepackage[colorlinks,linkcolor=darkblue,citecolor=blue,urlcolor=blue,pdftitle={fourfit user's manual},pdfauthor={Roger Cappallo}]{hyperref}
+\usepackage[titletoc]{appendix}
+\usepackage[parfill]{parskip}
+
+\begin{document}
+
+\newcommand{\Oa}[1]{\hspace{-12pt}\makebox[12pt]{$\star$}#1}
+\newcommand{\Da}[1]{\hspace{-12pt}\makebox[12pt]{$\times$}#1}
+\newcommand{\bfit}[1]{{\textrm{\textit{\textmd{#1}}}}}
+
+
+\begin{center}
+
+\vspace{5pt}
+
+{\LARGE fourfit user's manual}
+
+\vspace{5pt}
+
+{\Large Version 1.0}
+
+
+\vspace{10pt}
+
+{\it Roger Cappallo}
+
+\vspace{5pt}
+
+MIT Haystack Observatory
+
+\vspace{5pt}
+\today
+
+\end{center}
+
+\tableofcontents
+
+\section{Introduction}
+\input{introduction.tex}
+
+\section{History}
+\input{history.tex}
+
+\section{Program control}
+\input{program_control.tex}
+
+\section{Program output}
+\input{program_output.tex}
+
+\section{Architecture}
+\input{architecture.tex}
+
+\section{Algorithms}
+\input{algorithms.tex}
+
+\section{Fringe plots}
+\input{fringe_plots.tex}
+
+\begin{appendices}
+\newpage
+\begin{center}
+{\huge {\bf Appendices}}
+\end{center}
+\section{Command line options} \label{app:commandlineoptions}
+\input{command_line_options.tex}
+
+\section{Control file keywords} \label{app:controlfilekeywords}
+\input{cf_keywords.tex}
+
+\section{Multitone phase-cal} \label{app:multitonepcal}
+\input{multitone_pcal.tex}
+
+\section{File-based phase corrections} \label{app:filebasedpcal}
+\input{file_based_pcal.tex}
+
+\section{Mk4 file system} \label{app:mk4filesystem}
+\input{mk4_files.tex}
+
+\section{Subversion history} \label{app:subversionhistory}
+\input{svn_history.tex}
+
+\section{Adding new parameters} \label{app:addingnewparameters}
+\input{new_parameters.tex}
+
+\section{Calling graphs} \label{app:callinggraphs}
+\input{calling_graphs.tex}
+
+\end{appendices}
+\end{document}
+

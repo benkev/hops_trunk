@@ -1,0 +1,146 @@
+{\rtf1\ansi\deflang1024\deff0{\fonttbl{\f0\froman Times Roman;}{\f1\fmodern Courier;}{\f2\fnil Times;}}{\colortbl;\red0\green0\blue0;\red0\green0\blue255;}{\stylesheet{\f1\fs20\cf1 \snext0 Normal;}{\s1 \f1\fs20\cf1 \sbasedon0\snext1 Cell;}{\s2 \f1
+\fs20\cf1 \sbasedon0\snext2 Footnote;}{\s3\tqc\tx5040\tqr\tx10080\tqr\tx13680 \f1\fs20\cf1 \sbasedon0\snext3 HdrFtr;}{\s4 \ul\f1\fs20\cf2 \sbasedon0\snext4 html_hyperlink_text;}}
+{\info{\title ax06550u.aw}{\author cjl}{\doccomm Created by ApplixWare Release 4.41 (build 1021.211.13) #17  RTF Export Filter}}
+\paperw12240\paperh15840\margl1080\margr1080\margt1440\margb1440\widowctrl\ftnbj\sectd\marglsxn1080\margrsxn1080\margtsxn1440\margbsxn1440\sbknone\headery360\footery360\endnhere\pard\plain \qc \f1\fs20\cf1 {\b\ul\f2\fs36 Correlator Software Directory 
+Structure}
+\par \pard\plain \f1\fs20\cf1 
+\par \pard\plain \qc \f1\fs20\cf1 {\f2\fs24 CJL, March 23 1999}
+\par \pard\plain \f1\fs20\cf1 
+\par 
+\par 
+\par {\f2\fs24 This document describes the organization of the /correlator directory.  This directory contains all the bits and pieces, both software and data files, needed to make the correlator run, and to postprocess the data. It serves both the MkIII 
+and MkIV correlators.  The structure differs in some details from what is currently in /correlator, on which current MkIII operations depend.  The changes can be made in a short time, but they must be coordinated with changes on the HP1000 systems.}
+\par 
+\par {\f2\fs24 Most directories have environment variables associated with them.  It is strongly recommended that software which needs to access one or more of these directories uses these environment variables via the system getenv() call.  This allows 
+easy modification of the physical directory structure as circumstances}
+\par {\f2\fs24 dictate, and more importantly facilitates test setups for debugging and specialized applications.  To ease the use of these environment variables, all the important ones can be read in at the start of the program by calling the function 
+"environment()", which is in the $UTIL library.  This fills in a series of external character strings with the directory paths pointed to by the environment variables.}
+\par 
+\par {\f2\fs24 Default definitions of the environment variables will be made available in a shell script which can be executed as desired by users.}
+\par 
+\par {\b\ul\f2\fs28 /correlator}
+\par 
+\par {\b\f2\fs24 Function:}{\f2\fs24  Root directory.  Ideally, should contain only subdirectories.}
+\par 
+\par {\b\f2\fs24 Contents: }{\f2\fs24  mk3/    data/      sysvex/      dist/       prog/       task/\tab tmp/}
+\par 
+\par 
+\par {\b\ul\f2\fs28 /correlator/mk3}{\f2\fs28  }{\f2\fs24            \tab}{\b\ul\f2\fs28 $MK3}
+\par 
+\par {\b\f2\fs24 Function:}{\f2\fs24  Support directories for Mk3 correlator operations.}
+\par 
+\par {\b\f2\fs24 Contents:}{\f2\fs24   corlogs/    corrupt/    dribble/    schedules/}
+\par 
+\par {\f2\fs24 These subdirectories will simply be moved to /correlator/mk3 from their current locations in /correlator.  Some scripts will have to be modified, or symbolic links made.  These directories should probably not reside physically on CCC.}
+\par 
+\par 
+\par \page {\b\ul\f2\fs28 /correlator/data}
+\par 
+\par {\b\f2\fs24 Function:}{\f2\fs24  Points to main data directories}
+\par 
+\par {\b\f2\fs24 Contents: }{\f2\fs24  data0/ (=$CORDATA)    data1/  data2/...       afiles/}
+\par 
+\par {\f2\fs24 These subdirectories currently contain MkIII data, and Mk4 data can coexist in the same directories.  The actual location of data is configurable via the CORDATA environment variable.}
+\par 
+\par 
+\par {\b\ul\f2\fs28 /correlator/sysvex}{\f2\fs24          \tab}{\b\ul\f2\fs28 $SYSVEX}
+\par 
+\par {\b\f2\fs24 Function:}{\f2\fs24  Standard location for system-wide reference VEX files, namely evex, cvex, ivex and svex.  Pointed to by the environment variable SYSVEX.}
+\par 
+\par {\b\f2\fs24 Contents: }{\f2\fs24  evex.global     cvex.global     ivex.global     svex.global}
+\par 
+\par 
+\par {\b\ul\f2\fs28 /correlator/dist}{\b\f2\fs28            \tab}{\b\ul\f2\fs28 $DIST}
+\par 
+\par {\b\f2\fs24 Function:}{\f2\fs24  Location for assembly of sanitized, self-consistent, exportable versions of the software system (renamed from current directory for this purpose, called "hops").}
+\par 
+\par 
+\par {\b\ul\f2\fs28 /correlator/task}{\b\f2\fs28          \tab}{\b\ul\f2\fs28 $TASK}
+\par 
+\par {\b\f2\fs24 Function:}{\f2\fs24   Location for all correlator task files.  Used primarily by opera.}
+\par 
+\par 
+\par {\b\ul\f2\fs28 /correlator/tmp}{\b\f2\fs28 \tab\tab}{\b\ul\f2\fs28 $TMP}
+\par 
+\par {\b\f2\fs24 Function: }{\f2\fs24  Location for files of temporary nature only.}
+\par 
+\par 
+\par {\b\ul\f2\fs28 /correlator/prog}{\b\f2\fs28            \tab}{\b\ul\f2\fs28 $CORPROG}
+\par 
+\par {\b\f2\fs24 Function: }{\f2\fs24  Root directory for everything needed to make the software run.}
+\par 
+\par {\b\f2\fs24 Contents:}{\f2\fs24   bin/    doc/    text/   src/}
+\par 
+\par 
+\par \page {\b\ul\f2\fs28 /correlator/prog/bin}{\b\f2\fs28        }{\b\ul\f2\fs28 $BIN}{\f2\fs24  (architecture-specific)}
+\par 
+\par {\b\f2\fs24 Function:}{\f2\fs24   Contains architecture-specific program executables.}
+\par 
+\par {\b\f2\fs24 Contents:}{\f2\fs24   hppa/   hprt/   linux/  others?}
+\par 
+\par {\f2\fs24 The $BIN environment variable should point to the appropriate architecture.}
+\par 
+\par 
+\par {\b\ul\f2\fs28 /correlator/prog/text}{\b\f2\fs28       \tab}{\b\ul\f2\fs28 $TEXT}
+\par 
+\par {\b\f2\fs24 Function: }{\f2\fs24  Ascii files needed to support program execution.  For example, files describing VEX formats, file defining messaging system aliases.  Does not include online help files.}
+\par 
+\par 
+\par {\b\ul\f2\fs28 /correlator/prog/doc}{\b\f2\fs28 \tab}{\b\ul\f2\fs28 $DOC}
+\par 
+\par {\b\f2\fs24 Function:}{\f2\fs24   General system documentation, including online help files.}
+\par 
+\par {\b\f2\fs24 Contents:}{\f2\fs24   mk4_development/     help/    file_formats/     modifications/}
+\par 
+\par {\f2\fs24 The contents of this directory are historical, and should at some point be made more rational.  The help directory should probably have separate subdirectories for different programs, such as opera and aedit.  Currently it is called "unix_software" 
+and contains all the files used by the vhelp utility.  The "modifications" directory is an underused repository of software revision history information.}
+\par 
+\par 
+\par {\b\ul\f2\fs28 /correlator/prog/src}{\b\f2\fs28 \tab}{\b\ul\f2\fs28 $SRC}
+\par 
+\par {\b\f2\fs24 Function:}{\f2\fs24   All source code, including shell scripts, belongs in this directory tree}
+\par 
+\par {\b\f2\fs24 Contents:}{\f2\fs24     include/     postproc/      correlator/      scripts/      sub/}
+\par 
+\par 
+\par {\b\ul\f2\fs28 /correlator/prog/src/include}{\b\f2\fs28 \tab}{\b\ul\f2\fs28 $INC}
+\par 
+\par {\b\f2\fs24 Function:}{\f2\fs24   All header files which are used by more than one program are placed in this directory.  Header files which are strictly local to a program, or internal to a library, belong instead in the home directory of that 
+program or library.}
+\par 
+\par 
+\par \page {\b\ul\f2\fs28 /correlator/prog/src/sub}{\b\f2\fs28 \tab\tab}{\b\ul\f2\fs28 $SRCSUB}
+\par 
+\par {\b\f2\fs24 Function:  }{\f2\fs24 Subroutine libraries of general utility belong here.}
+\par 
+\par {\b\f2\fs24 Contents:}{\f2\fs24     \tab afio/\tab$AFIO\tab\tab A-file IO library}
+\par {\f2\fs24 \tab\tab bfio/\tab$BFIO\tab\tab MkIII binary file IO library}
+\par {\f2\fs24 \tab\tab ccfio/\tab$CCFIO\tab MkIII schedule file IO library}
+\par {\f2\fs24 \tab\tab dfio/\tab$DFIO\tab\tab Mk4 binary file IO library}
+\par {\f2\fs24 \tab\tab util/\tab$UTIL\tab\tab Collection of useful subroutines and utilities}
+\par {\f2\fs24 \tab\tab vex/\tab$VEX\tab\tab Vex file parsing and utility library}
+\par 
+\par 
+\par {\b\ul\f2\fs28 /correlator/prog/src/scripts}{\b\f2\fs28 \tab\tab}{\b\ul\f2\fs28 $SCRIPT}
+\par 
+\par {\b\f2\fs24 Function:}{\f2\fs24   Home for scripts of various kinds.  Copies should exist in $BIN.}
+\par 
+\par {\b\f2\fs24 Contents:}{\f2\fs24      shell/    awk/    aedit/    others?}
+\par 
+\par 
+\par {\b\ul\f2\fs28 /correlator/prog/src/postproc}{\b\f2\fs28 \tab\tab}{\b\ul\f2\fs28 $POST}
+\par 
+\par {\b\f2\fs24 Function:  }{\f2\fs24 Home of all the postprocessing programs, and postprocessing-specific subroutine libraries.}
+\par 
+\par {\b\f2\fs24 Contents:}{\f2\fs24   One directory per program, directory name the same as the program name.  Within each program directory lives the source code, a makefile, and separate directories for each flavor of computer architecture which is 
+supported.  In addition, there is a "sub" directory, which contains one subdirectory for each postprocessing-specific subroutine library.}
+\par 
+\par 
+\par {\b\ul\f2\fs28 /correlator/prog/src/correlator}{\b\f2\fs28 \tab}{\b\ul\f2\fs28 $CORR}
+\par 
+\par {\b\f2\fs24 Function:}{\f2\fs24   Home of all programs related to correlator function, and related subroutine libraries (like CALC).  This is where all the operational code for the various programs in the Mk4 online system belongs.  The correlator-specific 
+subroutine library area is where messaging system code belongs.}
+\par 
+\par {\b\f2\fs24 Contents:  }{\f2\fs24 Same structure as $POST above, one directory per program with directory name the same as the program name.  In addition, a "sub" directory, which should contain, at the least, "calc" and "mess" subdirectories.}
+\par 
+\par }

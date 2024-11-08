@@ -1,0 +1,114 @@
+#!/bin/tcsh -f
+#
+# This script handles documentation of all changes to source code in
+# HOPS.  It automatically enters time-stamped and initialled
+# descriptions of changes in modification history files associated
+# with each program, script or library.  It is intended to minimize
+# work for the programmer while maintaining a complete, machine
+# readable history of modifications.  The database of .mod files
+# maintained by this script can be examined conveniently using the
+# partner shell script "changes"
+#
+# Written by CJL, 21 July 1994
+#################################################################
+
+					# Make sure we have proper setup
+env_check mod
+if ($status != 0) exit (1)
+					# Check for MOD directory
+if ($?MOD != 1) then
+    echo "mod: Environment variable MOD not set, fix up setup.csh"
+    exit (1)
+endif
+					# This tries to make an
+					# intelligent guess based on the
+					# current working directory, so
+					# user need only hit return
+if ($1 == "") then
+    set current_path=`pwd`
+    set bestguess=$current_path:t
+					# If .mod file exists, it's a
+					# sensible guess.
+    set progfile=`printf "%s/%s.mod" $MOD $bestguess`
+    if (-e $progfile) then
+	echo "mod: Which program/script/library did you modify [$bestguess] ?: \c"
+	set reply=$<
+	if ($reply == "") then
+	    set progname=$bestguess
+	else
+	    set progname=$reply
+	endif
+					# Current directory is not obviously
+					# a program directory, do a simple
+					# query
+    else
+	echo "mod: Which program/script/library did you modify?: \c"
+	set reply=$<
+	if ($reply == "") then
+	    echo "mod: Sorry, you have to specify what you modified"
+	    exit (1)
+	else
+	    set progname=$reply
+	endif
+    endif
+else
+    set progname=$1
+endif
+					# This checks that the program
+					# name is as intended.  Normally
+					# silent and automatic
+set progfile=`printf "%s/%s.mod" $MOD $progname`
+if (! -e $progfile) then
+    echo "mod: No" $progfile "found.  Create it (y/n)?: \c"
+    set reply=$<
+    if ($reply == "n" || $reply == "N") then
+	exit (1)
+    else if ($reply == "y" || $reply == "Y") then
+	echo "mod: Proceeding"
+    else
+	echo "mod: Try answering 'y' or 'n' next time"
+	exit (1)
+    endif
+endif
+					# Time stamp in compact format
+set now=`date '+%Y/%m/%d %H:%M'`
+					# This is normally silent and
+					# automatic also
+set username=$LOGNAME
+if ($username[1] == "operator" || $username[1] == "root") then
+    echo "mod: You are logged in as operator or root."
+    echo "mod: Please enter your real username: \c"
+    set reply=$<
+    if ($reply != "") then
+	set username=$reply
+    else
+	echo "mod: No anonymous entries allowed."
+	exit (1)
+    endif
+endif
+					# There may be multiple entries
+					# for one invocation of mod ...
+while (1)
+					# Mandatory input by user here
+    echo "mod: Which routines did you modify?: \c"
+    set routines="$<"
+
+    echo "mod: Give a short, one-line description of the changes below:"
+    set changes="$<"
+					# Format and deliver the result
+    set output=`printf "%s, %s; %s; %s; %s; %s" $now[1] $now[2] "$username[1]" "$progname" "$routines" "$changes"`
+    echo $output >>! $progfile
+					# Ask if more, remind user which
+					# program this is!
+    echo "mod: Do you have any more modifications in $progname (y/[n])?: \c"
+    set reply=$<
+    if ($reply == "n" || $reply == "N" || $reply == "") then
+	echo "mod: $progfile updated."
+	exit (0)
+    else if ($reply == "y" || $reply == "Y") then
+	echo "mod: Continuing modifications for $progname ..."
+    else
+	echo "mod: Didn't understand your reply.  Use 'y' or 'n'.  Quitting"
+	exit (1)
+    endif
+end

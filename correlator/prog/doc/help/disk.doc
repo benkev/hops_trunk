@@ -1,0 +1,38 @@
+
+Summary of disk areas for VLBI data
+-----------------------------------
+
+To allow flexibility in periodic reconfigurations of disk resources, all
+disk areas in the VLBI software system are pointed at by environment
+variables.  The names of these environment variables will remain stable
+at all times, and are used by a wide variety of programs and scripts.  If
+you wish to construct robust procedures for processing your data, you
+should use these environment variables as well, instead of the unix
+pathname of the data directory.
+
+Currently, there are two types of VLBI data storage area, operational and
+scratch.  Respectively, these are used for operational correlator data
+storage and archiving, and offline manipulation of restored datasets by
+users.
+
+The operational data areas, as far as the average user is concerned, look
+like one single directory which contains all the data for currently active
+experiments.  It is pointed to by the CORDATA environment variable.  However,
+the data are in fact spread out over several physical disk areas, with
+symbolic links from the $CORDATA directories.  Most people need not be
+concerned with anything other than $CORDATA.  The operational data areas
+are the sole repository of correlator data until the experiment is archived
+to tape, so casual users are denied write access into these areas.  However,
+many programs (which have internal safeguards against corrupting the data
+structures) acquire write privileges in the operational data areas when
+invoked, so casual users can perform fringe fitting, for example.  If you
+wish to know the unix pathnames of the operational areas, check out the values
+of $CORDATA and $DATA1 ... $DATAn.
+
+The scratch data areas are writable by all, and are located in $SCRATCH1 to
+$SCRATCHn, where n is currently 2.  When restoring an experiment to disk from
+tape, you should put the data in one of these areas.  For the software to work
+correctly with the restored data, you must set your environment variable
+DATADIR to be the same as the appropriate $SCRATCHn.  If you want to work
+with data in the operational areas, remember to reset it back to $CORDATA.
+

@@ -1,0 +1,19 @@
+#!/usr/bin/csh
+source /correlator/prog/mk4_setup.csh
+echo ' '
+echo 'Note: output file is named <<inputfilename>>.latest_procdate'
+echo ' '
+if ($1 == "") then
+  echo ' '
+  echo 'invalid answer -- aborting'
+  echo ' '
+  echo 'This script reads in an (type 5) alist file and writes out'
+  echo 'a file including only the latest procdate lines'
+  echo ' '
+  echo 'The output file is named <<inputfilename>>.latest_procdate'
+  echo ' '
+  echo 'To run,  enter deldup <input file name> (must be alist type 5)'
+  echo ' '
+  exit (1)
+endif
+sort -o $1.latest_procdate -r -u -b -k 9.1,9.8 -k 15.1,15.2 -k 17.1,17.1 $1

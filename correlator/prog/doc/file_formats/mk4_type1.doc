@@ -1,0 +1,191 @@
+
+Type-1 (corel) file record formats
+----------------------------------
+
+Similar to Mk3, each correlator output record will correspond to a single AP
+for a single channel, with multiple lags.  The records will be variable-length,
+with the length determined by the number of lags present.  There may be "raw" 
+format correlator output records which have scrambled lag and bitcount fields.
+Each type-1 file will have, as the first record after the type 000 record, a
+record which contains pertinent file-wide information, and eliminates the
+current "orphan" potential of the current Mk3 system.  Mk4 correlator files
+will be dependent on the root file for the correct interpretation of their
+contents, but not for the mere identification of the data.  The general
+organization of a type-1 file will be as follows:
+
+Type 000 record		Standard for all Mk4 files
+Type 100 record		Identifies data by baseline, parent root, correlation
+			time, etc.  Specifies how many data records of what
+			type are present.  After reading the type 100 record,
+			the program should be able to perform many consistency
+			checks on the root contents and the data records.
+Type 101 records	Track-specific correlator hardware configuration
+			information similar to what goes into the Mk3
+			type-2000 record and cross-reference table.
+			There is one type-101 record for each index number.
+			Needed for correct interpretation of the type 110
+			and type 120 records.
+Type 110 records	These records contain the raw data dumped directly
+			from the correlator crate controller.  The lag data
+			in these records is not in an order suitable for
+			immediate analysis.  Type 110 records need to be
+			processed into type 120 records before proceeding.
+			Generally, type 110 and type 120 records will not
+			both exist in the same file.
+Type 120 records	Correlation lag data records for various modes.  The
+			different modes may involve inclusion or exclusion
+			of bitcounts by lag, autocorrelations, and so on.
+			There is only one mode per file.
+
+Because of the presence of variable length records, the type 100 record must
+precede all type 101, 110 and 120 records.  For simplicity, the number of lags 
+(and correlator blocks) must be constant in any given type-1 file.  There is 
+one type 100 record, multiple type 101 records, and multiple type 110/120 records 
+per type 101 record.  Some of the information in the type 100 record may not be 
+available until the rest of the file is written, necessitating re-writing of 
+that record.
+
+Type 100 (general data description) record format:
+
+Field		type		bytes	Description
+-----           ----            -----   -----------
+Type		ascii		3	100
+Version		ascii		2	0-99
+Unused		ascii		3	Spaces
+Baseline	ascii		2	Standard baseline id
+Filenum		i*2		2	Fileset file number
+parent		ascii		34	Root file name, null terminated
+Percent done	i*2		2	0-100% of scheduled data processed
+Qcode		ascii		2	Correlation "quality", criteria TBD
+start		date		12	Time of 1st AP
+stop		date		12	Time of last AP
+ndrec		i*4		4	Number of data records
+cflength	i*2		2	Length of correlator frame (msec)
+aplength	i*2		2	Length of AP (msec)
+Mode		i*4		4	Correlation mode bits
+lags		i*4		4	Number of lags/type-120 record
+blocks		i*2		2	Number of blocks per index number
+
+Record length is fixed at 92 bytes.  This record can be thought of as a
+"consistency control" record, which should be examined to make sure that
+the data are what you think they should be.  The IO library should do
+most of this checking, and raise the alarm to the application programmer
+when discrepancies are found.  Global hardware configuration information
+is also stored here.
+
+Type 101 (index number parameter) record format:
+
+Field		type		bytes	Description
+-----           ----            -----   -----------
+Type		ascii		3	101
+Version		ascii		2	0-99 
+Unused		ascii		3	Spaces
+Index		i*2		2	Index number
+Procdate	date		10	correlation time
+Ref. fcode	ascii		2	from ccf, e.g. X1
+Rem. fcode	ascii		2	from ccf, e.g. X3
+Polarization	ascii		2	RR, LL, RL, LR
+Corr. board	i*2		2	Correlator board serial #
+Corr. slot	i*2		2	Correlator board slot
+Ref channel	i*2		2	SU output channel numbers
+Rem channel	i*2		2	
+Delay offset	i*2		2	Bits added to apriori delay
+gate on		r*4		4	Pulsar gate on in periods
+gate off	r*4		4	Pulsar gate off in periods
+Post mortem	i*4		4	Up to 32 1-bit flags
+Block table	i*4	    4*blocks	One entry per block in snake
+
+Record length is variable at 48+(4*blocks). There are i records, where i is
+given by (high index - low index + 1).  This record describes channel-by-channel
+hardware configuration information for this correlation.
+Each 'Block table' entry consists of 3 bytes of static configuration
+information followed by the block number on the correlator board; order
+of entries is from head of snake to tail of snake.
+
+Some information in the type 101 records is analogous to that in the 
+type-2000 records of the Mk3 system.  The Mk4 scheme helps isolate 
+baseline-dependent information in the baseline-dependent type-1 files, and 
+helps prevent excessive file sizes for the primarily station-based type-0 
+root files.  Type-1 files are not intended to be made standalone by this change.
+
+
+Type 110 (raw correlator data) record format:
+
+Field           type            bytes   Description
+-----           ----            -----   -----------
+Type            ascii           3       110
+Version         ascii           2       0-99
+Unused          ascii           3       Spaces
+Baseline        ascii           2       Standard baseline id
+Filenum         i*2             2       Fileset file number
+rootcode        ascii           6       Standard root suffix
+Index           i*2             2       Index into type 101 record
+AP              i*4             4       Accumulation period number
+Flag            i*4             4       Up to 32 correlation flags
+Status          i*4             4       Up to 32 status bits
+Bitshift        r*4             4       Bit shift rate
+Delay           i*4             4       Delay in bits
+Fbit            r*4             4       Fractional bitshift at AP center
+Raw corr data   array      66*4*Blocks  Counts from corresponding corr block
+
+where 'Raw corr data' array element is:
+Right cell data i*4           33*4      In order read from correlator chip.
+                                        33rd element is Global Validity Count
+Left cell data  i*4           33*4      In order read from correlator chip.
+                                        33rd element is Global Validity Count
+
+Record length is variable at 44+(66*4*Blocks) bytes.  Minimum record length
+is 308 bytes, and the maximum overhead of the auxiliary information is
+15%.  For comparison, the equivalent overhead in Mk3 is 50%.
+
+
+Type 120 (sorted lag data) record format:
+
+Field		type		bytes	Description
+-----           ----            -----   -----------
+Type		ascii		3	120
+Version		ascii		2	0-99 
+Unused		ascii		3	Spaces
+Baseline	ascii		2	Standard baseline id
+Filenum		i*2		2	Fileset file number
+rootcode	ascii		6	Standard root suffix
+Index		i*2		2	Index into type 101 record
+AP		i*4		4	Accumulation period number
+Flag		i*4		4	Up to 32 correlation flags
+Status		i*4		4	Up to 32 status bits
+Bitshift	r*4		4	Bit shift rate
+Delay		i*4		4	Delay in bits
+Fbit		r*4		4	Fractional bitshift at AP center
+lagdata		array	     variable	Correlation counts
+
+where lagdata can have any one of three structures:
+1. COUNTS_PER_LAG format, lagdata is an array of size nlags, each element
+having the structure below.
+coscor		i*4		4	Cosine correlation count
+cosbits		i*4		4	Cosine total bit count
+sincor		i*4		4	Sine correlation count
+sinbits		i*4		4	Sine total bit count
+
+2. COUNTS_GLOBAL format, lagdata is a structure containing an array as shown
+below.
+cosbits		i*4		4	Cosine total bit count
+sinbits		i*4		4	Sine total bit count
+array[nlags], each element is:
+	coscor  i*4		4	Cosine correlation count
+	sincor  i*4		4	Sine correlation count
+
+3. AUTO_CORR format, lagdata is an array of size nlags. each element
+having the structure below.
+coscor		i*4		4	Cosine correlation count
+cosbits		i*4		4	Cosine total bit count
+
+Record length is variable, depending on the number of lags and the mode.
+Only one mode, and therefore one lagdata format, is present in any given file.
+
+
+The perhaps controversial inclusion of file identification information in
+the type-110/120 records is intended to provide easy "idiot-proofing" of the
+system.  Put a simple consistency check in the IO library, and you'll never
+have to worry about APs getting misplaced again.  The cost is 10 bytes per
+record, typically under 6 percent.
+

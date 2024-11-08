@@ -1,0 +1,18 @@
+From: "Chan, Chi-kwan - (chanc)" <chanc@email.arizona.edu>
+To: Geoff Crew <gbc@haystack.mit.edu>
+Subject: Re: cleanup of Rev3
+Date: Sat, 24 Mar 2018 16:04:53 +0000
+
+   Hi Geoff,
+
+   Attached.
+
+   "swpchid.c" is very specific so I don't think it will be that useful.
+
+   "genroot.c" and "synroot.c" can generate root code according to epoch time
+   and sync the in-file root codes with the file name, respectively.
+
+   "synroot.c" doesn't require any HOPS header because I hardwire the record
+   size---so it may not be that portable.
+
+   - CK

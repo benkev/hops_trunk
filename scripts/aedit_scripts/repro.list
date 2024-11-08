@@ -1,0 +1,7 @@
+qcode A B C D E F 0
+edit inp
+sort freq
+sort base 
+sort time
+write repro.alist
+exit

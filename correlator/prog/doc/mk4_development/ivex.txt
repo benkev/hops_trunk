@@ -1,0 +1,473 @@
+*Sample ivex file
+*
+*Example of VEX correlator-initialization file (.ivex).
+*The appropriate $CORR_INIT key will be specified at initialization time to properly initialize
+*the hardware/software.
+*
+*Notes:
+*  1. Parameters beginning with '~' are to be specified at setup time.
+*
+*ARW 990201
+*
+*-----------------------------------------------------------------------------------------------
+$IVEX_REV;
+*-----------------------------------------------------------------------------------------------
+*
+rev=1.0
+*
+*-----------------------------------------------------------------------------------------------
+$CORR_INIT;
+*-----------------------------------------------------------------------------------------------
+*
+  def INIT_A;
+    system_tempo = 0.89;                  *wrt 32 MHz nominal operation
+    bocf_period = 3200000 ;               *Unit of SYSCLKS; must be multiple of 32; must divide
+                                          *evenly into 32,000,000
+    *
+    ref $PBS_INIT = PBS_0 ;
+    ref $PBS_INIT = PBS_1 ;
+    ref $PBS_INIT = PBS_2 ;
+    ref $PBS_INIT = PBS_3 ;
+    ref $PBS_INIT = PBS_4 ;
+    ref $PBS_INIT = PBS_5 ;
+    ref $PBS_INIT = PBS_6 ;
+    ref $PBS_INIT = PBS_7 ;
+  enddef;
+*
+*-----------------------------------------------------------------------------------------------
+$PBS_INIT;
+*-----------------------------------------------------------------------------------------------
+*
+  def PBS_0;
+    SU_ID = 0 : SUA ;
+    ref $DRIVE_INIT = DRIVE_A;
+    ref $TRM_CONFIG = TRM1;
+    ref $SU/CORR_CONNECT = STD0 ;
+  enddef;
+*
+  def PBS_1;
+    SU_ID = 1 : SUB ;
+    ref $DRIVE_INIT = DRIVE_B;
+    ref $TRM_CONFIG = TRM1;
+    ref $SU/CORR_CONNECT = STD1 ;
+  enddef;
+*
+  def PBS_2;
+    SU_ID = 2 : SUC ;
+    ref $DRIVE_INIT = DRIVE_C;
+    ref $TRM_CONFIG = TRM1;
+    ref $SU/CORR_CONNECT = STD2 ;
+  enddef;
+*
+  def PBS_3;
+    SU_ID = 3 : SUD ;
+    ref $DRIVE_INIT = DRIVE_D;
+    ref $TRM_CONFIG = TRM1;
+    ref $SU/CORR_CONNECT = STD3 ;
+  enddef;
+*
+  def PBS_4;
+    SU_ID = 4 : SUE ;
+    ref $DRIVE_INIT = DRIVE_E;
+    ref $TRM_CONFIG = TRM1;
+    ref $SU/CORR_CONNECT = STD4 ;
+  enddef;
+*
+  def PBS_5;
+    SU_ID = 5 : SUF ;
+    ref $DRIVE_INIT = DRIVE_F;
+    ref $TRM_CONFIG = TRM1;
+    ref $SU/CORR_CONNECT = STD5 ;
+  enddef;
+*
+  def PBS_6;
+    SU_ID = 6 : SUG ;
+    ref $DRIVE_INIT = DRIVE_G;
+    ref $TRM_CONFIG = TRM1;
+    ref $SU/CORR_CONNECT = STD6 ;
+  enddef;
+*
+  def PBS_7;
+    SU_ID = 7 : SUH ;
+    ref $DRIVE_INIT = DRIVE_H;
+    ref $TRM_CONFIG = TRM1;
+    ref $SU/CORR_CONNECT = STD7 ;
+  enddef;
+*
+*-----------------------------------------------------------------------------------------------
+$DRIVE_INIT;
+*-----------------------------------------------------------------------------------------------
+*
+  def DRIVE_A;
+    drive_type = Mark4;
+    capstan_relative_diameter = 1.014;
+  *                inch   value  inch   value
+    vacuum_setting=  5 : 0x1234 : 15 : 0xabcd ;
+    tape_acceleration = 67.5 ips/sec ;
+  *                        hdstk   trks  DIMin  Eqlzr(Mbps)
+    headstack/DIM_connect =  1  :  even  :  0  :    8; *hdstk 1 even trks cncted to DIM port HSC0
+                                                       *equalized for 8 Mbps
+    headstack/DIM_connect =  1  :   odd  :  1  :    8; *hdstk 1  odd trks cncted to DIM port HSC1
+    headstack/DIM_connect =  2  :  even  :  2  :    8; *hdstk 2 even trks cncted to DIM port HSC2
+    headstack/DIM_connect =  2  :   odd  :  3  :    8; *hdstk 2  odd trks cncted to DIM port HSC3
+*	                       hdstk   fwd    rev  eqlzr
+	monitor_module_track =   1  :   17   : 16  : 0 ;       *monitor tracks, equalizer
+	monitor_module_track =   2  :   17   : 16  ; 0 ;       *monitor tracks, equalizer
+*                     hdstk  fbias  rbias  ffspeed  fsspeed  rfspeed  rsspeed  pscale  nscale
+    headstack_parms =   1  :       :      :        :        :        :        :       :      ;
+    headstack_parms =   2  :       :      :        :        :        :        :       :      ;
+  enddef;
+*
+  def DRIVE_B;
+    drive_type = Mark4;
+    capstan_relative_diameter = 1.014;
+  *                inch   value  inch   value
+    vacuum_setting=  5 : 0x1234 : 15 : 0xabcd ;
+    tape_acceleration = 67.5 ips/sec ;
+  *                        hdstk   trks  DIMin  Eqlzr(Mbps)
+    headstack/DIM_connect =  1  :  even  :  0  :    8; *hdstk 1 even trks cncted to DIM port HSC0
+                                                       *equalized for 8 Mbps
+    headstack/DIM_connect =  1  :   odd  :  1  :    8; *hdstk 1  odd trks cncted to DIM port HSC1
+    headstack/DIM_connect =  2  :  even  :  2  :    8; *hdstk 2 even trks cncted to DIM port HSC2
+    headstack/DIM_connect =  2  :   odd  :  3  :    8; *hdstk 2  odd trks cncted to DIM port HSC3
+*	                       hdstk   fwd    rev  eqlzr
+	monitor_module_track =   1  :   17   : 16  : 0 ;       *monitor tracks, equalizer
+	monitor_module_track =   2  :   17   : 16  ; 0 ;       *monitor tracks, equalizer
+*                     hdstk  fbias  rbias  ffspeed  fsspeed  rfspeed  rsspeed  pscale  nscale
+    headstack_parms =   1  :       :      :        :        :        :        :       :      ;
+    headstack_parms =   2  :       :      :        :        :        :        :       :      ;
+  enddef;
+*
+  def DRIVE_C;
+    drive_type = Mark4;
+    capstan_relative_diameter = 1.014;
+  *                inch   value  inch   value
+    vacuum_setting=  5 : 0x1234 : 15 : 0xabcd ;
+    tape_acceleration = 67.5 ips/sec ;
+  *                        hdstk   trks  DIMin  Eqlzr(Mbps)
+    headstack/DIM_connect =  1  :  even  :  0  :    8; *hdstk 1 even trks cncted to DIM port HSC0
+                                                       *equalized for 8 Mbps
+    headstack/DIM_connect =  1  :   odd  :  1  :    8; *hdstk 1  odd trks cncted to DIM port HSC1
+    headstack/DIM_connect =  2  :  even  :  2  :    8; *hdstk 2 even trks cncted to DIM port HSC2
+    headstack/DIM_connect =  2  :   odd  :  3  :    8; *hdstk 2  odd trks cncted to DIM port HSC3
+*	                       hdstk   fwd    rev  eqlzr
+	monitor_module_track =   1  :   17   : 16  : 0 ;       *monitor tracks, equalizer
+	monitor_module_track =   2  :   17   : 16  ; 0 ;       *monitor tracks, equalizer
+*                     hdstk  fbias  rbias  ffspeed  fsspeed  rfspeed  rsspeed  pscale  nscale
+    headstack_parms =   1  :       :      :        :        :        :        :       :      ;
+    headstack_parms =   2  :       :      :        :        :        :        :       :      ;
+  enddef;
+*
+  def DRIVE_D;
+    drive_type = Mark4;
+    capstan_relative_diameter = 1.014;
+  *                inch   value  inch   value
+    vacuum_setting=  5 : 0x1234 : 15 : 0xabcd ;
+    tape_acceleration = 67.5 ips/sec ;
+ *                        hdstk   trks  DIMin  Eqlzr(Mbps)
+    headstack/DIM_connect =  1  :  even  :  0  :    8; *hdstk 1 even trks cncted to DIM port HSC0
+                                                       *equalized for 8 Mbps
+    headstack/DIM_connect =  1  :   odd  :  1  :    8; *hdstk 1  odd trks cncted to DIM port HSC1
+    headstack/DIM_connect =  2  :  even  :  2  :    8; *hdstk 2 even trks cncted to DIM port HSC2
+    headstack/DIM_connect =  2  :   odd  :  3  :    8; *hdstk 2  odd trks cncted to DIM port HSC3
+*	                       hdstk   fwd    rev  eqlzr
+	monitor_module_track =   1  :   17   : 16  : 0 ;       *monitor tracks, equalizer
+	monitor_module_track =   2  :   17   : 16  ; 0 ;       *monitor tracks, equalizer
+*                     hdstk  fbias  rbias  ffspeed  fsspeed  rfspeed  rsspeed  pscale  nscale
+    headstack_parms =   1  :       :      :        :        :        :        :       :      ;
+    headstack_parms =   2  :       :      :        :        :        :        :       :      ;
+  enddef;
+*
+  def DRIVE_E;
+    drive_type = Mark4;
+    capstan_relative_diameter = 1.014;
+  *                inch   value  inch   value
+    vacuum_setting=  5 : 0x1234 : 15 : 0xabcd ;
+    tape_acceleration = 67.5 ips/sec ;
+  *                        hdstk   trks  DIMin  Eqlzr(Mbps)
+    headstack/DIM_connect =  1  :  even  :  0  :    8; *hdstk 1 even trks cncted to DIM port HSC0
+                                                       *equalized for 8 Mbps
+    headstack/DIM_connect =  1  :   odd  :  1  :    8; *hdstk 1  odd trks cncted to DIM port HSC1
+    headstack/DIM_connect =  2  :  even  :  2  :    8; *hdstk 2 even trks cncted to DIM port HSC2
+    headstack/DIM_connect =  2  :   odd  :  3  :    8; *hdstk 2  odd trks cncted to DIM port HSC3
+*	                       hdstk   fwd    rev  eqlzr
+	monitor_module_track =   1  :   17   : 16  : 0 ;       *monitor tracks, equalizer
+	monitor_module_track =   2  :   17   : 16  ; 0 ;       *monitor tracks, equalizer
+*                     hdstk  fbias  rbias  ffspeed  fsspeed  rfspeed  rsspeed  pscale  nscale
+    headstack_parms =   1  :       :      :        :        :        :        :       :      ;
+    headstack_parms =   2  :       :      :        :        :        :        :       :      ;
+  enddef;
+*
+  def DRIVE_F;
+    drive_type = Mark4;
+    capstan_relative_diameter = 1.014;
+  *                inch   value  inch   value
+    vacuum_setting=  5 : 0x1234 : 15 : 0xabcd ;
+    tape_acceleration = 67.5 ips/sec ;
+  *                        hdstk   trks  DIMin  Eqlzr(Mbps)
+    headstack/DIM_connect =  1  :  even  :  0  :    8; *hdstk 1 even trks cncted to DIM port HSC0
+                                                       *equalized for 8 Mbps
+    headstack/DIM_connect =  1  :   odd  :  1  :    8; *hdstk 1  odd trks cncted to DIM port HSC1
+    headstack/DIM_connect =  2  :  even  :  2  :    8; *hdstk 2 even trks cncted to DIM port HSC2
+    headstack/DIM_connect =  2  :   odd  :  3  :    8; *hdstk 2  odd trks cncted to DIM port HSC3
+*	                       hdstk   fwd    rev  eqlzr
+	monitor_module_track =   1  :   17   : 16  : 0 ;       *monitor tracks, equalizer
+	monitor_module_track =   2  :   17   : 16  ; 0 ;       *monitor tracks, equalizer
+*                     hdstk  fbias  rbias  ffspeed  fsspeed  rfspeed  rsspeed  pscale  nscale
+    headstack_parms =   1  :       :      :        :        :        :        :       :      ;
+    headstack_parms =   2  :       :      :        :        :        :        :       :      ;
+  enddef;
+*
+  def DRIVE_G;
+    drive_type = Mark4;
+    capstan_relative_diameter = 1.014;
+  *                inch   value  inch   value
+    vacuum_setting=  5 : 0x1234 : 15 : 0xabcd ;
+    tape_acceleration = 67.5 ips/sec ;
+  *                        hdstk   trks  DIMin  Eqlzr(Mbps)
+    headstack/DIM_connect =  1  :  even  :  0  :    8; *hdstk 1 even trks cncted to DIM port HSC0
+                                                       *equalized for 8 Mbps
+    headstack/DIM_connect =  1  :   odd  :  1  :    8; *hdstk 1  odd trks cncted to DIM port HSC1
+    headstack/DIM_connect =  2  :  even  :  2  :    8; *hdstk 2 even trks cncted to DIM port HSC2
+    headstack/DIM_connect =  2  :   odd  :  3  :    8; *hdstk 2  odd trks cncted to DIM port HSC3
+*	                       hdstk   fwd    rev  eqlzr
+	monitor_module_track =   1  :   17   : 16  : 0 ;       *monitor tracks, equalizer
+	monitor_module_track =   2  :   17   : 16  ; 0 ;       *monitor tracks, equalizer
+*                     hdstk  fbias  rbias  ffspeed  fsspeed  rfspeed  rsspeed  pscale  nscale
+    headstack_parms =   1  :       :      :        :        :        :        :       :      ;
+    headstack_parms =   2  :       :      :        :        :        :        :       :      ;
+  enddef;
+*
+  def DRIVE_H;
+    drive_type = Mark4;
+    capstan_relative_diameter = 1.014;
+  *                inch   value  inch   value
+    vacuum_setting=  5 : 0x1234 : 15 : 0xabcd ;
+    tape_acceleration = 67.5 ips/sec ;
+  *                        hdstk   trks  DIMin  Eqlzr(Mbps)
+    headstack/DIM_connect =  1  :  even  :  0  :    8; *hdstk 1 even trks cncted to DIM port HSC0
+                                                       *equalized for 8 Mbps
+    headstack/DIM_connect =  1  :   odd  :  1  :    8; *hdstk 1  odd trks cncted to DIM port HSC1
+    headstack/DIM_connect =  2  :  even  :  2  :    8; *hdstk 2 even trks cncted to DIM port HSC2
+    headstack/DIM_connect =  2  :   odd  :  3  :    8; *hdstk 2  odd trks cncted to DIM port HSC3
+*	                       hdstk   fwd    rev  eqlzr
+	monitor_module_track =   1  :   17   : 16  : 0 ;       *monitor tracks, equalizer
+	monitor_module_track =   2  :   17   : 16  ; 0 ;       *monitor tracks, equalizer
+*                     hdstk  fbias  rbias  ffspeed  fsspeed  rfspeed  rsspeed  pscale  nscale
+    headstack_parms =   1  :       :      :        :        :        :        :       :      ;
+    headstack_parms =   2  :       :      :        :        :        :        :       :      ;
+  enddef;
+*    
+*-----------------------------------------------------------------------------------------------
+$TRM_CONFIG;
+*-----------------------------------------------------------------------------------------------
+*
+*Rules for assigning TRM outputs to DIM inputs:
+*  1. Use the $TRACKS section to define the data organization on tape (including multiplex ratio).
+*  2. For the case that a single sign or magnitude sample stream occupies one or more tracks
+*     (multiplex_factor>=1):
+*       All tracks constituting the channel are assigned to a contiguous set of TRM outputs
+*       on a single TRM, in the order specified by the 'TRM_order_within_channel ='
+*       statement.
+*
+*Other notes:
+*  1. Only track numbers specified in the $TRACKS section can be used in any DIM/TRM-related
+*     statements. The 'track_substitution=' statement allows another DIM input to stand in place
+*     of the normally-assigned track, but the track is always referred to by its
+*     normally-assigned number in all other statements.
+*  2. If a different headstack is used to playback than was used to record, a
+*     'playback_headstack_assignment=' statement must be present to specify the substitute
+*     playback headstack number.
+*
+  def TRM1;
+*                                M  bits/sample
+    TRM_order_within_channel =   4  :   2 : sign0: mag0 : sign1: mag1: sign2: mag2: sign3: mag3;
+    TRM_order_within_channel =   2  :   2 : sign0: mag0 : sign1: mag1;
+    TRM_order_within_channel =   1  :   2 : sign0: mag0 ;
+    TRM_order_within_channel =   4  :   1 : sign0: sign1: sign2:sign3;
+    TRM_order_within_channel =   2  :   1 : sign0: sign1;
+    TRM_order_within_channel =   1  :   1 : sign0;
+	parity_error_limit = 5.e-4;
+*                           CRC parerr nosync resync
+	invalid_frame_control = on :  on  :  off :  on  ;
+  enddef;
+*
+**-----------------------------------------------------------------------------------------------
+*$CRM_CONFIG;
+**-----------------------------------------------------------------------------------------------
+**
+**The 'unroll_out_assignment=' statement specifies the required barrel-unroll output assignments
+**for the reconstruction of each CRM output channel.
+**
+**Note: This information is actually fixed in Xilinx and is not under control of the user.  It is
+**      provided here for informational purposes only.
+**
+*  def UNROLL_OUT;
+**                                CRM-out -------Barrel-unroll outputs-----------
+**   Fanout modes             M    Chan# Sgn0 Mag0 Sgn1 Mag1 Sgn2 Mag2 Sgn3 Mag3
+*    unroll_out_assignment =  4   :  0  :  0 :  4 :  1 :  5 :  2 :  6 :  3 :  7 ; *8 tks/chan
+*    unroll_out_assignment =  4   :  2  :  8 : 12 :  9 : 13 : 10 : 14 : 11 : 15 ;
+*    unroll_out_assignment =  4   :  4  : 16 : 20 : 17 : 21 : 18 : 22 : 19 : 23 ;
+*    unroll_out_assignment =  4   :  6  : 24 : 28 : 25 : 29 : 26 : 30 : 27 : 31 ;
+*    unroll_out_assignment =  4   :  8  : 32 : 36 : 33 : 37 : 34 : 38 : 35 : 39 ;
+*    unroll_out_assignment =  4   : 10  : 40 : 44 : 41 : 45 : 42 : 46 : 43 : 47 ;
+*    unroll_out_assignment =  4   : 12  : 48 : 52 : 49 : 53 : 50 : 54 : 51 : 55 ;
+*    unroll_out_assignment =  4   : 14  : 56 : 60 : 57 : 61 : 58 : 62 : 59 : 63 ;
+*    unroll_out_assignment =  2   :  0  :  0 :  4 :  1 :  5 ;                     *4 tks/chan
+*    unroll_out_assignment =  2   :  1  :  6 :  2 :  7 :  3 ;
+*    unroll_out_assignment =  2   :  2  :  8 : 12 :  9 : 13 ;
+*    unroll_out_assignment =  2   :  3  : 14 : 10 : 15 : 11 ;
+*    unroll_out_assignment =  2   :  4  : 16 : 20 : 17 : 21 ;
+*    unroll_out_assignment =  2   :  5  : 22 : 18 : 23 : 19 ;
+*    unroll_out_assignment =  2   :  6  : 24 : 28 : 25 : 29 ;
+*    unroll_out_assignment =  2   :  7  : 30 : 26 : 31 : 27 ;
+*    unroll_out_assignment =  2   :  8  : 32 : 36 : 33 : 37 ;
+*    unroll_out_assignment =  2   :  9  : 38 : 34 : 39 : 35 ;
+*    unroll_out_assignment =  2   : 10  : 40 : 44 : 41 : 45 ;
+*    unroll_out_assignment =  2   : 11  : 46 : 42 : 47 : 43 ;
+*    unroll_out_assignment =  2   : 12  : 48 : 52 : 49 : 53 ;
+*    unroll_out_assignment =  2   : 13  : 54 : 50 : 55 : 51 ;
+*    unroll_out_assignment =  2   : 14  : 56 : 60 : 57 : 61 ;
+*    unroll_out_assignment =  2   : 15  : 62 : 58 : 63 : 59 ;
+*    unroll_out_assignment =  1   :  0  :  0 :  4 ;                               *2 tks/chan
+*    unroll_out_assignment =  1   :  1  :  6 :  2 ;
+*    unroll_out_assignment =  1   :  2  :  8 : 12 ;
+*    unroll_out_assignment =  1   :  3  : 14 : 10 ;
+*    unroll_out_assignment =  1   :  4  : 16 : 20 ;
+*    unroll_out_assignment =  1   :  5  : 22 : 18 ;
+*    unroll_out_assignment =  1   :  6  : 24 : 28 ;
+*    unroll_out_assignment =  1   :  7  : 30 : 26 ;
+*    unroll_out_assignment =  1   :  8  : 32 : 36 ;
+*    unroll_out_assignment =  1   :  9  : 38 : 34 ;
+*    unroll_out_assignment =  1   : 10  : 40 : 44 ;
+*    unroll_out_assignment =  1   : 11  : 46 : 42 ;
+*    unroll_out_assignment =  1   : 12  : 48 : 52 ;
+*    unroll_out_assignment =  1   : 13  : 54 : 50 ;
+*    unroll_out_assignment =  1   : 14  : 56 : 60 ;
+*    unroll_out_assignment =  1   : 15  : 62 : 58 ;
+**   Fanin modes                   Chan# Sgn0 Mag0 Sgn 1 Mag1
+*    unroll_out_assignment = 0.5  :  0  :  0 :  4 ; *single track assigned to two unroll outputs
+*    unroll_out_assignment = 0.5  :  1  :  6 :  2 ;
+*    unroll_out_assignment = 0.5  :  2  :  8 : 12 ;
+*    unroll_out_assignment = 0.5  :  3  : 14 : 10 ;
+*    unroll_out_assignment = 0.5  :  4  : 16 : 20 ;
+*    unroll_out_assignment = 0.5  :  5  : 22 : 18 ;
+*    unroll_out_assignment = 0.5  :  6  : 24 : 28 ;
+*    unroll_out_assignment = 0.5  :  7  : 30 : 26 ;
+*    unroll_out_assignment = 0.5  :  8  : 32 : 36 ;
+*    unroll_out_assignment = 0.5  :  9  : 38 : 34 ;
+*    unroll_out_assignment = 0.5  : 10  : 40 : 44 ;
+*    unroll_out_assignment = 0.5  : 11  : 46 : 42 ;
+*    unroll_out_assignment = 0.5  : 12  : 48 : 52 ;
+*    unroll_out_assignment = 0.5  : 13  : 54 : 50 ;
+*    unroll_out_assignment = 0.5  : 14  : 56 : 60 ;
+*    unroll_out_assignment = 0.5  : 15  : 62 : 58 ;
+*    unroll_out_assignment = 0.25 :  0  :  0 :  6 :  8 : 14 ; *single track assigned to four
+*                                                             *unroll outputs
+*    unroll_out_assignment = 0.25 :  1  :  4 :  2 : 12 : 10 ;
+*    unroll_out_assignment = 0.25 :  2  : 16 : 22 : 24 : 30 ;
+*    unroll_out_assignment = 0.25 :  3  : 20 : 18 : 28 : 26 ;
+*    unroll_out_assignment = 0.25 :  4  : 32 : 38 : 40 : 46 ;
+*    unroll_out_assignment = 0.25 :  5  : 36 : 34 : 44 : 42 ;
+*    unroll_out_assignment = 0.25 :  6  : 48 : 54 : 56 : 62 ;
+*    unroll_out_assignment = 0.25 :  7  : 52 : 50 : 60 : 58 ;
+*    unroll_out_assignment = 0.25 :  8  :  0 :  6 :  8 : 14 ;
+*    unroll_out_assignment = 0.25 :  9  :  4 :  2 : 12 : 10 ;
+*    unroll_out_assignment = 0.25 : 10  : 16 : 22 : 24 : 30 ;
+*    unroll_out_assignment = 0.25 : 11  : 20 : 18 : 28 : 26 ;
+*    unroll_out_assignment = 0.25 : 12  : 32 : 38 : 40 : 46 ;
+*    unroll_out_assignment = 0.25 : 13  : 36 : 34 : 44 : 42 ;
+*    unroll_out_assignment = 0.25 : 14  : 48 : 54 : 56 : 62 ;
+*    unroll_out_assignment = 0.25 : 15  : 52 : 50 : 60 : 58 ;
+*  enddef;
+*
+*-----------------------------------------------------------------------------------------------
+$SU/CORR_CONNECT;
+*-----------------------------------------------------------------------------------------------
+*
+*Defines connections from Station Units to correlator-section Input Boards.
+*Normally this will remain fixed.  Software somewhere should check that the specified distibution of signals
+*does not violate this connection definition.
+*
+*The connections are defined in physical 'channel groups' of four channels each carried on a
+*single coax cable. Each SU has 4 output 'channel groups', each consisting of 4 contiguous
+*physical SU output channels:
+*      SU chan group    SU physical output chns
+*            0                 0-3
+*            1                 4-7
+*            2                 8-11
+*            3                12-15
+*Similarly, each Input Bd has 16 input 'channel groups', 0-15.
+*One SU chn grp connects to one Input Bd chan grp with one coax cable.
+*
+  def STD0;
+*                 SU    Corr   InputBd
+*               ChnGrp  Segmt  ChnGrp
+    SU_connect =   0  :   0   :   0 ;
+    SU_connect =   1  :   1   :   0 ;
+    SU_connect =   2  :   2   :   0 ;
+    SU_connect =   3  :   3   :   0 ;
+  enddef;
+*
+  def STD1;
+*                 SU    Corr   InputBd
+*               ChnGrp  Segmt  ChnGrp
+    SU_connect =   0  :   0   :   1 ;
+    SU_connect =   1  :   1   :   1 ;
+    SU_connect =   2  :   2   :   1 ;
+    SU_connect =   3  :   3   :   1 ;
+  enddef;
+*
+  def STD2;
+*                 SU    Corr   InputBd
+*               ChnGrp  Segmt  ChnGrp
+    SU_connect =   0  :   0   :   2 ;
+    SU_connect =   1  :   1   :   2 ;
+    SU_connect =   2  :   2   :   2 ;
+    SU_connect =   3  :   3   :   2 ;
+  enddef;
+*
+  def STD3;
+*                 SU    Corr   InputBd
+*               ChnGrp  Segmt  ChnGrp
+    SU_connect =   0  :   0   :   3 ;
+    SU_connect =   1  :   1   :   3 ;
+    SU_connect =   2  :   2   :   3 ;
+    SU_connect =   3  :   3   :   3 ;
+  enddef;
+*
+  def STD4;
+*                 SU    Corr   InputBd
+*               ChnGrp  Segmt  ChnGrp
+    SU_connect =   0  :   0   :   4 ;
+    SU_connect =   1  :   1   :   4 ;
+    SU_connect =   2  :   2   :   4 ;
+    SU_connect =   3  :   3   :   4 ;
+  enddef;
+*
+  def STD5;
+*                 SU    Corr   InputBd
+*               ChnGrp  Segmt  ChnGrp
+    SU_connect =   0  :   0   :   5 ;
+    SU_connect =   1  :   1   :   5 ;
+    SU_connect =   2  :   2   :   5 ;
+    SU_connect =   3  :   3   :   5 ;
+  enddef;
+*
+  def STD6;
+*                 SU    Corr   InputBd
+*               ChnGrp  Segmt  ChnGrp
+    SU_connect =   0  :   0   :   6 ;
+    SU_connect =   1  :   1   :   6 ;
+    SU_connect =   2  :   2   :   6 ;
+    SU_connect =   3  :   3   :   6 ;
+  enddef;
+*
+  def STD7;
+*                 SU    Corr   InputBd
+*               ChnGrp  Segmt  ChnGrp
+    SU_connect =   0  :   0   :   7 ;
+    SU_connect =   1  :   1   :   7 ;
+    SU_connect =   2  :   2   :   7 ;
+    SU_connect =   3  :   3   :   7 ;
+  enddef;

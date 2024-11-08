@@ -1,0 +1,104 @@
+From: "Blackburn, Lindy" <lblackburn@cfa.harvard.edu>
+Date: Mon, 11 Jan 2016 16:26:47 -0500
+Subject: Re: autotools build of hops
+To: Geoff Crew <gbc@haystack.mit.edu>
+Cc: Vincent Fish <vfish@haystack.mit.edu>,
+    Roger Cappallo <rjc@haystack.mit.edu>,
+    Kazunori Akiyama <kazu@haystack.mit.edu>
+
+Hi Geoff,
+
+
+I started with a new HOPS tarball on dewi, and did a basic configure.
+
+/home/lblackburn/hops-3.11/sub
+
+I had to
+
+> export CFLAGS='-fPIC'
+
+so they could be used for a shared object, and then made all the
+objects in sub/dfio and sub/util using the makefiles
+
+then declared the stray extern variables in
+
+/home/lblackburn/hops-3.11/sub/extern.h
+
+compiled as
+
+> gcc -fPIC -o extern.o -c extern.c -I.
+
+and made the shared object.
+
+> gcc -shared -fPIC -o dfio.so *.o dfio/*.o util/*.o
+
+the ctypes wrapper is in,
+
+/home/lblackburn/hops-3.11/sub/m4.py
+
+where the only tedious part is defining the struct so python can
+interpret the object in memory. I think there are various automated
+ways around this, but I wasn't completely satisfied with their output.
+
+the wrapper uses read_mk4corel() to generate the corel structure.
+
+It's easiest to browse the structure in ipython where tab completion
+can fill in the elements. The equivalent DiFX structure is somewhat
+more discoverable (also DiFX is built with a shared library from the
+start). In any case it gives something like this:
+
+---
+
+In [2]: a = m4.loadmk4('/media/lindy/DATA/dewi/3424/080-0500_LOW/FD..wxfrmh')
+prog: Allocated 2102952 bytes in read_mk4file, address 0x7fa5441ec010
+
+In [3]: a.
+
+
+...
+
+
+
+From: "Blackburn, Lindy" <lblackburn@cfa.harvard.edu>
+Date: Mon, 11 Jan 2016 16:46:06 -0500
+Subject: Re: autotools build of hops
+To: Geoff Crew <gbc@haystack.mit.edu>
+Cc: Vincent Fish <vfish@haystack.mit.edu>,
+        Roger Cappallo <rjc@haystack.mit.edu>,
+        Kazunori Akiyama <kazu@haystack.mit.edu>
+
+I put similar dfns for difx corr output files on dewi:
+
+/home/lblackburn/difx.py
+
+but I can't find a proper build of DiFX to use on that machine (smm-pc
+has too old a version of python: 2.4)
+
+It should work similarly, e.g.
+
+---
+
+In [2]: a = difx.loadDifxInput('/media/lindy/DATA/smm-pc/d21us_clean/h_1609')
+
+In [3]: a.
+a.antenna              a.mjdStop              a.nOutChan             a.pulsar
+a.baseline             a.nAntenna             a.nPhasedArray         a.quantBits
+a.chanBW               a.nBaseline            a.nPol                 a.refFreq
+a.config               a.nConfig              a.nPolar               a.rule
+a.dataBufferFactor     a.nCore                a.nPulsar              a.scan
+a.datastream           a.nDataSegments        a.nRule                a.source
+a.doPolar              a.nDatastream          a.nScan
+a.spacecraft
+a.eop                  a.nEOP                 a.nSource              a.specAvg
+a.eopMergeMode         a.nFlag                a.nSpacecraft          a.startChan
+a.fracSecondStartTime  a.nFreq                a.nThread
+a.visBufferLength
+a.freq                 a.nIF                  a.outputFormat
+a.job                  a.nInChan              a.phasedarray
+a.mjdStart             a.nJob                 a.polPair
+
+In [3]: [a.antenna[i].name for i in range(a.nAntenna)]
+Out[3]: ['CP', 'JC', 'SM', 'SN', 'SQ']
+
+
+

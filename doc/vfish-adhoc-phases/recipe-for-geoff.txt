@@ -1,0 +1,63 @@
+  # set DATADIR
+  # Useful alias to set DATADIR to $PWD:   alias here='eval "DATADIR=\$PWD"; echo "DATADIR=$DATADIR"'
+  # assumes you're working in 3769, else prepend paths as necessary
+fourfit [ -c ... ] 109-0604            # run a clean fourfit
+alist -v 6 -o first.list 109-0604      # make a first alist
+aedit -f first.list                    # get info for manual phase cals (could use fourfit -m 1 instead)
+  pol YL
+  ed inp
+  param 72 54 55 22                    # extract parameters as input for phases.pl below...
+  pwrite YL.pd                         # ...and write them to a file
+  pol
+  unflag pol
+  pol YR
+  ed inp
+  param 72 54 55 22
+  pwrite YR.pd
+  exit
+phases.pl -f YL.pd                     # get the manual pcals to put in the control file for LCP...
+  # Create a new fourfit control file [cf_a]
+  # In that file, put "pc_mode manual" at the top
+  # Copy the JA and ZA lines to it
+  # In that file, remove the "JA:" and turn "pc_phases" into "pc_phases_l", put "if station J" before
+  # Same for Z
+  # Add 
+phases.pl -f YR.pd                     # ... and RCP
+  # Same for "_r"
+  # Add "if station A", "pc_phases_x" and "_y" lines with frequency codes and 32 zeros
+fourfit -c cf_a 109-0604               # Rerun everything with new manual pcals
+alist -v 6 -o a.list 109-0604          # Create new list...
+aedit -f a.list                        # ...with only the new fourfits
+  ed dup proc
+  write a.list                         # this is the file we'll refourfit
+  pol YL                               # pick best pol for SNR
+  ed inp
+  write a-YL.list                      # this is the file we'll use to determine adhoc phases
+fringex -i 2 -r a-YL.list > a-YL.2sec  # segment the data
+adhoc-baseline.pl -a a-YL.2sec -o adhoc_A_2sec -b AJ
+adhoc-baseline.pl -a a-YL.2sec -o adhoc_A_2sec -b AZ
+  # These should have created files called "adhoc_A_2sec_" plus a station letter
+cp cf_a cf_b_adhoc
+  # Append the following lines manually to cf_b_adhoc ...
+  if station A
+    adhoc_phase      file
+    adhoc_file       adhoc_A_2sec_A
+    adhoc_file_chans abcdefghijklmnopqrstuvwxyzABCDEF
+  
+  if station J
+    adhoc_phase      file
+    adhoc_file       adhoc_A_2sec_J
+    adhoc_file_chans abcdefghijklmnopqrstuvwxyzABCDEF
+  
+  if station Z
+    adhoc_phase      file
+    adhoc_file       adhoc_A_2sec_Z
+    adhoc_file_chans abcdefghijklmnopqrstuvwxyzABCDEF
+
+  # ...or do it by script: print_adhoc_lines.pl -b adhoc_A_2sec -s AJZ >> cf_b_adhoc
+
+fourfit -c cf_b_adhoc -r a.list        # refourfit a.list with adhoc phases
+  # Now you can look at your beautiful ZJ fringes (RL and LR due to a pol swap somewhere)
+
+
+

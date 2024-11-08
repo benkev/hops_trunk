@@ -1,0 +1,32 @@
+
+     Warnings in tgen (from composer) written to task file 
+
+* WARNING:  Ignoring lvex file (if any) 
+
+Station(s) missing scans: 
+* Stations %s missed scan %s 
+* Station %s missed scan %s 
+* Scan %s skipped:  Fewer than 2 remaining stations 
+
+Tolerance 10 seconds (between ovex and lvex): 
+* Station %c late start %d sec next scan: 
+* Station %c early end %d sec next scan: 
+
+Tolerance 0: 
+* Station %c late onsource %d sec next scan: 
+
+Checks only if ASCII tape library exists:  
+* Tape %s (station %c) not found in library 
+
+Tolerance 0.03 m/s = 1.1811 ips: 
+* Station %c tape speed ovex %.1f lvex %.1f ips next scan: 
+
+Tolerance tape time 5 seconds under or 25 seconds over: 
+* Station %c footage time %.0f duration %d sec next scan: 
+
+Tolerance 100 meters or 304.8 feet: 
+* Station %c footage off %.0f ft next scan: 
+
+
+                                        Revised:  2001 July 23, JAB
+

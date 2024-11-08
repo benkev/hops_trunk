@@ -1,0 +1,389 @@
+\subsection{Selector keywords}
+\begin{tabular}{ll}
+    \textbf{Keyword} & \textbf{Value} \\
+    station         &  1 character \\
+    baseline        &  2 characters \\
+    source          &  string of 1-8 chars \\
+    f\_group        &  1 character \\
+    scan            &  UT-epoch (special format), or: \\
+                    &  $<$ UT-epoch \\
+                    &  $>$ UT-epoch \\
+                    &  UT-epoch1 to UT-epoch2  (inclusive time range) \\
+\end{tabular}
+Notes:
+\begin{enumerate}
+
+\item The wildcard character '?' can be used for any or all characters
+within the baseline, the source name, or the frequency group. So long as
+the other, non-wildcarded characters all match the scan will be selected.
+
+\item The station selector keyword is provided for the user's convenience,
+but internally within the program there is no station keyword. Internally,
+each use of the station keyword results in two matching control blocks,
+so that if station Z (commands) is equivalent to if baseline Z? (commands)
+followed by another block with if baseline ?Z (same commands). This subtlety 
+is not normally apparent to the user, but could arise, e.g., if one tried
+some compound condition involving both a station and a baseline, such as:
+
+if station Q and baseline QC \\
+
+Such combinations are probably best avoided.
+
+\end{enumerate}
+
+
+
+\subsection{Syntactic keywords}
+\begin{tabular}{ll}
+   if & \\
+   else &   (not yet implemented) \\
+   and & \\
+   or & \\
+   not & \\
+   ( )  &    (not yet implemented) \\
+   $< >$ & \\
+   to & \\
+   ? & \\
+\end{tabular}
+
+\subsection{Action keywords}
+\begin{tabular}{ll}
+    \textbf{Keyword} & \textbf{Value} \\
+   adhoc\_amp        & float \\
+   adhoc\_file       & string \\
+   adhoc\_file\_chans & string \\
+   adhoc\_period     & float \\
+   adhoc\_phase      & `sinewave', `polynomial', or `file' \\
+   adhoc\_poly       & $\leq 6$ floats/integers (mixture OK) \\
+   adhoc\_tref       & float \\
+   dc\_block         & `true' or `false' (def: false) \\
+   dec\_offset       & float \\
+   delay\_offs       & n char string, followed by n floats \\
+   dr\_win           & 2 floats \\
+   est\_pc\_manual   & int \\
+   fmatch\_bw\_pct   &  float \\
+   freqs            & n chars \\
+   gates            & n char string, followed by 2n floats \\
+   gen\_cf\_record  & `true' or `false' (def: false) \\
+   interpolator     & 'iterate' or 'simul' (def: simul) \\
+   ionosphere       & float \\
+   ion\_npts        &  int (def: 0)\\
+   ion\_smooth      & `true' or `false' (def: false) \\
+   ion\_win         &  2 floats \\
+   lsb\_offset      &  float \\
+   mb\_win          &  2 floats \\
+   mbd\_anchor      &  `sbd' or `model' (def: model) \\
+   notches          & 2n floats \\
+   optimize\_closure & `true' or `false' (def: false) \\
+   passband         & 2 floats \\
+   period           & int \\
+   pc\_amp\_hcode     & float \\
+   pc\_delay\_l       & float \\
+   pc\_delay\_r       & float \\
+   pc\_delay\_x       & float \\
+   pc\_delay\_y       & float \\
+   vbp\_correct       & `true' or `false' (def: false) \\
+   vbp\_fit           & `true' or `false' (def: false) \\
+   vbp\_coeffs        & 5 floats/integers (def: 0.0) \\
+   vbp\_file          & string \\
+\end{tabular}
+\begin{tabular}{ll}
+   pc\_phases        & n char string, followed by n floats \\
+   pc\_phases\_l     &  n char string, followed by n floats \\
+   pc\_phases\_r     &  n char string, followed by n floats \\
+   pc\_phases\_x     &  n char string, followed by n floats \\
+   pc\_phases\_y     &  n char string, followed by n floats \\
+   pc\_freqs         & n char string, followed by n floats \\
+   pc\_mode          & `normal', `ap\_by\_ap', `manual', or 'multitone' \\
+   pc\_period        & int \\
+   pc\_tonemask      & n char string, followed by n ints \\
+   ra\_offset        & float \\
+   ref\_freq         & float \\
+   samplers         & int, followed by up to 8 strings \\
+   sampler\_delay\_l &  up to 8 floats \\
+   sampler\_delay\_r &  up to 8 floats \\
+   sampler\_delay\_x &  up to 8 floats \\
+   sampler\_delay\_y &  up to 8 floats \\
+   sb\_win         &   2 floats \\
+   skip            &  `true' or `false' \\
+   start           &  integer \\
+   station\_delay  &   float \\
+   stop            &  integer   \\
+   switched        &  `scan\_start' or `each\_minute' \\
+   t\_cohere       &   float \\
+   use\_samples    &   `true' or `false' \\
+   weak\_channel   &   float \\
+\end{tabular}
+
+\vspace{0.3in}
+\textbf{\textit{-- deprecated commands -- for backward mk4 compatibility only:}} \\
+\vspace{0.3in}
+\fbox{\begin{tabular}{ll}
+   index      &  n ints - alternate method used to select data channels, based on the \\
+              &  original corel index number. Not as well supported as freqs, \\
+              &  and is currently being phased out. \\
+   max\_parity  &      float (tape only) \\
+   x\_crc       &      `keep' or `discard' (tape only) \\
+   x\_slip\_sync &      `keep', `discard', or an integer (tape only) \\
+   y\_crc        &     `keep' or `discard' (tape only) \\
+   y\_slip\_sync &      `keep', `discard', or an integer (tape only) \\
+\end{tabular}}
+
+\subsection{Keyword semantics}
+
+\subsubsection{Scan Selection}
+
+\begin{itemize}
+\item[]\textbf{skip} -- if this is set to true in the body of an if\_block, then
+                 any scans matching the if conditions will be skipped. 
+                 Note: as of 99.2.19 \textit{fourfit} will not properly skip data 
+                 if f\_group is specified.
+\end{itemize}
+
+\subsubsection{Filtering -- \textit{determine whether or not each AP is accepted}}
+
+\begin{itemize}
+\item[]\textbf{freqs}        controls which frequency channels get included in the fit.
+                 The letters a-p correspond to the order that the frequencies
+                 appear in the root file (assuming 16 channels). With no
+                 suffix, DSB is implied, if both sidebands are present.
+                 A plus suffix denotes USB, a minus is used for LSB.
+                 After 26 channels, the uppercase alphabet is used,
+                 then 10 digits, finally '\$' and '\%' (i.e. 64 channels).
+\item[]\textbf{start}        start time for data to be included
+\item[]\textbf{stop}         stop time for data to be included \\
+                 Arguments of start and stop are integers with an optional
+                 minus sign. A positive integer is interpreted as an
+                 absolute time in seconds past the hour (of the scan
+                 start time). When a minus sign precedes the start time
+                 it is considered to be a time relative to, and later
+                 than, the scheduled scan start. Similarly, a negative
+                 stop time precedes the scheduled scan stop time, by
+                 the indicated number of seconds.
+\item[]\textbf{switched}     turns on (frequency) switched mode, which discards some AP's
+                 and keeps others, depending on a gating waveform
+\item[]\textbf{period}       period in seconds of the gating waveform
+\item[]\textbf{gates}        for each freq. channel, the starting delay and duration, in
+                 seconds, of the gating waveform
+\item[]\textbf{passband}     lower and upper bounds (in MHz) of the spectral passband of
+                 data to be accepted, specified as RF frequencies. If the
+                 lower bound is greater than the upper bound, the range
+                 wraps around -- allowing a band in the middle to be
+                 excluded.
+\item[]\textbf{notches}     a list of non-overlapping [lower,upper] bounds pairs (in MHz)
+                 to exclude from the spectral passband (passband may be
+                 applied prior to removal of these notches). Note that the
+                 amplitude modification calculus isn't sufficiently
+                 sophisticated to detect overlaps of passband and notches,
+                 so be sure to keep your surgeries disjoint.  (A large number of notches
+                 is supported and you will get a complaint if you exceed it.)
+                 As with passband, the spectral data is rescaled so that
+                 the amplitude observable is in some sense preserved.
+\item[]\textbf{dc\_block}     if set to true, zero out lowest cross-power spectral
+                 channel; useful for suppressing DC bias
+\end{itemize}
+
+\vspace{0.3in}
+\textbf{\textit{-- deprecated commands -- for backward mk4 compatibility only:}} \\
+\vspace{0.3in}
+\fbox{\begin{tabular}{ll}
+   max\_parity   & maximum allowable fraction of bytes in error \\
+   x\_slip\_sync &  maximum number of frames w/ re-sync in reference station \\
+   y\_slip\_sync &  (same for remote station) \\
+   x\_crc        & either keep or discard AP if reference time has CRC error \\
+   y\_crc        &  (same for remote station) \\
+\end{tabular}}
+
+\subsubsection{search -- \textit{control the fringe-searching process}}
+
+\begin{itemize}
+\item[]\textbf{sb\_win}       single band delay search window bounds, in us
+\item[]\textbf{mb\_win}       multiband delay search window bounds; if the upper
+                 multiband delay bound (2nd number) is less than the lower bound
+                 (1st number), then \textit{fourfit} performs a "wrap-around" search, in
+                 order to handle the case of a delay near to the multiband
+                 (semi-) ambiguity.
+\item[]\textbf{dr\_win}       delay-rate search window bounds, in us/s 
+\item[]\textbf{ion\_npts}     number of evaluation points in ionospheric coarse search.
+        Either 0 (the default value) or 1 disables the ionosphere model.
+\item[]\textbf{ion\_smooth}   iff true, use alternative ion search strategy in which
+        tec tabular points are smoothed mid-search
+\item[]\textbf{ion\_win}      ionospheric coarse search window in TEC units
+\item[]\textbf{ra\_offset}    apply right asc.offset (asec) to re-center search windows
+\item[]\textbf{dec\_offset}   apply declination offset (asec) to re-center search windows
+\item[]\textbf{interpolator} selects method of fit interpolation. Classically, an
+                 iterative search has been done over sbd, mbd, drate, one
+                 dimension at a time, for 3 cycles. The simultaneous mode
+                 constructs a 5x5x5 cube of data points and does a 3D
+                 quintic interpolation.
+\end{itemize}
+
+
+\subsubsection{corrections -- \textit{apply corrections to the data, either before or after fit}}
+
+\begin{itemize}
+\item[]\textbf{pc\_mode}  specify phase\_cal mode:
+              - normal (model linear in time is extracted from the data)
+              - manual (specified totally by the user) 
+              - ap\_by\_ap (phase cal is extracted independently for each AP)
+                DEPRECATED: use normal or manual with pc\_period 1 or more
+              - multitone (all tones in band are coherently fit, and phase 
+                is extrapolated to the center of the band).
+\item[]\textbf{pc\_phases} phase-cal phases in deg, for each of the listed freq channels;
+             these offset phases are added to the underlying model, as
+             specified by pc\_mode, above. If 2 polarizations are present,
+             the same values are applied to both pols.
+\item[]\textbf{pc\_phases\_l} specified in same manner as pc\_phases, but the tone phases
+             so specified are applied only to the first pol (L, X, or H)
+\item[]\textbf{pc\_phases\_r} specified in same manner as pc\_phases, but the tone phases
+             so specified are applied only to the second pol (R, Y, or V)
+\item[]\textbf{pc\_phases\_x} synonym for pc\_phases\_l (see)
+\item[]\textbf{pc\_phases\_y} synonym for pc\_phases\_r (see)
+\item[]\textbf{pc\_freqs}  phase cal tone frequencies in KHz, for each of the listed
+             freq channels iff not in range -64..64. Inside of this
+             range, the value is interpreted as a tone number, with 1 being
+             the 1st USB tone, 2 being the 2nd USB tone, etc. Negative
+             tone numbers are used for LSB tones.
+\item[]\textbf{pc\_period} in multitone mode (only), the phase can be estimated
+             and applied over each pc\_period ap's, thus removing slopes
+             or other drifts in pcal (default is 5)
+\item[]\textbf{pc\_tonemask} - in multitone mode (only):
+             The values for pc\_tonemask form a bit-masked map of which 
+             tones to *exclude* for this frequency channel. Thus 1 
+             excludes the lowest tone, 2 the next lower tone, 4 the 3rd 
+             lowest tone, etc. A value of 5, for example, would exclude 
+             the lowest and the 3rd lowest tones (perhaps 10 KHz and 2.01
+             MHz).  
+\item[]\textbf{pc\_delay\_l} a time value in ns representing the difference between the
+\item[]\textbf{pc\_delay\_r} the travel time from the feed phase center to the pcal
+             injection point, minus the the travel time from the pcal
+             pulse generator to the injection point. It is specified
+             separately for the two polarization senses.
+\item[]\textbf{pc\_delay\_x} 
+\item[]\textbf{pc\_delay\_y} synonyms for pc\_delay\_l and pc\_delay\_r (see)
+\item[]\textbf{lsb\_offset} additive phase in degrees, for the LSB relative to the USB;
+             often necessary when correlating VLBA data against Mk 3
+\item[]\textbf{ref\_freq}  specifies a frequency in MHz at which the phase delay
+             is determined (default is total LO of first frequency)
+\item[]\textbf{adhoc\_phase} specify mode of ad hoc phase corrections. No corrections
+             are made if this isn't present, or is set to false.
+\item[]\textbf{adhoc\_period}  For ad hoc sinewave model; the period in integer seconds.
+\item[]\textbf{adhoc\_amp}      "   "  "     "       "    amplitude in degrees of phase.
+\item[]\textbf{adhoc\_tref}    For both ad hoc phase models; the reference time in seconds
+             past the most recent hour.
+\item[]\textbf{adhoc\_poly} For the ad hoc phase polynomial model; From 1-6 coefficients
+             describing a power-series model in time. ($deg/sec^n$)
+\item[]\textbf{adhoc\_file} Name of the file containing phases in the ad hoc file mode.
+\item[]\textbf{adhoc\_file\_chans} String of channel labels for phases (columns) in the
+             ad hoc file.
+\item[]\textbf{use\_samples}   If true, use the sampler statistics (aka state counts) to
+             normalize the raw correlation sums to the equivalent analog
+             correlation. This is specific to the mk4 hardware correlator, as the state
+             information is not otherwise available.
+\item[]\textbf{ionosphere} specified per station, in TEC ($10^{16}el/m^2$) units
+\item[]\textbf{t\_cohere}  coherence time used in fringe fit (default is infinite). The
+             principal use case for t\_cohere is to cope with limited atmospheric coherence
+             at high frequencies. \textit{fourfit} will add together multiple delay-rate channels
+             in an incoherent manner, effective smoothing the correlation function over
+             delay rate.
+\item[]\textbf{delay\_offs} delay offsets (ns) to be applied to each of the listed freq
+             channels. This correction is made prefit, similar to pcal.
+\item[]\textbf{samplers}  the number of samplers, followed by the freq channel 
+             identifiers of channels that share a common sampler are
+             grouped together in strings. In multitone mode only, the
+             averaged tone-derived differential delays are applied to 
+             all channels sharing a sampler. In VEX2 the plan is to get this
+             equipment-interconnection information from the VEX file.
+\item[]\textbf{optimize\_closure} modifies fine fringe search so as to minimize the
+             contribution of non-closing delay errors to the closure phase;
+             can result in poorer single-baseline fits
+\item[]\textbf{station\_delay} a priori guess at the delay of the pcal path, from maser
+             to the digitizers (ns). Recommended to use 
+             sampler\_delay\_l/r/x/y instead.
+\item[]\textbf{mbd\_anchor} controls the basis for choosing the mbd ambiguity when
+             forming the total. If 'sbd' then the ambiguity closest to
+             the singleband delay is chosen; if 'model' then the
+             ambiguity closest to the a priori model is chosen.
+\item[]\textbf{sampler\_delay\_l} indexed by sampler, it is the center of the window
+             in which the pcal delay ambiguity will be resolved. Just like
+             the old station\_delay, but now broken down by sampler and
+             polarization, since their cabling and filters will lead
+             to different delays. For LCP, in units of ns.
+\item[]\textbf{sampler\_delay\_r} same as the above, but for RCP, instead of LCP.
+\item[]\textbf{sampler\_delay\_x} synonym for sampler\_delay\_l.
+\item[]\textbf{sampler\_delay\_y} synonym for sampler\_delay\_r.
+\item[]\textbf{vbp\_correct} if true, apply video bandpass correction.
+\item[]\textbf{vbp\_fit} if true, fit for and print video bandpass correction.
+\item[]\textbf{vbp\_coeffs} numerical coefficients for video bandpass correction.
+             The algebraic model used is a cubic polynomial plus a 1/f term. If the
+             five coefficients supplied are called $a$ through $e$, then the model is
+             $\Delta \phi = a f^3 + b f^2 + c f + d + e/f$. The coefficients are in
+             degrees of phase.
+     \item[]\textbf{vbp\_file} (NYI) if specified, use file-based video bandpass correction 
+        from given file (supersedes algebraic model correction).
+\end{itemize}
+
+\subsubsection{switches and other miscellaneous functionality}
+\begin{itemize}
+\item[]\textbf{fmatch\_bw\_pct} associate freqs < this percentage of bw together (25\% default)
+\item[]\textbf{pc\_amp\_hcode}  generate an H code iff any pcal amps less than this (0.005 default)
+\item[]\textbf{weak\_channel}  the ratio of single\_channel\_amp to coherent\_sum\_amp 
+                 below which a G code is assigned to the scan (0.5 default)
+\item[]\textbf{gen\_cf\_record} if true,
+    saves the full control file in the fringe record
+\item[]\textbf{est\_pc\_manual} if nonzero, estimates manual
+    pc\_phase\_? and delay\_offs\_?
+    values. A value >0/<0 estimates ref/rem station values.
+    The magnitude is a mask of bits indicating what and how
+    to make estimates.  0x01 phase, 0x02 median channel sbd,
+    0x04 average sbd channel, 0x08 use total sbd value,
+    0x10 use original per-channel sbd delay, 0x20 activates
+    heuristics to discard outliers and 0x40 reports phase
+    measurement as a pc\_phase\_offset\_? value.  Calculations
+    are made with channels in the -f and -n range (inclusive).
+    Conflicting commanding on delay options does nothing.
+\item[]\textbf{chan\_ids} followed by a string of channel labels
+        and an array of RF frequencies. Allows override of the default single character 
+    channel labels. The labels are applied iff the corresponding RF freq matches to 0.01 MHz or better.
+\end{itemize}
+
+\subsubsection{other symbols}
+\begin{tabular}{ll}
+   ?       & wild card character - for single char within baseline, source or f\_group \\
+   keep    & 32767 \\
+   discard &     0 \\
+   true    &     1 \\
+   false   &     0 \\
+\end{tabular}
+   
+
+
+\subsubsection{Special Formats}
+   UT-epochs:  UT-epochs are expressed in the format ddd-hhmmss, where all 10
+           characters are necessary, including leading 0's if
+           appropriate.  This format will match that of a scan directory,
+           if the UT-epoch that is being specified is an actual scan time.
+
+
+\subsubsection{General Guidelines}
+\begin{enumerate}
+\item White space is ignored; i.e., multiple spaces and line feeds all
+      collapse to a single space.
+\item Multiple commands per line are fine.
+\item Comments: anything from an asterisk through the end of the line is ignored.
+\item Nested ifs are not allowed (or necessary). Nested parentheses in
+      an if condition are fine (not yet implemented).
+      As of 94.1.16, parentheses are not supported. The logical operators,
+      in decreasing order of precedence are (not, and, or).
+\item Wildcard "?" matches any single character for f\_group, station, or
+      baseline, any string (of up to 8 characters) for source, and any
+      time-value for scan.
+\item Phase cal and delay offsets are treated station by station. If not
+      in a "station context", then values are applied to remote stn only.
+\item Only freqs that are chosen for both stations in a baseline are 
+      present in the fit.
+\item If multiple if-blocks match a particular passes' choice of baseline,
+      f\_group, source, and scan criteria, then the later values assigned
+      to each parameter overwrite the earlier ones.
+\end{enumerate}
+

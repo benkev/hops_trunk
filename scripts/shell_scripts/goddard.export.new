@@ -1,0 +1,109 @@
+#!/usr/bin/csh
+source /correlator/prog/mk4_setup.csh
+setenv CORDATA /data3
+setenv DATADIR /data3
+echo ' '
+echo 'This script generates a standard export file for GSFC'
+echo 'The export file will be placed in:'
+echo ' '
+echo '/correlator/data/goddard_export/exp<experiment name>/<experiment name>.tar.gz'
+echo ' '
+echo 'where the experiment name is given by the user as the second argument'
+echo ' '
+if ($1 == "") then
+  echo 'To run,  enter goddard.export <experiment number> <experiment name>'
+  echo ' '
+  exit (1)
+endif
+if ($2 == "") then
+  echo 'To run,  enter goddard.export <experiment number> <experiment name>'
+  echo ' '
+  exit (1)
+endif
+echo 'Experiment number given is > \c'; echo $1
+echo 'Experiment name given is > \c'; echo $2
+echo ' '
+if (-e  /correlator/data/goddard_export/exp$2) then
+  echo ' '
+  echo 'Directory or export file already exists'
+  echo ' ' 
+  echo 'Cannot continue - evaluate the situation or purge existing export directory.'
+  echo ' '
+  exit (0)
+endif
+cd /correlator/data/goddard_export
+mkdir exp$2
+cd exp$2
+#note - do this manually now ... 
+#alist -o $1.out -v 1 /data0/$1
+echo ' '
+echo 'Unfortunately,  the script cannot determine automatically what data'
+echo 'needs to be eliminated from the data set (i.e. pre-passes etc ...)'
+echo 'Thus,  the afile listing contains ALL the data for the experiment'
+echo 'at this time.   The file will now be opened with vi so you can edit'
+echo 'out whatever you need to'
+echo ' '
+echo 'ready to edit? (y/n)'
+echo ' '
+set check=$<
+if ($check == "y") then
+  vi $1.out
+else 
+  echo ' '
+  echo 'Sorry - I can't continue if you don't wish to edit,  as most'
+  echo 'likely bad data will get into the data set'
+  echo ' '
+  echo 'Cleaning up debris and exiting ...'
+  echo ' '
+  cd ~
+  rm -r /correlator/data/goddard_export/exp$2
+  echo ' '
+  echo 'try again'
+  echo ' '
+  exit (0)
+endif
+aedit -r/correlator/scripts_misc/aedit_scripts/goddard.export -f $1.out
+mv vlist.temp \#v$1
+rm $1.out
+linkdata -s -d /correlator/data/goddard_export/exp$2 /correlator/data/goddard_export/exp$2/\#v$1
+alist /correlator/data/goddard_export/exp$2/$1
+aedit -r/correlator/scripts_misc/aedit_scripts/write.ver1 -f alist.out
+mv alist.out.ver1 \#a$1
+mv alist.out \#a$1.new
+cp /correlator/data/$1/$1.ovex .
+cp /correlator/data/$1/$1.lvex .
+cp /correlator/data/$1/cf_$1 .
+cp /correlator/data/$1/$1.comments \#c$1
+cp /correlator/data/$1/$1.psfile \#p$1
+echo ' '
+echo 'From another session (sorry,  this has to be done by hand for now):'
+echo ' '
+echo '1) check export data alist against final #P file (check data integrity) ...'
+echo ' '
+echo '2) Copy over #C, #F, #S, #L, #P files, or anything else you want to include'
+echo '   in the export file (put them in /src/exp<experiment name>'
+echo ' '
+echo 'Ready to continue? (y/n) '
+echo ' '
+set answer=$<
+if ($answer == "y") then
+  tar chvf /data3/$2.tar *
+  ls -al /data3/$2.tar
+  /opt/gzip/bin/gzip /data3/$2.tar
+  mv /data3/$2.tar.gz .
+  pwd
+  ls -al
+  echo ' ' 
+  echo 'Export file is now present.  Inform appropriate person at Goddard\!'
+  echo ' '
+  echo 'file name and directory location are displayed above.'
+  echo ' '
+  exit (1)
+endif
+if ($answer == "n") then 
+  echo 'When ready to generate tar file,  execute exporttape'
+  echo 'All Done!!'
+  exit (1)
+endif
+echo 'invalid answer -- aborting'
+

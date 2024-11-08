@@ -1,0 +1,38 @@
+Documentation for the program "linkdata", CJL January 14 1994
+-------------------------------------------------------------
+
+COMMAND NAME:   linkdata
+
+SYNOPSIS:  Creates a "mirror" data directory based on input A-file
+
+SYNTAX:  linkdata [-r] [-d destdir] afile1 afile2 ... afilen
+		where [] arguments are optional
+		Note: all option flags must appear before afiles
+
+OPTION FLAGS:	-r
+			Specifies that parent root extents are NOT 
+			to be sought separately from the input A-file 
+			list (default behaviour is to make sure every 
+			file has associated root)
+		-d
+			destdir specifies that 'destdir' is to be used 
+			as the destination directory to receive the 
+			linked files.  The default is the current working 
+			directory ('.')
+
+ARGUMENTS:	afile list
+			A list of one or more A-files which describe the
+			data to be mirrored.
+
+ENVIRONMENT:	DATADIR
+
+DESCRIPTION:
+
+Program to convert a specification of a subset of data into a directory 
+structure filled with symbolic links to the real data.  This "dummy" 
+directory structure can then be used to perform any desired operation on 
+the selected subset of data.  The subset specification takes the form of 
+a standard A-file, presumably filtered according to various criteria by 
+"aedit".  The overall result is a flexible tool for selecting and operating 
+on data, be it generation of export tapes, refringing, or recorrelating 
+operations, or applications not yet anticipated.

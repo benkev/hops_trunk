@@ -1,0 +1,101 @@
+\subsection{Introduction}
+
+In the past, there were three different phase calibration modes that were employed in fourfit, with each having its own strengths and applicable usage cases. A brief summary of their characteristics is given in Table 1.  This memo describes a new mode, called multitone mode, which introduces new capabilities, as well as incorporating most of the functionality of the 3 previous modes.
+
+
+mode
+description
+advantages
+disadvantages
+normal
+any single tone extracted by corr. hardware
+simplicity
+poor snr due to ignored tones
+manual
+each channel's phase is manually specified
+can be determined by peaking on a strong calibrator and used for a whole experiment; no thermal noise added
+labor-intensive; requires calibrator scan; doesn't follow scan to scan variation
+ap\_by\_ap
+pcal phase for a single tone is extracted and applied independently for each AP
+able to track a `wandering' phase
+introduces extra noise into fringe phase; poorest snr
+Table 1 Prior phase cal modes in fourfit
+
+
+\subsection{Multitone Features}
+\begin{itemize}
+\item{multiple tones within each channel}: the coherent sum of all tones within the channel's bandpass is formed, a best-fit delay determined, the phase is evaluated at mid-band, and applied
+\item{masking of tones by channel}: in order to avoid contamination of the phase calibration by strong interfering tones, it is possible to select for use any subset of the tones within the band, by way of a  excluded tone mask
+\item{flexible averaging over time}: since phase corrections can vary over time within a scan, perhaps not even in a linear fashion, the multitone phasecal correction can be segmented over time. The integration period is user-adjustable so that the phase can be tracked with a minimum effect on the noise added into the interferometric fringes by pcal phase noise.
+\item{additive phases by channel}: for flexibility it is sometimes useful to apply an extra additive phase, on a channel by channel basis
+\end{itemize}
+
+\subsection{Mathematical Underpinnings}
+Let us define:
+
+\begin{tabular}{ll}
+   $N$       &  number of tones within the band \\
+   $f_n$     &  frequency of the nth phase cal tone within the band (Hz) \\
+   $f_c$     &  center frequency of the band (Hz) \\
+   $\rho_n$  &  complex phasor of the nth tone, as measured \\
+   $\tau_n$  &  best-fit delay (s) to tones across the band \\
+   $P_n$     &  coherent sum at mid-band \\
+\end{tabular}
+
+To find the best-fit delay we take the complex phasors for all of the included tones
+within the band, which due to their means of generation by a short pulse - all fall
+nicely on a grid of equally spaced points in frequency, and find the peak (delay)
+of their FFT. In order to increase accuracy, the phasors are first 0-padded, which
+is equivalent to using a sinc interpolator on the delay function. Using the best-fit
+delay, we then counter-rotate the individual phasors to the center frequency
+(since we are correcting the mean channel phase) and form their sum:
+
+    
+\begin{equation}
+        P_n = \sum_{n=0}^{N-1} \rho_n e^{-i2\pi(f_n-f_c)\tau_n}
+\end{equation}
+\vspace{0.3in}
+The phase of this complex result, \textit{arg} ($P_n$), is used to correct the 
+fringe phase of the channel.
+ 
+\subsection{Syntax and Usage}
+
+A fourfit user invokes and controls multitone mode by adding one or more lines 
+to the fourfit control file. The stations to which a particular specification 
+is applied are determined by the normal fourfit control file context rules. 
+The applicable stations could be established, for example, by a construct 
+of the form if <station> or if <baseline>, or the scope could be global 
+(specified prior to any ifs). The relevant commands, all of which are optional, are
+
+\begin{itemize}
+        \item\textbf{pc\_mode multitone} command to specify multitone mode
+
+        \item\textbf{pc\_period <period>} an integer specifying the averaging period in AP's 
+                (default is 5 ap's). pcal ap's are typically 1 sec in duration. The optimal value
+                to use depends on the pcal signal strength and the variation in time of the pcal
+                signal. Smaller/shorter values add more thermal noise in the phase correction but track
+                the phase well, larger/longer values add less Gaussian noise but are susceptible
+                to phase drifts.
+
+        \item\textbf{pc\_tonemask <chan\_specifier> <mask1> <mask2>} an integer tone exclusion mask
+                is given for each of the specified channels; each bit within an exclusion mask
+                corresponds to a tone within the channel; if set, bit 0 omits the 1st tone from 
+                the fit, bit 1 omits the 2nd tone, and so on. This is useful for leaving out
+                RFI-corrupted tones from the fit across the channel.
+
+        \item\textbf{pc\_phases <chan\_specifier> <ch1\_phase> <ch2\_phase>} specifies, for each named channel,
+                an additional phase to be added to the values normally extracted by multitone mode.
+\end{itemize}
+
+
+\subsection{Examples}
+
+Example 1: comparison of normal and multitone phase cal modes when the tone 
+sequence occurs at different points within different bands. When using normal
+mode the correction phase depends on the placement of the tone that is being extracted,
+due to the delay from injection point to where the waveform is sampled.
+
+
+
+
+

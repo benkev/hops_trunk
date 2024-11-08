@@ -1,0 +1,22 @@
+To install from a fresh svn checkout, run the following:
+
+aclocal
+autoconf
+autoheader
+automake -a
+
+./configure --prefix=${DIFXROOT}
+make
+make install
+
+After this, changes to sources require make/make install to be run, and
+after changes to the configuration, autoreconf suffices.
+
+All of the above is handled from the main hops configure script if you
+invoke
+
+    .../trunk/configure --enable-d2m4 ... DIFXROOT=$DIFXROOT
+
+but note the application will be installed in the $HOPS_ROOT area.
+
+eof

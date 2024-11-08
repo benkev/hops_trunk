@@ -1,0 +1,8 @@
+qcode G H 1-9
+ed in
+parameter 72 54 55 22
+sort time
+sort base
+sort freq
+pwrite param.pd
+exit

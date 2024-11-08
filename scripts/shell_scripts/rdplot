@@ -1,0 +1,28 @@
+#!/bin/csh
+echo ' '
+echo 'This scripts generates the standard set of goddard plots'
+echo 'specifically designed for the CONT94 regular station' 
+echo 'experiments.  WARNING! It will delete all *.plt'
+echo 'files in the current working directory!  Plots take a'
+echo 'few HOURS to generate and tie up the printer in the VLBI'
+echo 'area.'
+echo ' ' 
+echo 'Do you want to continue?'
+echo ' '
+set answer=$<
+if ($answer == "y") then
+  efind -f -o $1.out $1
+  aedit -r/correlator/prog/src/aedit_scripts/aedit.rd -f $1.out
+  echo ' '
+  echo 'Plots will come out on the laserjet III in the VLBI area'
+  echo ' '
+  exit (1)
+endif
+if ($answer == "n") then
+  echo ' '
+  echo 'OK - aborting'
+  echo ' '
+  exit (1)
+endif
+echo 'invalid answer -- aborting'
+

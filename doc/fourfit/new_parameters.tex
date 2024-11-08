@@ -1,0 +1,46 @@
+To add a new (simple) parameter, one must modify the source
+code in a number of routines. Even though there are a number
+of places to change, the structure of the code ensures that
+the changes are generally straight-forward.
+The necessity of changing the routines marked as optional 
+depends on the specifics of the parameter that is being added.
+\begin{enumerate}
+\item\textbf{control.h}
+    most likely the paraameter value needs to be kept in struct c\_block
+
+\item\textbf{parser.h}
+    most likely you'll need to provide a new token for the parameter
+
+\item\textbf{param\_struct.h} (optional)
+    possibly add new parameters to this global structure
+
+\item\textbf{init\_tokens.c}
+    maps your tokens to the control file strings
+
+\item\textbf{default\_cblock.c}
+    set the default value
+
+\item\textbf{nullify\_cblock.c}
+    set to recognizible null value
+
+\item\textbf{copy\_cblock\_parts.c}
+    a line to copy it when non-null
+
+\item\textbf{parser.c}
+    appropriate fsm changes
+
+\item\textbf{precorrect.c} (optional)
+    changes prior to fringe search
+
+\item\textbf{create\_fsm.c} (optional)
+    if your change changes the fsm
+
+\item\textbf{../../help/fourfit.doc}
+    document what the new parameter does
+
+\item\textbf{../../data/ff\_testdata/chk..sh} (optional)
+    consider adding a test to make check in
+    order to verify that what you changed
+    does what you want (now and into the future).
+
+\end{enumerate}

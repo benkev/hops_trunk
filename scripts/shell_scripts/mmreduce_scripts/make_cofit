@@ -1,0 +1,92 @@
+#!/bin/csh -f
+#
+# This sub-script does the main coherence-time fitting job.  It
+# first segments and averages the data files using a variety of
+# segmentation times, then invokes cofit to do the actual coherence
+# time fitting.  The starting point is a sanitized list of 
+# data records with coherently detected fringes (the codetf file).
+# Because the PGPLOT library currently cannot open two output
+# devices at once, this script runs cofit twice, so that the 
+# process of generating the fitted output records and the process
+# of generating plots in an appropriate form do not conflict.
+# Called from mmreduce.
+#
+# Written by CJL, 22 February 1996
+#################################################################
+
+					# Skip option
+if (-e $1.cofit) then
+    echo "mmreduce: A cofit output file already exists.  If you want"
+    echo "mmreduce: to use it, you should skip this step.  If not, the existing"
+    echo "mmreduce: file will be overwritten"
+    skipask
+    if ($status == 1) exit (0)
+endif
+
+echo "mmreduce: Generating the coherence analysis dataset.  This may"
+echo "mmreduce: take a while, depending on the size of the input dataset"
+
+fringex -i all -r $1.codetf -b | average -bc -o $1.coavg
+if ($status != 0) then
+    echo "mmreduce: Error return from fringex/average.  This is a problem."
+    exit (1)
+endif
+					# Production cofit run
+echo "mmreduce: Ready to perform the coherence fitting.  You have a choice"
+echo "mmreduce: of graphical output options.  This will be the production"
+echo "mmreduce: run, but you will get the opportunity of doing another,"
+echo "mmreduce: graphics-only run (no output file), later.  Your options are:"
+echo "mmreduce:     1. X-Window interactive graphics"
+echo "mmreduce:     2. Postscript hardcopy graphics"
+echo "mmreduce:     3. No graphics"
+echo "mmreduce: Pick a number from 1 to 3: \c"
+set reply=$<
+if ($reply == 1) then
+    cofit -x -o $1.cofit $1.coavg
+else if ($reply == 2) then
+    cofit -d $1.cofit_ps/ps -o $1.cofit $1.coavg
+    if ($status == 0) then
+	echo "mmreduce: Printing coherence data on postscript printer"
+	lpps $1.cofit_ps
+    endif
+else if ($reply == 3) then
+    cofit -d /null -o $1.cofit $1.coavg
+else
+    echo "mmreduce: Invalid response, will use null graphics device"
+    cofit -d /null -o $1.cofit $1.coavg
+endif
+if ($status != 0) then
+    echo "mmreduce: Error return from cofit!  Sorry, but I have to stop here."
+    exit (1)
+endif
+					# This part just for graphics output
+while (1)
+    echo "mmreduce: Cofit completed successfully, and results were written out"
+    echo "mmreduce: Do you want to generate another set of graphical output? (y/n): \c"
+    set reply=$<
+    if ($reply == "y" || $reply == "Y") then
+	echo "mmreduce: Your options are:"
+	echo "mmreduce:     1. X-Window interactive graphics"
+	echo "mmreduce:     2. Postscript hardcopy graphics"
+	echo "mmreduce: Pick a number from 1 to 2: \c"
+	set reply=$<
+	if ($reply == 1) then
+	    cofit -x -o /dev/null $1.coavg
+	else if ($reply == 2) then
+	    cofit -d $1.cofit_ps/ps -o /dev/null $1.coavg
+	    if ($status == 0) then
+	        echo "mmreduce: Printing coherence data on postscript printer"
+	        lpps $1.cofit_ps
+	    endif
+	else
+	    echo "mmreduce: Invalid response, let's go over that again, shall we?"
+	    continue
+	endif
+	break
+    else if ($reply == "n" || $reply == "N") then
+	break
+    else
+	echo "mmreduce: Please answer 'y' or 'n'"
+    endif
+end
+

@@ -1,0 +1,37 @@
+#!/bin/csh -f
+#
+# This sub-script is not complete.  Eventually, it will be a very
+# complex script which handles bispectral formation and averaging
+# in an effort to generate useful phases, but for the time being it
+# merely does the necessary segmenting and incoherent averaging to
+# generate optimal amplitude estimates.
+# Called from mmreduce.
+#
+# Written by CJL, 19 August 1996
+#################################################################
+
+					# Skip option
+if (-e $1.vis) then
+    echo "mmreduce: A visibility output file already exists.  If you want"
+    echo "mmreduce: to use it, you should skip this step.  If not, the existing"
+    echo "mmreduce: file will be overwritten"
+    skipask
+    if ($status == 1) exit (0)
+endif
+
+echo "mmreduce: This is the final step of mmreduce, designed to generate final"
+echo "mmreduce: visibilities.  At present, it is an incomplete version that"
+echo "mmreduce: omits the final step of visibility generation.  It should, however,"
+echo "mmreduce: make good estimates of amplitude, segmented at the noloss coherence"
+echo "mmreduce: time and the incoherently searched rate and delay.  It should also"
+echo "mmreduce: make a bispec file with optimal closure phase estimates"
+
+fringex -i noloss -r $1.fmlistf -d srchpos -bc | average -b -o $1.ampl
+if ($status != 0) then
+    echo "mmreduce: Error return from fringex/average.  This is a problem."
+    exit (1)
+endif
+
+aedit -b "batch;read $1.fmlistf;close force;twrite $1.trilist"
+bispec -o $1.bispec $1.fmlistf $1.trilist
+rm $1.trilist

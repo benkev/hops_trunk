@@ -1,0 +1,41 @@
+Documentation for the program "search", CJL, April 25 1996
+---------------------------------------------------------
+
+COMMAND NAME:   search
+
+SYNOPSIS:  Searches incoherently averaged A-file data for fringes
+
+SYNTAX:  search [-d device] [-m msglevel] [-o outfile] [-x] filelist
+
+OPTION FLAGS:	-d device
+			Specifies the output graphics device for the
+			contour plots of SNR in the delay/rate grid.
+			The specification is in the standard PGPLOT form
+			of filename/devicetype (e.g. test.ps/ps)
+
+		-m msglevel
+			Verbosity control parameter, ranging from -3 to +3,
+			with lower numbers being more verbose.  The default
+			value is 1.
+
+		-o outfile
+			If specified, this flag directs the A-file output
+			of search to the named file.  If omitted, search
+			writes its output to stdout.
+
+		-x
+			Shorthand for "-d /xw", the xwindow display.
+
+ARGUMENTS:	filelist
+			One or more input A-files which contain data generated
+			by "average".  These data have been segmented and
+			incoherently averaged at each point on a grid of rate
+			and delay.  Such a grid is set up using fringex.
+			
+
+ENVIRONMENT:	None.
+
+
+DESCRIPTION:
+
+A description will be available real soon now.

@@ -1,0 +1,73 @@
+libtoolize: Remember to add 'LT_INIT' to configure.ac.
+libtoolize: 'AC_PROG_RANLIB' is rendered obsolete by 'LT_INIT'
+configure.ac:16: warning: The macro `LT_WITH_LTDL' is obsolete.
+configure.ac:16: You should run autoupdate.
+configure.ac:16: the top level
+
+# NOEMA:
+    step 1 introduces frqs as alias for freqs and some associated games.
+    step 2 verifies alias channels actually work
+    step 3 proceed to surgery commands
+
+# any round -- in progress.
+x   Should restore max_parity to emit an error message while ignoring it.
+    -f / -n options should also be CF keyword controlled and also
+        fall under the control of the new alias system. Or even:
+        display_channels <channel-list>
+
+# any round: elevate the polarization defines to a common location
+
+# any round: what about stale locks in priorty locking mechanism.
+    if ^C is hit between creation and deletion, it won't go away
+    signal handlers call _exit() which doesn't invoke atexit().
+    possibly install a signal handler, and then remove it....
+
+# any round; fix the return value from fourfit so that existing tests
+    are happy.
+
+# any round: generate_graphs is a total mess, should be sub-functioned.
+
+# any round: use ompi parallelization directives to speed up some loops.
+  or can also try loop multiprocessor optimisations....
+  CF: TELCAL examples -- but this only works if underlying code is
+  fully re-entrant
+
+# any round:
+  cabs has a sqrt, but r^2+i^2 does not and sqrt is not needed.
+
+other various other random unsorted/not-yet-editted notes..
+
+HOPS3/4:
+    Need to make psplot and fplot allow polarization selection
+      and/or differentiation of "close" points
+    pull HOPS3.2x tarballs into MRD
+    migrate HOPS3 tests to use tarballs
+    review MRD tarballs
+    should have a script to do a more automated cofit
+HOPS4
+    plantuml , SWIG4.x to captive 'data' area.
+    nightly (whither pgplot.h)
+        PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+        /usr/local/pgplot/cpgplot.h
+        the fourfit build in HOPS4 needs cleanup to take pkg-config into account
+        hops-git: should pick up HOPS3->git with data plan
+regression data for new HOPS e.g. gefera:
+        $ l /swc/difx/difx-data/regression/bm494e-wxpsc-????.tgz
+        -rw-rw----. 1 gbc difx 13227021 Oct 31 09:30
+            /swc/difx/difx-data/regression/bm494e-wxpsc-difx.tgz
+        -rw-rw----. 1 gbc difx 14661016 Oct 31 09:37
+            /swc/difx/difx-data/regression/bm494e-wxpsc-hops.tgz
+    needs a revist due to repaired passband SNR....
+
+----
+
+Jan-05-HOPS-TTD:
+ 1  finish the MRD data tarball area--it was mostly complete once
+        upon a time, but needs review
+ 2  autobarf needs an update at some point
+ 3  coping mechanism for NOEMA data
+ 4  regression test updates, including on polconvert
+    we should make a push to actually capture some
+    geodetic scans so that meaningful regression can be done.
+
+# vim: nospell

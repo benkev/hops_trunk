@@ -1,0 +1,385 @@
+To: VLBA Data Acquisition Group 
+
+Subject: VLBA Acquisition Recorder Controller Communications Protocol
+
+Author:  Roger Cappallo 
+
+Date:    originally 86.10.16 --- most recently updated 94.1.5
+                                        
+  
+  
+GENERAL CONSIDERATIONS: 
+  
+Since the MCB standard interface is used, the electrical specifications  
+and initiation protocol can be found in the appropriate MCB documents.  A block 
+of 256 addresses are employed, of which only the lower 240 are available  
+to the user (controller).  The origin of the block is set by a DIP switch on the
+interface, and is unknown to the recorder controller.  Hence, all addresses 
+specified here will be referenced relative to 0; of course, actual commands 
+should have the fixed offset appropriate to the drive added in.  A further  
+subdivision of the 240 byte address space has been made to separate the control 
+(write) requests from the monitor (read) requests, as suggested by the MCB  
+group.  Address 00-7F request monitor data (read-only), and addresses 80-EF are 
+reserved for control requests.  The control request locations are actually  
+read-write, since a read from one of these locations will echo back the last  
+control request received at the same location.  In general, there is some
+duplication of monitor data available, since commands which affect the state of 
+the controller will be reported separately in the read (00-7F) section.  This 
+is done so that we may present what actually IS (by reading back latched ports, 
+etc. ), as opposed to what WAS commanded (returned in 80-EF). Only quantities
+that can actually be sampled or measured by the hardware are duplicated.
+  
+  
+NOTES:  
+
+   1) Control requests having a single bit, such as REWIND TAPE, still  
+      require that bit to be set for action to take place.  
+
+   2) The ERROR FLAGS word is monitor word 74:  If any error bit is  
+      set, so will be the ERROR EXISTS bit (0) of the General Status Word.  
+      Reading the ERROR FLAGS word will clear all error bits, although  
+      they can immediately be set again in the event of a persistent error. 
+
+
+
+
+   MCB Monitor Data (transport outputs)
+  
+                 Status                                  # bits     Address 
+                 ______                                  ______     _______ 
+  
+    1) Write Module:  
+         a) Formatter select (=0|1 for FMTR1|FMTR2)       8 x 1       00  
+                Bit 0:  Group 0 in Head 1 
+                Bit 1:    "   1  "   "  1 
+                Bit 2:    "   2  "   "  1 
+                Bit 3:    "   3  "   "  1 
+                Bit 4:  Group 0 in Head 2 
+                Bit 5:    "   1  "   "  2 
+                Bit 6:    "   2  "   "  2 
+                Bit 7:    "   3  "   "  2 
+  
+         b) Output group enable (=0|1 for disable|enable) 8 x 1       01  
+                Bit 0:  Group 0 in Head 1 
+                Bit 1:    "   1  "   "  1 
+                Bit 2:    "   2  "   "  1 
+                Bit 3:    "   3  "   "  1 
+                Bit 4:  Group 0 in Head 2 
+                Bit 5:    "   1  "   "  2 
+                Bit 6:    "   2  "   "  2 
+                Bit 7:    "   3  "   "  2 
+  
+         c) System track select (fmtr. track# = 0-35) 
+                SYSTRK 0 of Head 1                          6         02  
+                  "    1  "   "  1                          6         03  
+                  "   34  "   "  1                          6         04  
+                  "   35  "   "  1                          6         05  
+                SYSTRK 0 of Head 2                          6         06  
+                  "    1  "   "  2                          6         07  
+                  "   34  "   "  2                          6         08  
+                  "   35  "   "  2                          6         09  
+  
+    2) Monitor module:  
+         a) Track select - both Read and Bypass (track# = 0-35) 
+                Head 1, Output A                            6         10  
+                  "  1,    "   B                            6         11  
+                Head 2,    "   A                            6         12  
+                  "  2,    "   B                            6         13  
+  
+         b) Read module equalizer select (0|1|2 = std, alt1, alt2)  
+                Head 1, Output A                            2         14  
+                  "  1,    "   B                            2         15  
+                Head 2,    "   A                            2         16  
+                  "  2,    "   B                            2         17  
+  
+         c) Output select (0 = Head 1, Output A, read  
+                           1 =   "  1,    "   A, bypass 
+                           2 =   "  1, Output B, read 
+                           3 =   "  1,    "   B, bypass 
+                           4 = Head 2, Output A, read 
+                           5 =   "  2,    "   A, bypass 
+                           6 =   "  2, Output B, read 
+                           7 =   "  2,    "   B, bypass)  
+  
+                Formatter 1, signal M1                      3         18  
+                    "     1,    "   M2                      3         19  
+                Formatter 2,    "   M1                      3         1A  
+                    "     2,    "   M2                      3         1B  
+
+	   d) Data extract
+	       i) Bit sync select                           2         1C
+	      ii) Delay in bits                            16         1D
+	     iii) Extracted data (bits 31-0)               32       1E-1F
+           e) Clock recovery
+               i) Range select                              7         20
+           f) Button closure map (0|1 = wasn't|was pushed)  4         21
+                 bit 0: switch #1
+                 bit 1:   "    #2
+                 bit 2:   "    #3
+                 bit 3:   "    #4
+           g) Clock counter (bits 31-0)                    32       22-23
+
+  
+    3) Transport module:  
+        a) Footage counter   (feet)                        16         30  
+        b) Supply reel pack (feet)                         16         31  
+        c) Take-up reel pack (feet)                        16         32  
+        d) Low tape sense  (0|1 = no|yes)                   1         33  
+	e) Bar code length (chars)                         16         34
+	f) Bar code                                        96       35-3A
+  
+    4) Head positioner: 
+        a) Current headblock parameter value               16         40
+        b) Total position commanded  (kA)                  16         41  
+        c) Actual position  (kA)                           16         42  
+        d) Raw LVDT voltage last read (mV)                 16         43  
+  
+    5) A/D board:   
+         a) Raw A/D channel #n (0-15) output               12       50-5F 
+  
+         b) Total power (0.01 V)                      
+                Head 1                                     12         60  
+                  "  2                                     12         61  
+
+         c) Head temperatures   (0.1 deg C)             
+                Head 1                                     12         62  
+                  "  2                                     12         63  
+
+         d) Vacuum   (0.1 in. of water)                    12         64  
+  
+    6) Mk3A Clock-Recovery module:
+	 a) Frequency band                                  7         68
+	 b) Input track # (-1 - 30)                        16         69
+
+    7) VME boards:   
+         a) Read parameter values in RAM/ROM               16         70  
+         b) Software revision #                            16         71  
+         c) Chassis serial #                                8         72  
+         d) General Status Word (0|1 = false|true)         16         73  
+               bit 0: error exists  
+               bit 1: tape moving 
+               bit 2: headstack moving  
+               bit 3: ramping 
+               bit 4: head positioning  
+               bit 5: tape positioning  
+	       bit 6: vacuum OK and servo ready
+	       bit 7: 5 MHz present
+	       bit 8: 1 pps present
+	       bit 9: head peaking 
+               bit 10: head tracking
+               bit 11: forward direction
+	       bit 12: bar code valid
+	       bit 13: slewing
+               bit 14: button pressed
+	       bit 15: measuring data rate
+
+         e) Error flags  (0|1 = false|true)                16         74  
+               bit 0: data out of range      
+               bit 1: (unused)      
+               bit 2: unable to attain vacuum with LOAD
+	       bit 3: failed attempt to change active head
+               bit 4: head index out of range
+               bit 5: head block paramater # out of range
+	       bit 6: A/D conversion timeout
+	       bit 7: MCB write request to locs. 0 - 7F denied
+	       bit 8: attempted tape motion without tape loaded
+	       bit 9: head movement timed out
+	       bit 10: unsuccessful bar code read
+	       bit 11: speed measurement failure 
+	       bit 14: spurious interrupt
+	       bit 15: software error
+
+         f) Software error code (internal, see mcbus.h)    16         75 
+
+	 g) Spurious interrupt vector                      16         76
+
+         h) GSW extension  (0|1 = false|true)              16         77 
+	       bit 0: data captured
+
+
+
+
+   MCB Command Data (transport inputs)
+  
+                 Action                                  # bits     Address 
+                 ______                                  ______     _______ 
+  
+    1) Write Module:  
+         a) Formatter select (=0|1 for FMTR1|FMTR2)       8 x 1       80  
+                Bit 0:  Group 0 in Head 1 
+                Bit 1:    "   1  "   "  1 
+                Bit 2:    "   2  "   "  1 
+                Bit 3:    "   3  "   "  1 
+                Bit 4:  Group 0 in Head 2 
+                Bit 5:    "   1  "   "  2 
+                Bit 6:    "   2  "   "  2 
+                Bit 7:    "   3  "   "  2 
+  
+         b) Output group enable (=0|1 for disable|enable) 8 x 1       81  
+                Bit 0:  Group 0 in Head 1 
+                Bit 1:    "   1  "   "  1 
+                Bit 2:    "   2  "   "  1 
+                Bit 3:    "   3  "   "  1 
+                Bit 4:  Group 0 in Head 2 
+                Bit 5:    "   1  "   "  2 
+                Bit 6:    "   2  "   "  2 
+                Bit 7:    "   3  "   "  2 
+  
+         c) System track select (fmtr. track# = 0-35) 
+                SYSTRK 0 of Head 1                          6         82  
+                  "    1  "   "  1                          6         83  
+                  "   34  "   "  1                          6         84  
+                  "   35  "   "  1                          6         85  
+                SYSTRK 0 of Head 2                          6         86  
+                  "    1  "   "  2                          6         87  
+                  "   34  "   "  2                          6         88  
+                  "   35  "   "  2                          6         89  
+  
+    3) (continuation of Transport Module):
+	 q) Set acceleration (units: 0.01 ips/s)           16         8C
+	 r) Set top speed (units: 0.01 ips)                16         8D
+
+
+    2) Monitor module:  
+         a) Track select - both Read and Bypass (track# = 0-35) 
+                Head 1, Output A                            6         90  
+                  "  1,    "   B                            6         91  
+                Head 2,    "   A                            6         92  
+                  "  2,    "   B                            6         93  
+  
+         b) Read module equalizer select (0|1|2 = std, alt1, alt2)  
+                Head 1, Output A                            2         94  
+                  "  1,    "   B                            2         95  
+                Head 2,    "   A                            2         96  
+                  "  2,    "   B                            2         97  
+  
+         c) Output select (0 = Head 1, Output A, read  
+                           1 =   "  1,    "   A, bypass 
+                           2 =   "  1, Output B, read 
+                           3 =   "  1,    "   B, bypass 
+                           4 = Head 2, Output A, read 
+                           5 =   "  2,    "   A, bypass 
+                           6 =   "  2, Output B, read 
+                           7 =   "  2,    "   B, bypass)  
+  
+                Formatter 1, signal M1                      3         98  
+                    "     1,    "   M2                      3         99  
+                Formatter 2,    "   M1                      3         9A  
+                    "     2,    "   M2                      3         9B  
+         d) Data extract:
+	     i) Bit sync select                             2         9C
+            ii) Bit delay (=0 captures sync bits 63-32)    16         9D
+           iii) Sync threshold                              8         9E
+	    iv) Initiate data extract                       1         9F
+	     v) Sync word (bits 63-0; A3 triggers download)64       A0-A3
+            vi) Sync mask (bits 63-0; A7 triggers)         64       A4-A7
+         e) Clock recovery
+             i) Range select                                7         A8
+         f) Indicator light #1                             12         A9
+               a) MCB address: bits 7-0
+               b) Bit number:   "  11-8
+         g) Indicator light #2                             12         AA
+         h)     "       "   #3                             12         AB
+         i)     "       "   #4                             12         AC
+         j) Clear button closure map                        1         AD
+	 k) Abort|adjust|measure fine data rate (0|1|2)     2         AE
+
+
+    3) Transport module:  
+        a) Stop drive                                       1         B0  
+        b) Start drive             (0|1 = reverse|forward)  1         B1  
+	c) Fast move to low-tape point (0|1 = rev|for)      1         B2
+        d) Load tape into vacuum column                     1         B3  
+			 (0|1 = do | do not read bar code)
+        e) Rewind and unload tape                           1         B4  
+        f) Set capstan speed (in units of .01 in/s)        16         B5  
+        g) Enable low tape   (0|1 = disable|enable)         1         B6  
+        h) Position tape to footage #  (0-65535)           16         B7  
+        i) Force footage counter to value  (feet)          16         B8  
+	j) Set capstan size constant (arbitrary units)     16         B9
+	k) Release brakes and servos                        1         BA
+	l) Set offset speed (units of 0.01 in/s)           16         BB
+	m) Slew delay (initiates; units 0.01 s)            16         BC
+	n) Tape thickness (kA)                             16         BD
+	o) Bar code primitive                               2         BE
+	     Bit 0: Read (0|1 = do not | do)
+	     Bit 1: Verify checksum (0|1 = disable|enable)
+        p) Set low-tape point                              16         BF
+  
+
+    4) Head positioner:  
+        a) Set index #                                     16         C0  
+        b) Download index position (kA)                    16         C1  
+        c) Set tape direction for offset (0|1 = rev|for)   16         C2  
+        d) Active head # (1-4)                             16         C3  
+	e) Set head block parameter # (0-10)                4         C4
+	     0: Inchworm speed / fast-out   (kA/s)
+	     1:    "       "     slow-out     "
+	     2:    "       "     fast-in      "
+	     3:    "       "     slow-in      "
+	     4: LVDT + linear coefficient   (kA/V)
+	     5:   "  -    "        "          "
+	     6:   "  + quadratic   "        (kA/V^2)
+	     7:   "  -    "        "          "
+	     8: Forward tape motion offset  (kA)
+	     9: Reverse   "    "      "       "
+	    10: LVDT temperature coeff.     (kA/degC)
+
+	f) Download head block parameter value             16         C5
+	g) Move head to absolute position (kA)             16         C6
+	h) Move head relative to current position (kA)     16         C7
+	i) Move active head to index position + offset(kA) 16         C8
+	j) Peak up on strongest track within +/- n kA      16         C9
+        k) Enable auto-tracking and set interval (s)       16         CA  
+	l) Abort motion of active head                      1         CB
+	m) Head motion primitives (CD triggers)             2         CC
+	     Bit 0:     speed  (0|1 = slow|fast)
+	     Bit 1:  direction (0|1 = in|out)
+	     Bits 15-0: delay  (40 us units)               16         CD
+        n) Measure (active) head position                   1         CE
+	o) Minimum auto-tracking power                     16         CF
+
+
+
+  
+    5) A/D board:
+        a) Set D/A channel #0 in mv. (0-10000)             14         D0
+	b)  "   "     "     1  "  "      "                 14         D1
+	c)  "   "     "     2  "  "      "                 14         D2
+	d)  "   "     "     3  "  "      "                 14         D3
+	e) Enable vacuum motor                              1         D4
+	f) Set vacuum sensor y-intercept (0.1 in H20)      16         D5
+	g)  "     "     "    slope (0.1 in H20 / V)        16         D6
+
+
+    6) Mk3A Clock-Recovery module:
+	 a) Frequency band                                  7         D8
+	 b) Input track # (-1 - 30)   (triggers)            5         D9
+	 c) Output track # (1-32) or common (0)             6         DA
+	 d) Parallel mode group select                      6         DB
+              Bits  2-0: Input group (1-4)
+	      Bits 10-8: Output  "     "  
+         e) Common mode track select                        7         DC
+              Bits 4-0:  Input  track (1-28)
+	      Bits 10-8: Output group (1-4)
+
+
+
+    7) VME boards:  
+        a) Set address for RAM/ROM read/write (bits 23-16)  8         E0  
+                                              ( "   15-0)  16         E1  
+        b) Overwrite parameter value in RAM                16         E2  
+        c) OR mask into RAM location                       16         E3  
+        d) AND mask into RAM location                      16         E4  
+        e) Input button #1 command assignment               8         E5
+        f)   "      "    "    data     "                   16         E6
+        g)   "      "   #2 command     "                    8         E7
+        h)   "      "    "    data     "                   16         E8
+        i)   "      "   #3 command     "                    8         E9
+        j)   "      "    "    data     "                   16         EA
+        k)   "      "   #4 command     "                    8         EB
+        l)   "      "    "    data     "                   16         EC
+        m) Error flags (same as word 74)                   16         ED
+        n) Error code  (same as word 75)                   16         EE
+        o) Master reset of CPU (by sending AE51)           16         EF 
+  

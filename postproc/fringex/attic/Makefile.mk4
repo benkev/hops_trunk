@@ -1,0 +1,37 @@
+## $MK4_DIST_D/src/postproc/fringex/Makefile
+SHELL := /bin/ksh
+
+##-----------------------------------------------------------------------------
+ifeq "$(MK4_MK_ENV)" ""
+  include $(shell echo $${PWD%/src/*})/cfg/env.mk
+  default $(MAKECMDGOALS) :
+	@mkdir -p $(MK4_MK_BLD_D)
+	@$(MAKE) -f $(MK4_MK_SRC_D)/Makefile -C $(MK4_MK_BLD_D) $(MAKECMDGOALS) 
+
+##-----------------------------------------------------------------------------
+else # ifeq "$(MK4_MK_ENV)" ""
+  include $(MK4_MK_CFG_D)/common.mk
+  include $(MK4_MK_CFG_D)/$(MK4_MK_ARCH).mk 
+
+  ##---------------------------------------------------------------------------
+  language := c
+
+  ##---------------------------------------------------------------------------
+  ## prg
+  prg := fringex
+  prg_srcs  := $(strip \
+   accum_segs.c     clear_fxp.c      dms_to_deg.c     fringex.c        read_binaries.c\
+   calc_seg.c       model.c          fill_aline.c     parse_cmdline.c  set_reffreq.c\
+   parse_iflag.c    parse_dflag.c    clear_loops.c    filelist.c       set_loops.c\
+  )
+  prg_libs := dfio afio mk4util vex m c
+  prg_lpath :=  $(MK4_MK_LIB_D)
+
+  ##
+  ipath := $(MK4_MK_INC_D)
+
+  ##
+  include $(MK4_MK_CFG_D)/rules.mk 
+
+##-----------------------------------------------------------------------------
+endif # ifeq "$(MK4_MK_ENV)" ""

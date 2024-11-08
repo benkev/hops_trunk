@@ -1,0 +1,235 @@
+# Makefile for aedit                      CJL 10/24/89
+# Modified to be architecture-independent CJL  4/18/91
+# Modified to use cmake			  CJL  1/08/92
+# Modified to use AFIO library            CJL  2/01/93
+# Added CCFIO library                     CJL  2/16/93
+#
+ 
+# Instructions for C compilation: system-dependencies
+# should be taken care of by the setup.csh script with ARCH
+# properly set.
+
+LIBS=$(PGPLOT_DIR)/libcpgplot.a $(PGPLOT_DIR)/libpgplot.a\
+$(SVLIB) $(BFIO)/$(ARCH)/libbfio.a\
+$(AFIO)/$(ARCH)/libafio.a $(X_FPLOT)/$(ARCH)/libx_fplot.a\
+$(UTIL)/$(ARCH)/libutil.a $(CCFIO)/$(ARCH)/libccfio.a
+
+.c.o:
+	$(CCOMPL) -c $(CFLAGC) -I$(INC) $<
+
+SOURCES=\
+active_filter.c		aeclr_corel.c		aeclr_fringe.c		aeclr_root.c\
+aedit.c			allocate_parms.c	axis.c			axis_scale.c\
+calc_close.c		cfilter.c		check_env.c		cleanup.c\
+cleanup_psplot.c	clear.c			clear_pstruct.c		clear_source.c\
+triangle_value.c	command_id.c		cursor_select.c		datum_value.c\
+display_psdata.c	dup_check.c		dup_flag.c		edit.c\
+erase_point.c		esdesp_check.c		execute.c		extract_parms.c\
+ffilter.c		fill_closure.c		fill_parms.c\
+fplot.c			get_axis.c		get_param.c\
+get_param_list.c	get_plot_data.c		get_plot_datum.c	get_ps_indices.c\
+help.c			init_inputs.c		psfile.c\
+locate_pscurs.c		make_psarray.c		make_tri.c		makekey.c\
+param_list.c		parse_commands.c	plot.c			plot_fqex.c\
+plot_header.c		plot_points.c		plot_quality.c		pr_allsumm.c\
+pr_csumm.c		pr_fsumm.c		pr_inputs.c		pr_rsumm.c\
+pr_source.c		pr_ssumm.c		pr_summary.c		print_data.c\
+ps_baselabel.c		ps_fplot.c		ps_free.c		ps_inside.c\
+ps_proc_datum.c		ps_scanlabel.c		ps_selbase.c		ps_selqual.c\
+ps_selscan.c		psplot.c		psplot_defaults.c	pstag_process.c\
+read_cursor.c		read_data.c		rfilter.c		run_com_file.c\
+run_pscursor.c		ccread.c		set_baselines.c\
+set_fraction.c		set_frequencies.c	set_mode.c		set_nfreq.c\
+set_prange.c		set_procrange.c		set_pscodes.c		set_psparam.c\
+set_qcodes.c		set_sources.c		set_stations.c		set_timerange.c\
+set_type.c		set_year.c		setup_plot.c\
+setup_psarray.c		setup_psplot.c		smatch.c		sorter.c\
+summ_corel.c		summ_data.c		summ_fringe.c		summ_root.c\
+symbol_key.c		trngl_present.c		unflag.c		update_fqex.c\
+update_sinfo.c		write_data.c		write_param.c		write_prmline.c\
+write_psfile.c		zoom.c			time_axis.c		set_device.c\
+auto_hardcopy.c		edit_families.c		cross_link.c		test1.c\
+write_families.c	station_reduce.c	aeclr_triangle.c	aeclr_quad.c\
+tarray_index.c		qarray_index.c		write_tdata.c		clear_summ.c\
+alloc_btq.c		fill_tdata.c		clear_fqex.c		summ_triangle.c\
+summ_quad.c		init_summ.c		pr_tsumm.c		set_triangles.c\
+set_quads.c		tfilter.c		qfilter.c		save.c\
+tricheck.c		edit_close.c		parse_cmdline.c		ps_freq_group.c\
+write_pshdr.c		add_station.c
+
+OBJECTS=\
+active_filter.o		aeclr_corel.o		aeclr_fringe.o		aeclr_root.o\
+aedit.o			allocate_parms.o	axis.o			axis_scale.o\
+calc_close.o		cfilter.o		check_env.o		cleanup.o\
+cleanup_psplot.o	clear.o			clear_pstruct.o		clear_source.o\
+triangle_value.o	command_id.o		cursor_select.o		datum_value.o\
+display_psdata.o	dup_check.o		dup_flag.o		edit.o\
+erase_point.o		esdesp_check.o		execute.o		extract_parms.o\
+ffilter.o		fill_closure.o		fill_parms.o\
+fplot.o			get_axis.o		get_param.o\
+get_param_list.o	get_plot_data.o		get_plot_datum.o	get_ps_indices.o\
+help.o			init_inputs.o		psfile.o\
+locate_pscurs.o		make_psarray.o		make_tri.o		makekey.o\
+param_list.o		parse_commands.o	plot.o			plot_fqex.o\
+plot_header.o		plot_points.o		plot_quality.o		pr_allsumm.o\
+pr_csumm.o		pr_fsumm.o		pr_inputs.o		pr_rsumm.o\
+pr_source.o		pr_ssumm.o		pr_summary.o		print_data.o\
+ps_baselabel.o		ps_fplot.o		ps_free.o		ps_inside.o\
+ps_proc_datum.o		ps_scanlabel.o		ps_selbase.o		ps_selqual.o\
+ps_selscan.o		psplot.o		psplot_defaults.o	pstag_process.o\
+read_cursor.o		read_data.o		rfilter.o		run_com_file.o\
+run_pscursor.o		ccread.o		set_baselines.o\
+set_fraction.o		set_frequencies.o	set_mode.o		set_nfreq.o\
+set_prange.o		set_procrange.o		set_pscodes.o		set_psparam.o\
+set_qcodes.o		set_sources.o		set_stations.o		set_timerange.o\
+set_type.o		set_year.o		setup_plot.o\
+setup_psarray.o		setup_psplot.o		smatch.o		sorter.o\
+summ_corel.o		summ_data.o		summ_fringe.o		summ_root.o\
+symbol_key.o		trngl_present.o		unflag.o		update_fqex.o\
+update_sinfo.o		write_data.o		write_param.o		write_prmline.o\
+write_psfile.o		zoom.o			time_axis.o		set_device.o\
+auto_hardcopy.o		edit_families.o		cross_link.o		test1.o\
+write_families.o	station_reduce.o	aeclr_triangle.o	aeclr_quad.o\
+tarray_index.o		qarray_index.o		write_tdata.o		clear_summ.o\
+alloc_btq.o		fill_tdata.o		clear_fqex.o		summ_triangle.o\
+summ_quad.o		init_summ.o		pr_tsumm.o		set_triangles.o\
+set_quads.o		tfilter.o		qfilter.o		save.o\
+tricheck.o		edit_close.o		parse_cmdline.o		ps_freq_group.o\
+write_pshdr.o		add_station.o
+
+$(ARCH)/aedit: $(OBJECTS) $(LIBS)
+	$(FCOMPL) -o aedit $(CFLAGL) $(OBJECTS) $(LIBDIR) $(LIBS) -lm -lX11
+	mv aedit $(ARCH)
+
+# Header file dependencies:
+# the following routines include aedit.h and by implication sizelimits.h
+
+active_filter.o 	aedit.o 	auto_hardcopy.o 	axis.o\
+cfilter.o 		clear.o 	cursor_select.o 	datum_value.o\
+edit.o 			execute.o 	ffilter.o 		fplot.o\
+get_param.o 		get_plot_data.o get_plot_datum.o 	init_inputs.o\
+parse_commands.o 	plot.o 		plot_fqex.o 		plot_quality.o\
+pr_inputs.o 		read_data.o 	rfilter.o 		run_com_file.o\
+set_baselines.o 	set_device.o 	set_fraction.o 		set_frequencies.o\
+set_mode.o 		set_nfreq.o 	set_prange.o 		set_procrange.o\
+set_qcodes.o 		set_sources.o 	set_stations.o 		set_timerange.o\
+set_type.o 		setup_plot.o 	time_axis.o 		write_data.o\
+write_families.o 	write_tdata.o 	zoom.o			fill_closure.o\
+set_triangles.o		set_quads.o	tfilter.o		qfilter.o\
+parse_cmdline.o\
+: aedit.h sizelimits.h
+
+# Header file dependencies:
+# the following routines include summary.h and by implication sizelimits.h
+
+aedit.o 		alloc_btq.o 		calc_close.o 	clear_fqex.o\
+clear_source.o 		clear_summ.o 		fill_parms.o 	fill_tdata.o\
+get_plot_data.o 	make_tri.o		psfile.o\
+makekey.o 		plot.o 			plot_fqex.o 	plot_header.o\
+pr_allsumm.o 		pr_csumm.o 		pr_fsumm.o 	pr_rsumm.o\
+pr_source.o 		pr_ssumm.o 		psplot.o 	summ_corel.o\
+summ_data.o 		summ_fringe.o 		summ_root.o 	symbol_key.o\
+update_fqex.o 		update_sinfo.o		dup_flag.o	execute.c\
+get_plot_datum.o 	get_ps_indices.o	extract_parms.o	pr_summary.o\
+setup_plot.o		write_data.o		time_axis.o	write_tdata.o\
+summ_triangle.o		summ_quad.o		init_summ.o	pr_tsumm.o\
+edit_close.o\
+: summary.h sizelimits.h
+
+# Header file dependencies:
+# the following routines include aedata.h and by implication adata.h
+
+aeclr_corel.o		aeclr_fringe.o		aeclr_root.o		aedit.o\
+calc_close.o		cfilter.o		clear.o			cursor_select.o\
+datum_value.o		dup_check.o		dup_flag.o		edit.o\
+execute.o		extract_parms.o		ffilter.o\
+fill_closure.o		fill_parms.o		psfile.o\
+fplot.o			get_param.o		get_plot_data.o		get_plot_datum.o\
+get_ps_indices.o	makekey.o		param_list.o		plot.o\
+plot_fqex.o		pr_summary.o		print_data.o		ps_fplot.o\
+ps_proc_datum.o		psplot.o		pstag_process.o		read_data.o\
+rfilter.o		run_com_file.o		run_pscursor.o		set_pscodes.o\
+set_year.o		setup_psarray.o		sorter.o		summ_corel.o\
+summ_data.o		summ_fringe.o		summ_root.o		unflag.o\
+update_fqex.o		write_data.o		write_param.o		write_prmline.o\
+zoom.o			triangle_value.o	plot_quality.o\
+edit_families.o		cross_link.o		write_families.o	station_reduce.o\
+aeclr_triangle.o	aeclr_quad.o		tarray_index.o		qarray_index.o\
+write_tdata.o		summ_triangle.o		summ_quad.o		tfilter.o\
+qfilter.o		save.o			tricheck.o		edit_close.o\
+: aedata.h $(INC)/adata.h
+
+# Header file dependencies:
+# the following routines include close_flags.h
+
+fill_closure.o		plot_quality.o\
+: close_flags.h
+
+# Header file dependencies:
+# the following routines include pstruct.h
+
+axis.o			axis_scale.o		clear_pstruct.o		triangle_value.o\
+cursor_select.o		datum_value.o		execute.o		get_plot_data.o\
+get_plot_datum.o	init_inputs.o		plot.o			plot_fqex.o\
+plot_points.o		plot_quality.o		setup_plot.o		symbol_key.o\
+get_axis.o		edit.o			time_axis.o		fplot.o\
+zoom.o			pr_inputs.o		clear.o\
+: pstruct.h
+
+# Header file dependencies:
+# the following routines include flags.h
+
+active_filter.o		cfilter.o		dup_flag.o		cursor_select.o\
+ffilter.o		ps_proc_datum.o		pstag_process.o\
+rfilter.o		unflag.o		edit_families.o		get_plot_data.o\
+station_reduce.o	tfilter.o		qfilter.o		edit_close.o\
+edit.o\
+: flags.h
+
+# Header file dependencies:
+# the following routines include data.h
+
+extract_parms.o		fill_parms.o		fplot.o			get_param.o\
+ps_fplot.o		summ_data.o\
+: $(INC)/data.h
+
+# Header file dependencies:
+# the following routines include ccfile.h
+
+aedit.o			make_psarray.o		psplot.o		psplot_defaults.o\
+ccread.o		setup_psarray.o		ps_freq_group.o\
+psfile.o\
+: $(INC)/ccfile.h
+
+# Header file dependencies:
+# the following routines include psplot.h
+
+cleanup_psplot.o	display_psdata.o	get_ps_indices.o	locate_pscurs.o\
+make_psarray.o		ps_baselabel.o		ps_fplot.o		ps_free.o\
+ps_proc_datum.o		ps_scanlabel.o		ps_selbase.o		ps_selqual.o\
+ps_selscan.o		psplot.o		psplot_defaults.o	pstag_process.o\
+run_pscursor.o		set_pscodes.o		set_psparam.o		setup_psarray.o\
+setup_psplot.o		ps_freq_group.o		psfile.o		write_psfile.o\
+write_pshdr.o\
+: psplot.h sizelimits.h
+
+# Header file dependencies:
+# the following routines include param_list.h and by implication usearray.h
+
+get_param.o		get_param_list.o\
+: param_list.h usearray.h
+
+# Header file dependencies:
+# the following routines include usearray.h
+
+aedit.o			allocate_parms.o	extract_parms.o\
+ffilter.o		fill_parms.o		get_param_list.o	param_list.o\
+pr_inputs.o		set_prange.o		write_param.o\
+write_prmline.o		datum_value.o		get_axis.o		get_param.o\
+: usearray.h
+
+# Header file dependencies:
+# the following routines include sort.h
+
+sorter.o		makekey.o		write_families.o	write_data.o\
+: sort.h

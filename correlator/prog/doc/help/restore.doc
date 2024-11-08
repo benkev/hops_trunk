@@ -1,0 +1,99 @@
+Summary of procedure for retrieving data from tape to disk - MAT 23 April 94
+----------------------------------------------------------------------------
+
+If you need to restore an experiment which no longer resides anywhere on
+disk in the unix system,  the procedure could fall into any one of three
+categories,  depending on the age of the experiment:
+
+Category 1
+
+These are experiments which have made their way entirely through
+the unix system,  and for which a unix tar archive tape exists.  
+Any experiment which was processed in it's entirety after February
+of 1993 will be in this category.  Tar archives for these experiments
+are located on the top shelf of a bookshelf in Colin's Lonsdale's office
+just to the right as you enter (Colin's office is the last on the right
+in the "east wing" of the building).  The tapes are stacked by the Haystack
+assigned experiment number.
+
+Restoring data from these tapes is handled by the shell script "retrieve".
+It will show you how much space is available: make sure you
+have enough space to hold your entire experiment (a matter of some
+guesswork,  but typically 200 Megabytes is enough for most experiments).
+
+To work with the data,  be sure your $DATADIR environment variable points 
+to the directory where your data resides.
+
+Category 2
+
+These are experiments which were processed between roughly September of
+1983 and January 1993,  and reside only on traditional HP A900 savem format
+archive tapes (either 9 track 6250 bpi reels or DAT's after Jan 27 1992).
+The procedure for restoring experiments in this category is a bit more
+involved (and baroque).  Please note then, that this is merely a very rough
+outline of the procedure.  Expect in reality to deal with many potential
+pitfalls and deeper levels of detail, depending on the size of the experiment
+and available resources on the HP A900 computer. Also note that the following
+description of the restore procedure assumes a working knowledge of the HP
+A900 operating system.  To include a tutorial on every aspect of the procedure
+at this time would be hopelessly voluminous.
+
+First,  you must generate a type 52 listing of the scans you want to restore
+(you may use the standard unix software tools to do this) in the standard
+afile format (version 1).  Then you must decide whether you need to restore
+type 51 (raw correlator) or type 52 extents.  Type 51's are needed if you
+expect to do any re-fourfiting,  and type 52's only are needed if you only
+need to look at fourfit/fringe plots and run fringex.  The afile list generated
+must then be ftp'd over to the A900,  then fed to either one of two transfer
+files;  *REFRN for restoring type 51's,  or *UNIB for type 52's.   Either of
+these transfer files have their one major pitfall:
+
+*REFRN - Before feeding the afile list you have created to this transfer file,
+open the file with the HP editor and type 'tr,/cmdfiles/efind.fix'.  This 
+rearranges some of the columns in the afile to the expected format.  If
+you don't,  you will spend hours mounting tapes which will read in their 
+entirety,  but restore no useful data - you have been warned !!
+
+*UNIB  - Be sure to edit out any duplicate scans according to your own 
+criterion,  otherwise the transfer file will do it for you.  If you include
+duplicates intentionally,  they will be filtered out by the transfer file.
+
+Restoring BOTH type 51's and their corresponding type 52's is not an automated
+procedure and thus must be done somewhat by hand.  It might be easier and
+quicker to consider restoring only the type 51's and re-fourfit on a fast
+unix machine after the data is restored in this case.
+
+Log on to the A900 and execute the appropriate transfer file.  Either of
+them will ask lots of questions,  for which some the answers are obvious
+and some not.  When it comes to mounting tapes, the A900 DATS are located
+in metal drawers near the correlator console and the 9 tracks could be either
+in an area near the telescope console (ask the correlator operator)  or down
+the hill inside the radome of the Wesford telescope.  If you manage to get
+through the restore process successfully, your data will then reside on an
+an HP format cartridge on the A900.
+
+Next, find out if an archive is in progress on the A900 by asking the
+correlator operator.  If so,  wait for it to finish (if not,  proceed,
+immediately), then execute transfer file *transfer.  This will transfer
+the data from the HP format cartridge to the unix archiving area.  Within
+1/2 an hour of the completion of the transfer from the A900 side (the
+prompt returns to your terminal),  the data will begin appearing in the
+standard data area on the unix system.  It should be completely transferred
+in about 5 minutes.  At this point the data is available. 
+
+If you are restoring type 51's for an entire experiment it is possible that
+the experiment will take several interations of filling and transferring 
+data on the A900.  This will complicate the procedure.
+
+
+Category 3
+
+These are experiments which were processed between roughly the beginning
+of Mark III VLBI (Late 1979) to August 1983.  These archives are stored
+on tar format Exabytes or DATS.  At this time there are no automated tools
+available to extract, convert or filter these tapes, thus the procedure
+must be done entirely by hand.  Until scripts are developed it is recommended
+that the restoration of experiments in this category be left to a Haystack
+person familiar with their format.
+
+

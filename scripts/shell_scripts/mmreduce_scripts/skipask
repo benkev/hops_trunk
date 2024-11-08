@@ -1,0 +1,19 @@
+#!/bin/csh -f
+#
+# Trivial script to handle repetitive queries about skipping
+# sections of the mmreduce process
+#
+# Written by CJL, 22 February 1996
+#################################################################
+
+while (1)
+    echo "mmreduce: Do you want to skip this step? (y/n): \c"
+    set reply=$<
+    if ($reply == "y" || $reply == "Y") then
+	exit (1)
+    else if ($reply == "n" || $reply == "N") then
+	exit (0)
+    else
+	echo "mmreduce: Please answer 'y' or 'n'"
+    endif
+end

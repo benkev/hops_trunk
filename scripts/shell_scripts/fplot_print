@@ -1,0 +1,23 @@
+#!/bin/csh -f
+#
+# Default operation is to print the fringe plot using suitably compressed
+# text (modify lp command below for local printer configuration).  If the
+# environment variable FP2FILE exists, the user is instead prompted for
+# a filename to which to send the fringe plot.  Hitting return causes it
+# to be printed normally.
+#
+# Modified by CJL, 4 August 1997
+#########################################################################
+if ($?FP2FILE == 0) then
+    cat $HOPS/lib/ljfplot $1 | lp -o nb -o l129 -o tl129 -s -dnetjet
+    rm $1
+else
+    echo "Enter file name, or hit return to print fringe plot: \c"
+    set reply=$<
+    if ($reply == "") then
+        cat $HOPS/lib/ljfplot $1 | lp -o nb -o l129 -o tl129 -s -dnetjet
+        rm $1
+    else
+        mv $1 $reply
+    endif
+endif

@@ -1,0 +1,62 @@
+Documentation for the script "monitor" CJL, March 28 1995
+---------------------------------------------------------
+
+COMMAND NAME:   monitor
+
+SYNOPSIS:  Handles data flowing from HP1000 computer in "dribble" mode
+
+SYNTAX:  monitor
+
+OPTION FLAGS:	None
+
+ARGUMENTS:	None
+
+ENVIRONMENT:	DATAHOST, OPDISPLAY, TRANSFER, CORDATA, DATA1 ... DATAn
+
+
+DESCRIPTION:
+
+This script is designed to handle the quasi-realtime data flow from a MkIII
+or MkIIIA correlator controlled by HP1000 computers.  The behaviour of the
+script is controlled via environment variables, as described below.
+
+When invoked, "monitor" will check the environment, check for another copy
+of itself which may already be running, and if all is well, start up a
+hpterm window on the display $OPDISPLAY.  The monitor command must be issued
+from the $DATAHOST machine.
+
+In the hpterm window, the "dribble" command is automatically issued.  The
+dribble script goes into an infinite loop, waking up every 60 seconds to look
+for data files newly transferred to the $TRANSFER disk area via ftp from the
+HP1000 computer.  The dribble command should not be issued manually, and
+will refuse to start unless invoked by "monitor".
+
+When "dribble" encounters data from the correlator, it performs a variety of
+checks, and invokes "rename -d" (see vhelp rename for details).  This causes
+the data files to be carefully examined, and then renamed into the standard
+unix filenaming convention.  The data are sent to the main data areas pointed
+to by $CORDATA and $DATA1 ... $DATAn.  Upon successful completion of this
+operation, the data are test-fourfitted, and the results of this fringe
+fit are displayed in the monitor window.  A completion code is then ftp'ed
+back to the HP1000 computer as confirmation of transfer, so that the data can
+be purged.  
+
+If, however, there were any problems with the process, an error code is
+sent back to the HP1000 instead.  A .error file is generated, which sits in 
+the $TRANSFER directory, causing an error message from "dribble" every 60
+seconds.  These error files and their associated data files may be transferred
+to the directory $TRANSFER/errors for later examination by using the script
+"drool" (see vhelp drool).
+
+If the data monitor dies for some reason, the hpterm window will disappear.
+To interrupt the monitor, type control-C in the monitor window.  However, to
+avoid corrupt data, DO NOT under any circumstances do this while the monitor
+is actually in the process of renaming files (i.e. make sure it is in a
+dormant state).
+
+Each time the monitor starts up, all text in the monitor window is logged into
+a file of the form $TRANSFER/monitor.yyddd-hhmmss, where the time refers to 
+the issuance of the "monitor" command.  The logging to this file is buffered
+by the system, so will not be completely up to date at any given time.  When
+the monitor is killed with a control-C (see previous paragraph), the buffer
+is flushed and the log is completed.

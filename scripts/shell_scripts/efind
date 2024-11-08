@@ -1,0 +1,129 @@
+ 
+#   This is a shell script to construct an A file containing all the data
+#   pertaining to an experiment number as given on the command line.
+#   It searches the A0000 file for a list of A files containing data on
+#   the experiment, and constructs a temporary shell script to egrep the
+#   actual data from these files one by one.  The default output file
+#   is "Ennnn" in the current directory, where "nnnn" is the supplied
+#   experiment number.  This file is suitable for input into "aedit" for
+#   filtering, editing and plotting.
+#
+#   The script looks for the environment variable ADIR, which is the path
+#   of the directory containing all the A files on the UNIX system.  If
+#   it is undefined or null, the script searches for the files in the
+#   directory "/users/correlator/afiles".
+#
+#   Created 3/28/90  CJL
+#   Version 1.0 released 4/5/90  CJL
+
+#   Get command line flags.  This code is based on getopt, not the SUN-
+#   -recommended getopts, because HP does not support getopts.
+
+ROOT="F"
+COREL="F"
+FRNGE="F"
+OUTFILE=""
+
+set -- `getopt rcfo: $*`
+if test $? != 0
+then
+    echo "Bad flag. Possibilities are -r, -c, -f, -o"
+    exit 1
+fi
+for i in $*
+do
+    case $i in
+	-r)    ROOT="T";shift;;
+	-c)    COREL="T";shift;;
+	-f)    FRNGE="T";shift;;
+	-o)    OUTFILE=$2;shift 2;;
+	--)    shift;break;;
+    esac
+done
+
+#   Check for sensible remaining argument (expt number)
+
+if test $# -ne 1
+then
+    echo "Bad number of arguments"
+    echo ""
+    set 0
+fi
+if test $1 -lt 1 -o $1 -gt 9999
+then
+    echo "The single argument must be an integer between"
+    echo "1 and 9999, corresponding to the experiment number"
+    echo "options are -r  (look for root extents)"
+    echo "            -c  (look for corel extents)"
+    echo "            -f  (look for frnge extents)"
+    echo "            -o filename (output file)"
+    echo "defaults are -rcf -o Ennnn"
+    echo "where nnnn is the experiment number given"
+    echo ""
+    exit 1 
+fi
+
+#   First set up the output file and remove previous versions
+#   The default is Ennnn where "nnnn" is the experiment number
+
+OUTFILE=${OUTFILE:-E$1}
+export OUTFILE
+if test -f $OUTFILE
+then
+    rm $OUTFILE
+fi
+
+#   Figure out what string we want to grep for, depending on values
+#   of ROOT, COREL, and FRNGE
+
+STRING="^................ $1"
+if test $ROOT = "T" -a $COREL = "F" -a $FRNGE = "F"
+then STRING="^.......0........ $1"
+elif test $ROOT = "F" -a $COREL = "T" -a $FRNGE = "F"
+then STRING="^.......1........ $1"
+elif test $ROOT = "F" -a $COREL = "F" -a $FRNGE = "T"
+then STRING="^.......2........ $1"
+elif test $ROOT = "T" -a $COREL = "T" -a $FRNGE = "F"
+then STRING="^.......[01]........ $1"
+elif test $ROOT = "T" -a $COREL = "F" -a $FRNGE = "T"
+then STRING="^.......[02]........ $1"
+elif test $ROOT = "F" -a $COREL = "T" -a $FRNGE = "T"
+then STRING="^.......[12]........ $1"
+fi
+export STRING
+
+#   Then sort out the afile directory ... check ADIR for specification
+#   "/users/correlator/afiles" is the default if ADIR undefined.
+
+ADIR=${ADIR:-/users/correlator/afiles}
+export ADIR
+
+#   Look for string of form " 1234(" in A0000 file, extract A file name
+#   from start of line, paste into new command file which greps for a
+#   string of form " 1234" in columns 17-21 of the A files.  The construction
+#   "$$" represents the PID of this process, so the "alist.$$" file is
+#   unique.
+
+if test -f $ADIR/A0000
+then
+    echo "Scanning A0000 file ..."
+    egrep ' '$1'\(' $ADIR/A0000 | sed \
+  's/\(A[A-F0-9]*\).*/echo "\1 ... ";grep "$STRING" $ADIR\/\1 >> $OUTFILE/' \
+  >> alist.$$
+else
+    echo "$ADIR/A0000 file not found ... quitting"
+    exit 1
+fi
+
+#   Check that we actually identified A files containing data on the
+#   experiment (test -s false for zero length file), execute, and clean up.
+
+if test -s alist.$$ 
+then
+    echo "Searching for data and writing into file $OUTFILE"
+    sh alist.$$
+else
+    echo "No data found ... check experiment number.  If this is a very"
+    echo "new experiment, perhaps the data are not yet transferred to UNIX"
+fi
+rm alist.$$

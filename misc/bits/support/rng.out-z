@@ -1,0 +1,186 @@
+GSL_RNG_TYPE=borosh13
+At done 0.000000 took 0.067 s (tot 0.071) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=cmrg
+At done 0.000000 took 0.109 s (tot 0.111) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=coveyou
+At done 0.000000 took 0.067 s (tot 0.071) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=fishman18
+At done 0.000000 took 0.149 s (tot 0.153) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=fishman20
+At done 0.000000 took 0.041 s (tot 0.043) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=fishman2x
+At done 0.000000 took 0.054 s (tot 0.055) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=gfsr4
+At done 0.000000 took 0.071 s (tot 0.076) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=knuthran
+At done 0.000000 took 0.081 s (tot 0.085) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=knuthran2
+At done 0.000000 took 0.135 s (tot 0.137) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=knuthran2002
+At done 0.000000 took 0.129 s (tot 0.133) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=lecuyer21
+At done 0.000000 took 0.083 s (tot 0.086) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=minstd
+At done 0.000000 took 0.080 s (tot 0.083) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=mrg
+At done 0.000000 took 0.143 s (tot 0.147) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=mt19937
+At done 0.000000 took 0.078 s (tot 0.081) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=mt19937_1999
+At done 0.000000 took 0.080 s (tot 0.084) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=mt19937_1998
+At done 0.000000 took 0.078 s (tot 0.082) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=r250
+At done 0.000000 took 0.068 s (tot 0.071) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=ran0
+At done 0.000000 took 0.039 s (tot 0.042) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=ran1
+At done 0.000000 took 0.042 s (tot 0.045) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=ran2
+At done 0.000000 took 0.106 s (tot 0.110) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=ran3
+At done 0.000000 took 0.080 s (tot 0.084) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=rand
+At done 0.000000 took 0.072 s (tot 0.076) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=rand48
+At done 0.000000 took 0.072 s (tot 0.076) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=random128-bsd
+At done 0.000000 took 0.040 s (tot 0.042) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=random128-glibc2
+At done 0.000000 took 0.039 s (tot 0.041) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=random128-libc5
+At done 0.000000 took 0.077 s (tot 0.080) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=random256-bsd
+At done 0.000000 took 0.081 s (tot 0.085) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=random256-glibc2
+At done 0.000000 took 0.077 s (tot 0.080) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=random256-libc5
+At done 0.000000 took 0.079 s (tot 0.083) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=random32-bsd
+At done 0.000000 took 0.078 s (tot 0.081) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=random32-glibc2
+At done 0.000000 took 0.077 s (tot 0.081) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=random32-libc5
+At done 0.000000 took 0.077 s (tot 0.081) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=random64-bsd
+At done 0.000000 took 0.077 s (tot 0.080) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=random64-glibc2
+At done 0.000000 took 0.079 s (tot 0.082) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=random64-libc5
+At done 0.000000 took 0.077 s (tot 0.080) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=random8-bsd
+At done 0.000000 took 0.070 s (tot 0.073) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=random8-glibc2
+At done 0.000000 took 0.037 s (tot 0.039) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=random8-libc5
+At done 0.000000 took 0.072 s (tot 0.076) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=random-bsd
+At done 0.000000 took 0.078 s (tot 0.082) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=random-glibc2
+At done 0.000000 took 0.078 s (tot 0.082) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=random-libc5
+At done 0.000000 took 0.040 s (tot 0.042) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=randu
+At done 0.000000 took 0.072 s (tot 0.076) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=ranf
+At done 0.000000 took 0.072 s (tot 0.076) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=ranlux
+At done 0.000000 took 0.491 s (tot 0.495) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=ranlux389
+At done 0.000000 took 0.800 s (tot 0.804) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=ranlxd1
+At done 0.000000 took 0.335 s (tot 0.339) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=ranlxd2
+At done 0.000000 took 0.572 s (tot 0.576) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=ranlxs0
+At done 0.000000 took 0.262 s (tot 0.265) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=ranlxs1
+At done 0.000000 took 0.372 s (tot 0.376) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=ranlxs2
+At done 0.000000 took 0.606 s (tot 0.610) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=ranmar
+At done 0.000000 took 0.106 s (tot 0.110) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=slatec
+At done 0.000000 took 9.999
+Flushing data... done.
+GSL_RNG_TYPE=taus
+At done 0.000000 took 0.076 s (tot 0.081) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=taus2
+At done 0.000000 took 0.036 s (tot 0.038) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=taus113
+At done 0.000000 took 0.073 s (tot 0.077) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=transputer
+At done 0.000000 took 0.035 s (tot 0.037) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=tt800
+At done 0.000000 took 0.076 s (tot 0.080) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=uni
+At done 0.000000 took 9.999
+Flushing data... done.
+GSL_RNG_TYPE=uni32
+At done 0.000000 took 0.081 s (tot 0.085) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=vax
+At done 0.000000 took 0.062 s (tot 0.065) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=waterman14
+At done 0.000000 took 0.068 s (tot 0.072) 0.006400 to go
+Flushing data... done.
+GSL_RNG_TYPE=zuf
+At done 0.000000 took 0.124 s (tot 0.128) 0.006400 to go
+Flushing data... done.

@@ -1,0 +1,35 @@
+#
+# $Id: streamstor.pc 58 2010-11-03 13:01:26Z gbc $
+#
+# This is a stub useful for compilation only.
+#
+# various places where the streamstor toolset has been installed:
+#prefix=/home/streamstor/linux
+#prefix=/usr/local/src/streamstor/linux
+#
+# this stub is a no-op backup
+prefix=$(top_srcdir)/mark5/stubs
+exec_prefix=${prefix}
+#
+# different versions of gcc have been used
+#libdir=${exec_prefix}/lib/gcc_v3
+#libdir=${exec_prefix}/lib/gcc_v4
+libdir=${exec_prefix}/lib
+#
+#includedir=${prefix}/include
+includedir=${prefix}
+
+Name: streamstor
+Description: Conduant streamstor driver and library
+Requires:
+Version: 8.3
+# uncomment one of these:
+#Libs: -L${libdir} -lwdapi1011 -lssapi -lrt
+#Libs: -L${libdir} -lwdapi1001 -lssapi -lrt
+#Libs: -L${libdir} -lwdapi921 -lssapi -lrt
+#Libs: -L${libdir} -lwdapi910 -lssapi -lrt
+#Libs: -L${libdir} -lwdapi702 -lssapi -lrt
+#Libs: -L${libdir} -lwdapi623 -lssapi -lrt
+#Libs: -L${libdir} -lssapi -lrt
+# this is pretty constant.  ;-)
+Cflags: -I${includedir} -DSTREAMSTOR_STUBS=1

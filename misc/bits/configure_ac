@@ -1,0 +1,46 @@
+#
+# simple config file
+#
+AC_PREREQ(2.59)
+AC_INIT(junk, 0.0, me@haystack.mit.edu)
+AM_INIT_AUTOMAKE([foreign])
+AC_CONFIG_SRCDIR([Makefile.am])
+AC_CONFIG_HEADER([hops_config.h])
+
+AC_PREFIX_DEFAULT([`pwd`/`uname -m`])
+
+# check for some things
+AC_PROG_CC
+AC_CHECK_LIB(m, floorl)
+
+# check for more things
+AC_CHECK_HEADERS([gsl/gsl_randist.h])
+AC_CHECK_LIB(gsl, gsl_ran_gaussian,
+    [AC_DEFINE(HAVE_LIBGSL,1,[Define to 1 with -lgsl (noise testing)])
+    GSL_LIBS='-lgsl -lgslcblas'
+    have_gsl=true], [have_gsl=false], [-lgslcblas])
+AC_SUBST(GSL_LIBS)
+AM_CONDITIONAL(HAVE_GSL, $have_gsl)
+
+AC_CHECK_LIB(rt, clock_gettime,
+    [AC_DEFINE(HAVE_LIBRT,1,[Define to 1 with -lrt (noise testing)])
+    RT_LIBS='-lrt'])
+AC_SUBST(RT_LIBS)
+
+PKG_CHECK_MODULES(FFTW3, fftw3, [hasfftw=true], [hasfftw=false])
+if [$hasfftw] ; then
+    AC_DEFINE([HAVE_FFTW], 1, [1=has FFTW])
+fi
+AC_SUBST(FFTW3_CFLAGS)
+AC_SUBST(FFTW3_LIBS)
+AM_CONDITIONAL(HAVE_FFTW, $hasfftw)
+
+# files to build from .in
+AC_CONFIG_FILES([Makefile])
+
+# actually build the files
+AC_OUTPUT
+
+#
+# eof
+#

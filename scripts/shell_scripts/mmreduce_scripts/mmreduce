@@ -1,0 +1,207 @@
+#!/bin/csh -f
+#
+# This script controls the data analysis for mm-VLBI,
+# automating this complex process as much as possible.
+#
+# Written by CJL, 21 February 1996
+#################################################################
+
+set nonomatch
+
+					#############################
+					# Step 1, Make sure we have #
+					# proper setup              #
+					#############################
+env_check mmreduce
+if ($status != 0) exit (1)
+					# Make sure user happy with environment
+echo "mmreduce: Below are the current values of several key environment variables\n"
+echo "mmreduce: DATADIR=$DATADIR"
+while (1)
+    echo "\nmmreduce: Is this satisfactory? ([y]/n): \c"
+    set reply=$<
+    if ($reply == "y" || $reply == "Y" || $reply == "") then
+	echo "mmreduce: OK, proceeding\n"
+	break
+    else if ($reply == "n" || $reply == "N") then
+	echo "mmreduce: OK, set up your environment and try again"
+	exit (1)
+    else
+	echo "mmreduce: Please answer 'y' or 'n'"
+    endif
+end
+					####################################
+					# Step 2, determine the experiment #
+					# number and get an ID string from #
+					# the user                         #
+					####################################
+echo "mmreduce: What is the experiment number of the data you wish to reduce?: \c"
+set expt_no=$<
+set expdir=$DATADIR/$expt_no
+if (! -d $expdir) then
+    echo "\nmmreduce: Error, directory '$expdir' does not exist\!"
+    exit (1)
+endif
+echo "\nmmreduce: Please provide an identifying string for this run"
+echo "mmreduce:              which should not exceed 8 characters: \c"
+set reply=$<
+set id_string=${expt_no}-$reply
+					###################################
+					# Step 3, figure out if this is a #
+					# restarted run, and handle any   #
+					# restart request from the user   #
+					###################################
+set alist_file=${id_string}.alist
+set mlist_file=${id_string}.mlist
+set mlistf_file=${id_string}.mlistf
+set codet_file=${id_string}.codet
+set codetf_file=${id_string}.codetf
+set cofit_file=${id_string}.cofit
+set cofitf_file=${id_string}.cofit
+set cmlist_file=${id_string}.cmlist
+set cmlistf_file=${id_string}.cmlistf
+set fmlist_file=${id_string}.fmlist
+set fmlistf_file=${id_string}.fmlistf
+set vis_file=${id_string}.vis
+
+set filelist=(${id_string}.*)
+if (-e $filelist[1]) then
+    echo "\nmmreduce: It appears that work has already been done on"
+    echo "mmreduce: this dataset.  Here is a list of related files I found:\n"
+    ls -l ${id_string}.*
+    echo "\nmmreduce: Depending on exactly what has been done to generate"
+    echo "mmreduce: these files, you may be able to restart the analysis"
+    echo "mmreduce: at the following stages (alternatively, you can manually"
+    echo "mmreduce: skip each individual stage when starting from the beginning):\n"
+    echo "mmreduce: 0. Start at the very beginning again"
+    if (-e $alist_file) echo "mmreduce: 1. Generate masterlist from raw alist file"
+    if (-e $mlist_file) echo "mmreduce: 2. Manual aedit run on masterlist file"
+    if (-e $mlistf_file) echo "mmreduce: 3. Make coherent detection list from masterlist"
+    if (-e $codet_file) echo "mmreduce: 4. Manual aedit run on coherent detection list"
+    if (-e $codetf_file) echo "mmreduce: 5. Perform coherence analysis with cofit"
+    if (-e $cofit_file) echo "mmreduce: 6. Manual aedit run on cofit output file"
+    if (-e $cofitf_file && -e $mlistf_file) \
+                         echo "mmreduce: 7. Run coterp to fill in all coherence times"
+    if (-e $cmlist_file) echo "mmreduce: 8. Manual aedit run on coherence-fitted masterlist"
+    if (-e $cmlistf_file) echo "mmreduce: 9. Incoherent fringe search of masterlist"
+    if (-e $fmlist_file) echo "mmreduce: 10. Manual aedit of fringe-searched masterlist"
+    if (-e $fmlistf_file) echo "mmreduce: 11. Visibility generation from final masterlist"
+    echo "\nmmreduce: Pick a number to initiate processing at the desired stage: \c"
+    set reply=$<
+    switch ($reply)
+	case 0:
+	    goto mm_start
+	case 1:
+	    goto make_mlist
+	case 2:
+	    goto make_mlistf
+	case 3:
+	    goto make_codet
+	case 4:
+	    goto make_codetf
+	case 5:
+	    goto make_cofit
+	case 6:
+	    goto make_cofitf
+	case 7:
+	    goto make_cmlist
+	case 8:
+	    goto make_cmlistf
+	case 9:
+	    goto make_fmlist
+	case 10:
+	    goto make_fmlistf
+	case 11:
+	    goto make_vis
+	default:
+	    echo "mmreduce: Invalid choice '$reply', exiting"
+	    exit (1)
+    endsw
+endif
+					###################################
+					# Step 4. Call each sub-script in #
+					# proper order                    #
+					###################################
+mm_start:
+    mm_start $id_string $expdir
+    if ($status != 0) then
+	echo "mmreduce: Failure in mm_start script"
+	exit (1)
+    endif
+
+make_mlist:
+    make_mlist $id_string
+    if ($status != 0) then
+	echo "mmreduce: Failure in make_mlist script"
+	exit (1)
+    endif
+
+make_mlistf:
+    make_mlistf $id_string
+    if ($status != 0) then
+	echo "mmreduce: Failure in make_mlistf script"
+	exit (1)
+    endif
+
+make_codet:
+    make_codet $id_string
+    if ($status != 0) then
+	echo "mmreduce: Failure in make_codet script"
+	exit (1)
+    endif
+
+make_codetf:
+    make_codetf $id_string
+    if ($status != 0) then
+	echo "mmreduce: Failure in make_codetf script"
+	exit (1)
+    endif
+
+make_cofit:
+    make_cofit $id_string
+    if ($status != 0) then
+	echo "mmreduce: Failure in make_cofit script"
+	exit (1)
+    endif
+
+make_cofitf:
+    make_cofitf $id_string
+    if ($status != 0) then
+	echo "mmreduce: Failure in make_cofitf script"
+	exit (1)
+    endif
+
+make_cmlist:
+    make_cmlist $id_string
+    if ($status != 0) then
+	echo "mmreduce: Failure in make_cmlist script"
+	exit (1)
+    endif
+
+make_cmlistf:
+    make_cmlistf $id_string
+    if ($status != 0) then
+	echo "mmreduce: Failure in make_cmlistf script"
+	exit (1)
+    endif
+
+make_fmlist:
+    make_fmlist $id_string
+    if ($status != 0) then
+	echo "mmreduce: Failure in make_fmlist script"
+	exit (1)
+    endif
+
+make_fmlistf:
+    make_fmlistf $id_string
+    if ($status != 0) then
+	echo "mmreduce: Failure in make_fmlistf script"
+	exit (1)
+    endif
+
+make_vis:
+    make_vis $id_string
+    if ($status != 0) then
+	echo "mmreduce: Failure in make_vis script"
+	exit (1)
+    endif

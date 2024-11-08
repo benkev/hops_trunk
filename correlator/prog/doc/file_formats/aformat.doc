@@ -1,0 +1,316 @@
+Unix-based A-file format                Documentor CJL, 28 January 1994
+-----------------------                 -------------------------------
+
+Below is a description of the A-file format, version 2 and higher.  Version 2
+was introduced for two purposes.  First, deficiencies in the old format
+were fixed.  Various useful quantities were added, and the scan time
+precision was improved to 1 second, allowing trivial construction of
+a unique unix data file name from the A-file line.  Second, a mechanism
+for future support of A-file format evolution was included via the
+version number in field 1.
+
+A ground rule is that the new format is field-oriented, not column-oriented.
+Fields are delimited by spaces.  In general, A-file format writing routines
+will stick to the same columns to facilitate viewing of the files, but these
+columns are NOT fixed, and any software that uses these files will not care
+about the columns.  Many fields, however, will normally have fixed widths 
+(indicated by definite number of characters in the width column below).
+Extreme values in any field cause the field width to expand.  Common to all
+lines is a format version number in the first field.  A non-numeric
+character implies version 1 (the old HP-1000 format).  Future modifications
+to the format will increment this version number.  All unix software will
+support all A-file format versions, including files with mixed formats.  In
+the latter case, however, certain fields will be missing in certain lines,
+and processing of those quantities may be blocked by programs that encounter
+such mixed-format files.
+
+Note that version 2+ or mixed format A-files CANNOT be used on the HP-1000
+systems.  If you need to ship an A-file back there, for reprocessing perhaps,
+it MUST be a version 1 A-file.  Control over the output format from the unix
+programs is provided.
+
+Below are the formal definitions of the formats for different line types,
+format version number 4.
+
+The contents of the type 0 lines are as follows:
+
+Field # Contents                Width/type      Comments
+------- --------                ----------      --------
+1       Format version #        1/i             Non-numeric = version 1
+2       Root id code            6/c             6-char lower case
+3       File type (0)           1/i             Root file record
+4       Extent #                2/i             Should always be zero
+5       Size                    4/i             # of 256-byte records in file
+6       Expt serial #           4/i             Part of filename
+7       Scan ID                 32/c            From obsvex, blanks trimmed
+8       Procdate yyddd-hhmmss   12/c            Corel run date
+9       Year of scan            4/i             Four-digit year
+10      Time tag ddd-hhmmss     10/c            Equals scan directory name
+11      Source name             8/c             Blank padded
+12      Station list            variable/c      1 character per station
+
+Changes version 1 to 2: Deletion of the archive number (obsolete 
+                        under unix), repositioning of the root id code, 
+                        and addition of seconds precision to the scan.  
+                        The FMGR file name is also dropped.
+Changes version 2 to 3: None
+Changes version 3 to 4: Added seconds precision to procdate
+Changes version 4 to 5: Added scan ID, changed scan year to 4 digits, removed
+                            corel version from procdate
+
+
+The contents of the type 1 lines are as follows:
+
+Field # Contents                Width/type      Comments
+------- --------                ----------      --------
+1       Format version #        1/i             Non-numeric = version 1
+2       Root id code            6/c             6-char lower case
+3       File type (1)           1/i             Corel file record
+4       Size                    4/i             # of 256-byte records in file
+5       Expt serial #           4/i             Part of filename
+6       Scan ID                 32/c            From obsvex, blanks trimmed
+7       Procdate yyddd-hhmmss   12/c            Corel run date
+8       Year of scan            4/i             Four-digit year
+9       Time tag ddd-hhmmss     10/c            Equals scan directory name
+10      Source name             8/c             Blank-padded
+11      Baseline/QF             3/c             2-char baseline id and 1-char qcode
+                                                Meaning of qcode in corel.doc
+12      Scheduled duration      4/i             Seconds
+13      Lags                    4/i             Number of lags in correlation
+14      Reference drive #       1/i             
+15      Remote drive #          1/i             
+16      frequencies             2/c             E.g. SX
+17      Reference clock error   7/f             Microsec
+18      Ref/rem clock diff.     7/f             Microsec
+19      Status bits             6/octal         See corel.doc for details
+
+Changes version 1 to 2: Repositioning of the root id code, addition of 
+                        seconds precision to the scan, separating reference 
+                        and remote drive numbers into two fields (in case 
+                        they go over 9), omission of the scheduled scan start 
+                        seconds (now in the scan field), and omission of 
+                        correlation start/stop times and EQTs, which are not 
+                        present in the root file, and therefore not accessible 
+                        under unix.  The FMGR file name is also dropped.
+Changes version 2 to 3: None
+Changes version 3 to 4: Addition of field 13, and seconds precision to procdate
+Changes version 4 to 5: Added scan ID, deleted extent number from field 4 (so
+                         that version 5 is unusable for Mk3), 4-digit scan year
+                         removed corel version from procdate
+
+
+The contents of the type 2 lines are as follows:
+
+Field # Contents                Width/type      Comments
+------- --------                ----------      --------
+1       Format version #        1/i             Non-numeric = version 1
+2       Root id code            6/c             6-char lower case
+3       File type (2)           1/i             General format for fringe data
+4       Extent #                2/i             Part of filename
+5       Duration                4/i             Nominal duration of this datum (sec)
+6       Length                  4/i             Seconds of data represented.
+7       Offset                  4/i             Offset (sec) of mean time of data from
+                                                nominal scan time (field 11)
+8       Expt serial #           4/i             Part of filename
+9       Procdate yyddd?hhmmss   12/c            FRNGE/fourfit processing time
+                                                char 6 is corel version number
+10      Year of scan            2/i             Two-digit year.
+11      Time tag ddd-hhmmss     10/c            Nominal start time of data record
+12      Scan offset             3/i             Offset from scan time to time tag (sec)
+13      Source name             8/c             Blank-padded ascii string
+14      Baseline/QF             3/c             2-char baseline id and 1-char qcode
+                                                Meaning of qcode defined in fourfit
+15      Freq/mode/#freq         4/c             e.g. XC08 for X-band mode C 8 freqs
+16      Lags                    4/i             Number of lags in correlation
+17      Amplitude               6/f             In units of 1/10000
+18      Ampl. SNR               5/f             4 significant digits
+19      Phase(deg)              5/f             Can be of various type, see field 21
+20      Phase SNR               5/f             4 significant digits
+21      Data type               2/c             First char specifies data origin:
+                                                A = ap by ap data from fringex
+                                                C = coherently avgd data from fringex
+                                                I = incoherently avgd data from average
+                                                J = Inc. scan avg from average, dur=seglen
+                                                K = Cofit output (bogus duration)
+                                                S = scan summary from alist
+                                                O = overlapping coh. avg. from fringex
+                                                Second char specifies phase type:
+                                                f = residual to corel+fourfit, e.c.
+                                                c = residual to corel only
+                                                t = total phase (geodetic definition)
+                                                e = total earth-centered phase
+22      Resid SBD               5/f             Microseconds
+23      Resid MBD               8/f             Microseconds
+24      MBD ambiguity           6/f             Microseconds
+25      Resid rate              7/f             Picoseconds/second
+26      Ref. elevation          4/f             At reference epoch, degrees
+27      Rem. elevation          4/f             At reference epoch, degrees
+28      Ref. azimuth            5/f             At reference epoch, degrees
+29      Rem. azimuth            5/f             At reference epoch, degrees
+30      u (megalambda)          6/f             precision 4 sig. digits
+31      v (megalambda)          6/f             precision 4 sig. digits
+32      ESDESP                  6/c             E=ref.tape error rate exponent: 
+                                                        0=1.0E00  9=1.0E-9
+                                                S=ref.tape slip sync rate: 
+                                                        0=10%     9=1%
+                                                D=percentage data discarded:
+                                                        0=10%     9=1%
+                                                E=rem.tape error rate exponent:
+                                                        0=1.0E00  9=1.0E-9
+                                                S=rem.tape slip sync rate:
+                                                        0=10%     9=1%
+                                                P=fraction of data processed:
+                                                        0=<5%     9=>95%
+                                                i.e. INTG.TIME/scheduled run duration
+33      Reference epoch         4/c             mmss at which various time-dependent
+                                                quantities are calculated
+34      Reference frequency     8/f             Precision 10 KHz
+35      Total e.c. phase        5/f             Regardless of field 21
+36      Total drate             11/f            At ref epoch, microsec/sec
+37      Total mbdelay           13/f            At ref epoch, microsec
+38      Total SBD-MBD           5/f             At ref epoch, microsec
+39      Search coh. time        3/i             Seconds
+40      Zero-loss coh. time     3/i             Seconds
+41      Parent corel extent(s)  variable        up to 4 numbers, "a,b,c,d"
+
+
+Changes version 1 to 2: Brand new fields are 1, 21, 26, 27, 28, 29, 30, 31, 34.  
+                        Modified or enhanced fields are 11, 19, 22, 23, 41.  
+                        Discarded fields are FMGR file name, reference and remote 
+                        tape labels, A-file number, phasecal numbers for first 
+                        and last channels, reference and remote.  
+Changes version 2 to 3: Addition of fields 5 and 7.  
+Changes version 3 to 4: Addition of fields 12, 16, 20, 39 and 40, and seconds precision
+                        to procdate
+
+Version 5, below, was introduced in order to support Mk4.  Because version 4
+will still be used for legacy Mk3 data, both versions are described here in
+full.
+
+Field # Contents                Width/type      Comments
+------- --------                ----------      --------
+1       Format version #        1/i             Non-numeric = version 1
+                                                >=5 implies Mk4
+2       Root id code            6/c             6-char lower case
+3       File type (2)           1/i             General format for fringe data
+4       Fileset #               2/i             Part of filename
+5       Duration                4/i             Nominal duration of this datum (sec)
+6       Length                  4/i             Seconds of data represented.
+7       Offset                  4/i             Offset (sec) of mean time of data from
+                                                nominal scan time (field 11)
+8       Expt serial #           4/i             Part of filename
+9       Scan ID                 32/c            From obsvex, blanks trimmed
+10      Procdate yyddd-hhmmss   12/c            FRNGE/fourfit processing time
+11      Year of scan            4/i             Four-digit year.
+12      Time tag ddd-hhmmss     10/c            Nominal start time of data record
+13      Scan offset             3/i             Offset from scan time to time tag (sec)
+14      Source name             8/c             Blank-padded ascii string
+15      Baseline                2/c             2-char baseline id 
+16      QF/errcode              2/c             2-char qcode and errcode
+                                                Meanings defined in fourfit
+17      Band/#freq              3/c             e.g. X08 for X-band 8 freqs
+18      Polarization            2/c             RR, LL, RL, LR
+19      Lags                    4/i             Number of lags in correlation
+20      Amplitude               6/f             In units of 1/10000
+21      Ampl. SNR               5/f             4 significant digits
+22      Phase(deg)              5/f             Can be of various type, see field 21
+23      Phase SNR               5/f             4 significant digits
+24      Data type               2/c             First char specifies data origin:
+                                                A = ap by ap data from fringex
+                                                C = coherently avgd data from fringex
+                                                I = incoherently avgd data from average
+                                                J = Inc. scan avg from average, dur=seglen
+                                                K = Cofit output (bogus duration)
+                                                S = scan summary from alist
+                                                O = overlapping coh. avg. from fringex
+                                                Second char specifies phase type:
+                                                f = residual to corel+fourfit, e.c.
+                                                c = residual to corel only
+                                                t = total phase (geodetic definition)
+                                                e = total earth-centered phase
+25      Resid SBD               5/f             Microseconds
+26      Resid MBD               8/f             Microseconds
+27      MBD ambiguity           6/f             Microseconds
+28      Resid rate              7/f             Picoseconds/second
+29      Ref. elevation          4/f             At reference epoch, degrees
+30      Rem. elevation          4/f             At reference epoch, degrees
+31      Ref. azimuth            5/f             At reference epoch, degrees
+32      Rem. azimuth            5/f             At reference epoch, degrees
+33      u (megalambda)          6/f             precision 4 sig. digits
+34      v (megalambda)          6/f             precision 4 sig. digits
+35      ESDESP                  6/c             E=ref.tape error rate exponent: 
+                                                        0=1.0E00  9=1.0E-9
+                                                S=ref.tape slip sync rate: 
+                                                        0=10%     9=1%
+                                                D=percentage data discarded:
+                                                        0=10%     9=1%
+                                                E=rem.tape error rate exponent:
+                                                        0=1.0E00  9=1.0E-9
+                                                S=rem.tape slip sync rate:
+                                                        0=10%     9=1%
+                                                P=fraction of data processed:
+                                                        0=<5%     9=>95%
+                                                i.e. INTG.TIME/scheduled run duration
+36      Reference epoch         4/c             mmss at which various time-dependent
+                                                quantities are calculated
+37      Reference frequency     8/f             Precision 10 KHz
+38      Total e.c. phase        5/f             Regardless of field 21
+39      Total drate             11/f            At ref epoch, microsec/sec
+40      Total mbdelay           13/f            At ref epoch, microsec
+41      Total SBD-MBD           5/f             At ref epoch, microsec
+42      Search coh. time        3/i             Seconds
+43      Zero-loss coh. time     3/i             Seconds
+
+Changes from version 4 to 5: deleted mode, parent extents, corel version #
+                             added polarization, 2-char qf/errcode, scan_id
+                             changed scan year to 4 digits
+
+The above is intended to fulfill data export needs, but is insufficient for 
+astrometric purposes.
+
+
+The contents of the type 3 lines are as follows:
+
+Field # Contents                Width/type      Comments
+------- --------                ----------      --------
+1       Format version #        1/i
+2       Expt serial #           4/i             
+3       File type (3)           1/i             Closure triangle data
+4       Scan ID                 32/c            From obsvex, blanks trimmed
+5       Year of scan            4/i             Four-digit year.
+6       Time tag ddd-hhmmss     10/c            Nominal start time of data record
+7       Scan offset             3/i             Offset from scan time to time tag (sec)
+8       Source name             8/c             Blank-padded ascii string
+9       Freq/mode               2/c             e.g. XC for X-band mode C
+10      Lags                    4/i             Number of lags in correlation
+11      Triangle                3/c             e.g. ABC
+12      root extension(s)       6-20/c          If more than one, comma separated
+13      extents                 i,i,i           For baselines AB, BC, CA
+14      lengths                 i,i,i           For baselines AB, BC, CA
+15      Duration                4/i             Nominal duration of datum
+16      Offset                  4/i             Offset from nominal scan time of
+                                                mean time of all contributing data
+17      Scan quality            1/c             Based on baseline qf's
+18      Data quality            1/c             Based on data values
+19      ESDESP                  6/c             Minimum of baseline values
+20      bispectral amp          9/f             Units of 10**-12
+21      bispectral snr          7/f             
+22      bispectral phase        5/f             Closure phase (degrees)
+23      Data type               2/c             Analogous to type 2 field 21, 
+                                                meaning yet to be defined
+24      closure sbd             6/f             Microseconds
+25      closure mbd             8/f             Microseconds
+26      closure mbd ambig.      6/f             Microseconds
+27      closure delay rate      7/f             Picosec/sec
+28      Elevations              f,f,f           For stations A,B,C
+29      Azimuths                f,f,f           For stations A,B,C
+30      Reference epoch         4/c             mmss at which various time-dependent
+                                                quantities are calculated
+31      Reference frequency     8/f             Precision 10 KHz
+32      Coherence time          3/i             Minimum of contributing baselines
+
+
+Changes version 1 to 2: There was no version 1.
+Changes version 2 to 3: Added fields 15, 16, 23.
+Changes version 3 to 4: Added fields 7, 10, 32.
+Changes version 4 to 5: Added scan ID, changed scan year to 4 digits

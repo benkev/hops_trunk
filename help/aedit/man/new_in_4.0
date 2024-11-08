@@ -1,0 +1,55 @@
+\begin{center}
+\large\bf
+\underline{New in 4.0}
+\end{center}
+
+There have been many enhancements in ``aedit" since the release 3.0
+in 1992, some of which are major, so I have decided to call this
+release 4.0.  Below is a list of the most important enhancements.  The
+detailed documentation of the individual commands covers the numerous
+other, more minor changes.
+
+\begin{enumerate}
+\item Full support is now available for all three types of data record,
+0, 1 and 2.  This applies to filtering, sorting, and other operations.
+Two new ``edit" options are now available which remove data records
+which lack parent or child data records (e.g. if a root record has no
+associated corel or fringe records in the database, it can be edited
+out with the command ``edit parents").  The ``family" sort option causes
+data records to be grouped by root family when writing the data to disk
+(normally, all type 2 records are written, then all type 1's, then all
+type 0's).
+\item Aedit now has significant experiment summary capabilities.  The
+command ``ccread" causes a specified correlator control file to be read
+into memory, after which one may invoke the ``psplot" command.  This is
+a highly interactive experiment status browser and data editor, which
+uses color-coded rectangles to represent data records.  You can tag or
+edit data based on quality code, scantime or baseline, or by clicking on
+individual data cells, and you can of course pop up fringe plots by 
+clicking on any cell.  The display is intended to visually assist 
+diagnosis of experiment-wide problems, among other things.
+\item In order to circumvent the problem of limited numbers of parameters
+in the standard A-file format, ``aedit" now supports parameter extraction
+directly from the type-2 data files on disk.  Depending on circumstances,
+you can now extract, plot, and write out any of a wide range of parameters.
+You can also filter the data on the basis of the values of extracted parameters.
+Phasecal information is now accessible only through the extracted
+parameters.  The relevant commands are ``parameter", ``pwrite", ``plist"
+and ``prange".
+\item Plotting within ``aedit" has been improved significantly.  It is now
+possible to plot any quantity, including extracted parameters if present,
+against any other quantity (provided it makes rudimentary sense .. you
+cannot plot closure rate versus baseline SNR, for example).  Specification
+of the output device has been simplified for a subset of devices.  All
+plots remain fully active, in the sense that on appropriate devices you can
+edit data with the interactive cursor, or pop up fringe plots on Xwindow
+devices.  New commands of relevance include ``xscale", ``yscale", ``reference"
+and ``remote".
+\item Along with all other MkIV programs, ``aedit" supports the new version 2
+A-file format.  This format features a somewhat more useful mix of quantities,
+with additional precision in many cases, and is to be preferred where
+possible.  ``Aedit" can write the data out in any A-file format (see the
+command ``outversion").
+\end{enumerate}
+
+C. Lonsdale, March 1994.

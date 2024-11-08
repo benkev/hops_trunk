@@ -1,0 +1,27 @@
+#!/usr/bin/perl -w
+# read in alist list and grab file root names
+$filin=$ARGV[0]; # read in file name
+$expno=$ARGV[1]; # read in experiment number
+print "file root file $filin \n\n";
+open(FILIN,$filin) || die "File named \"$filin\" not found\n";
+open(FILOUT,">ln_$filin") || die "cannot create \"delete_$filin\" \n";
+while (<FILIN>) {
+  chomp;
+  @readline = split();
+  $ref = substr($readline[14],0,1);
+  $rem = substr($readline[14],1,1);
+  print FILOUT "ln -s " .
+    "/data2/uvlbi/$expno/$readline[8]/$readline[13]..$readline[1] " .
+    " $expno/$readline[8]/$readline[13]..$readline[1] \n";
+  print FILOUT "ln -s " .
+    "/data2/uvlbi/$expno/$readline[8]/$readline[14]..$readline[1] " .
+    " $expno/$readline[8]/$readline[14]..$readline[1] \n";
+  print FILOUT "ln -s " .
+    "/data2/uvlbi/$expno/$readline[8]/$ref..$readline[1] " .
+    " $expno/$readline[8]/$ref..$readline[1] \n";
+  print FILOUT "ln -s " .
+    "/data2/uvlbi/$expno/$readline[8]/$rem..$readline[1] " .
+    " $expno/$readline[8]/$rem..$readline[1] \n";
+}
+close(FILIN);
+close(FILOUT);

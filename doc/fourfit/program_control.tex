@@ -1,0 +1,48 @@
+\subsection{\textbf command line}
+The \textit{fourfit} command line has a number of options, which are
+detailed in Appendix \ref{app:commandlineoptions}. 
+Depending on the chosen options, each execution of \textit{fourfit}
+could process any combination of:
+\begin{itemize}
+\item one or more scans
+\item one or more baselines
+\item one or more frequency bands
+\item one or more polarization products
+\end{itemize}
+The most commonly used options include -t to invoke test mode,
+which doesn't create any output files, -b to specify a particular
+baseline to process, -p to pop up a fringe plot on the screen,
+and -c to specify a control file name.
+
+
+\subsection{\textbf control file}
+Control files are the principal means by which \textit{fourfit} is usually controlled.
+There is normally one control file created per experiment, with finer control
+of processing provided within an experiment by using optional selectors,
+such as specifying a time range or particular scans,
+within the control file. Control file information can in turn come through
+three different routes, in the order they are read:
+\begin{enumerate}
+\item there is the capability (not normally used) of having
+a default control file. If it exists, it is accessed by
+an environment variable called \$DEF\_CONTROL. It might prove useful
+if the program defaults need to be changed on a regular basis.
+\item a control file that may be referenced
+through the -c option of the \textit{fourfit} command line
+\item a convenience feature that allows immediate use of control file commands
+on the run line (see \textbf{set} below)
+\end{enumerate}
+If the same parameters are set in more than one location it is the last
+setting that is used.
+
+\subsection{\textbf{set} mechanism}
+As explained above, the final control file input to the program
+is anything on the command line following \textbf{set}, if that is present.
+Since it comes last, the information - if it matches the selector
+criteria - overwrites any corresponding earlier information. For example,
+the experiment control file might specify the singleband delay range over
+which to search, but one could override it by appending 
+\textbf{set sb\_win 0.56 0.56}, which would force it to use the value of 
+0.56 $\mu$secs. This mechanism provides a convenient way to see the
+effect of quick changes to parameters, since it avoids having to edit
+the control file.

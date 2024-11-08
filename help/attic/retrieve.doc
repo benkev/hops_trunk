@@ -1,0 +1,51 @@
+Documentation for the script "retrieve" CJL, April 25 1994
+----------------------------------------------------------
+
+COMMAND NAME:   retrieve
+
+SYNOPSIS:  Helps the user restore archives to disk
+
+SYNTAX:  retrieve
+
+OPTION FLAGS:	None
+
+ARGUMENTS:	None
+
+ENVIRONMENT:	CORDATA, SCRATCH1 ... SCRATCHn
+
+DESCRIPTION:
+
+This shell script takes the guesswork out of restoring the contents of
+archive tapes to disk.  The user types "retrieve" at the terminal,
+and is prompted to select a destination disk, confirm the tape
+drive device name, and load the tape in the drive.  The script then
+extracts the data, and makes sure the file permission masks are set
+appropriately.  If the user is running with the "operator" user ID,
+the script includes the operational data area as a possible destination,
+and does not fiddle with the file permissions under the assumption
+that the data are to remain protected from general users, just like
+before the data were archived.
+
+There are a couple of things to note about the script, and the archives
+it accesses.  This script assumes that it is reading a tape written
+by the "archive" shell script.  Because that script writes from inside
+the experiment directory, the tar tape does not contain the experiment
+directory itself.  Since this directory is required by much of the 
+software, the "retrieve" script must recreate it.  Therefore, the user
+is prompted for the experiment number at the start of the script.  It
+is an error to omit this number.  If you want to place your experiment
+in a semi-private subdirectory within the scratch areas, the recommended
+action is to "retrieve" normally, then "mv" the resulting experiment
+directory to the desired location.  This MUST be somewhere in that same
+scratch area, otherwise you may accidentally end up physically moving
+hundreds of megabytes of data around unnecessarily.  The "mv" command
+should execute in well under 1 second.
+
+Later versions of this script may try to get the experiment number
+automatically.  Also, the method for generation of archive tapes may
+be changed to include the experiment directory.
+
+This script does not look at the contents of the tape.  It will just
+dump the files into the experiment directory you specify.  Error checking
+is minimal, and you must respond to questions accurately, or the
+script may simply die on you.

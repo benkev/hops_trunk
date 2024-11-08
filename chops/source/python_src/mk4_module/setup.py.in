@@ -1,0 +1,6 @@
+from @PYTHON_SETUP@ import setup
+
+setup(name='mk4',
+      version='0.1',
+      package_dir={ '': '@abs_builddir@' },
+      packages=['mk4b', 'afiob'])

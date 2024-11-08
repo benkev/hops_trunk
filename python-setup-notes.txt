@@ -1,0 +1,59 @@
+
+from John email sep 19
+
+Regarding the impending python 3.12 aggravating removal of distutils, I think the path forward is relatively straightforward, we just need to replace calls to "python setup.py" wit "pip install". In the cmake build this is handled with:
+
+    if("${PYTHON_SETUP}" STREQUAL "setuptools")
+        #use pip/setuptools
+        install(CODE "execute_process(COMMAND ${PY_EXE} -m pip install ${CMAKE_CURRENT_BINARY_DIR} --upgrade --target=${PYTHON_MODULE_INSTALL_DIR} )")
+    else()
+        #use distutils
+        install(CODE "execute_process( COMMAND ${PY_EXE} ${SETUP_PY} install --prefix=${CMAKE_INSTALL_PREFIX} )")
+    endif()
+
+for automake I think we just need to change the command executed by the install-exec-local target:
+
+install-exec-local:
+        ($(PYTHON) setup.py install \
+                --prefix $(DESTDIR)$(prefix) \
+                --record $(DESTDIR)$(pythondir)/$(PKG_NAME)/install_mk4_files.txt \
+                --verbose)
+
+to call the pip based equivalent. However we'll need to detect if their system has pip installed at configure time, since it does not come by default on many linux distros and isn't part of the standard library.
+
+I liked it better when Guido was in charge... 
+
+
+Ok...actually I lied. I forgot there are a couple other things which
+need to change. One is the setup.py files themselves need to be processed
+during configure so that:
+
+from @PYTHON_SETUP@ import setup
+
+(which replaces the standard import statement) becomes either:
+
+from setuptools import setup
+
+or:
+
+from distutils.core import setup
+
+depending on the local python version and whether or not setuptools/pip
+is available.
+
+The second thing is that pip pollutes the source directory with a bunch
+of egg.info crap.
+
+Try what I could with all the various flags passed to pip, the only way
+I found around that was to just copy the whole source directory into the
+build directory where the pollution doesn't matter and then install it
+from there. Alternatively, we could clean it up after, but that plays
+havoc with the dist/distcheck targets.
+
+Deprecation warnings come from:
+    /home/gbc/HOPS/build-3.25/chops/source/python_src/mk4_module
+    /home/gbc/HOPS/build-3.25/chops/source/python_src/hopstest_module
+    /home/gbc/HOPS/build-3.25/chops/source/python_src/ffcontrol_module
+    /home/gbc/HOPS/build-3.25/chops/source/python_src/vpal_module
+    /home/gbc/HOPS/build-3.25/chops/source/python_src/vex_module
+

@@ -1,0 +1,37 @@
+## $MK4_DIST_D/src/postproc/pratio/Makefile
+SHELL := /bin/ksh
+
+##-----------------------------------------------------------------------------
+ifeq "$(MK4_MK_ENV)" ""
+  include $(shell echo $${PWD%/src/*})/cfg/env.mk
+  default $(MAKECMDGOALS) :
+	@mkdir -p $(MK4_MK_BLD_D)
+	@$(MAKE) -f $(MK4_MK_SRC_D)/Makefile -C $(MK4_MK_BLD_D) $(MAKECMDGOALS) 
+
+##-----------------------------------------------------------------------------
+else # ifeq "$(MK4_MK_ENV)" ""
+  include $(MK4_MK_CFG_D)/common.mk
+  include $(MK4_MK_CFG_D)/$(MK4_MK_ARCH).mk 
+
+  ##---------------------------------------------------------------------------
+  language := c
+
+  ##---------------------------------------------------------------------------
+  ## prg
+  prg := pratio
+  prg_srcs  := $(strip \
+   calc_vec_avg.c      open_outfiles.c     ratio.c             transfer_cotimes.c\
+   close_outfiles.c    parse_cmdline.c     reset_pol_field.c   write_ratios.c\
+   compute_ratios.c    pratio.c            set_pol_field.c \
+  )
+  prg_libs := afio mk4util m c
+  prg_lpath :=  $(MK4_MK_LIB_D)
+
+  ##
+  ipath := $(MK4_MK_INC_D)
+
+  ##
+  include $(MK4_MK_CFG_D)/rules.mk 
+
+##-----------------------------------------------------------------------------
+endif # ifeq "$(MK4_MK_ENV)" ""

@@ -1,0 +1,29 @@
+
+Subject: Re: HOPS pipeline paper
+From: Colin Lonsdale <cjl@haystack.mit.edu>
+Date: Wed, 20 Mar 2019 14:34:42 -0400
+To: "Blackburn, Lindy" <lblackburn@cfa.harvard.edu>
+
+Hi Lindy,
+
+I am not sure it’s worth a modification to the paper, but just a small
++clarification on the history in section 2.  When we (Roger Chris and me)
++rewrote the FRNGE algorithms in C, we not only worked on the I/O, control and
++file structures directly associated with the correlator software and the fringe
++fitter, but we also added various kinds of functionality.  Chris pretty much
++focused on the decoding of the FRNGE fortran code, but Roger and I did most of
++the rest.  This included more complete and graphically precise representation
++of the results of the fringe fitting process (the fringe plot), new
++functionality internal to fourfit facilitated by the more modern code base, and
++a lot of machinery based on so-called A-files to manage the output products and
++use results to feed back into the correlator control and fringe fitting
++process.  That same A-file machinery was subsequently the foundation on which
++the tools for dealing with limited coherence data were based.  The main point
++was that the translation to C was accompanied and followed by a range of new
++capabilities that arrived in a steady stream over the years, and led to a HOPS
++package that was well primed for mm-VLBI work.  Roger of course carried on with
++this sort of work long after I got diverted from code-writing by other
++responsibilities.
+
+- Colin
+

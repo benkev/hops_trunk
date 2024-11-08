@@ -1,0 +1,308 @@
+EXPLANATION OF FRNGE PRINTOUT:
+  
+PLOT#1 5 superimposed plots of: 
+1] Fringe rate spectrum-plot symbols 123456789ABCDEFG give singleband delay 
+     1 indicates a residual single band delay of -4 lags(-1 microsec at 2MHZ) 
+     8 indicates a residual single band delay of-0.5lags
+     9 indicates a residual single band delay of  0 lags
+     G indicates a residual single band delay of 3.5lags
+     X indicates a residual single band delay outside search range
+     ^ value off top of plot
+ Plot center +4 inches from left edge = 0 residual rate 
+ Plot full scale amplitude given in units of 0.01% correlation
+2] Single band delay resolution plot symbols + or = when outside search 
+    Plot starts at 1 point from left edge and runs for 16 points
+3] Multi-band delay resolution plot symbols * or # when outside search
+    Plot center +4 inches from left hand edge =0 residual delay 
+4] All points in 3-dimensional search that have SNR greater than 4 sigma
+    Plot symbols 123456789ABCDEFG 
+   which indicate the single-band delay as in the fringe rate spectrum
+   plot.The delay rate of each point is plotted on the same scale as the
+   fringe rate spectrum. The multi-band delay of each point is not indicated
+   and while the amplitude of each point is scaled in units of 0.01% the
+   points are NOT interpolated and can be as much as 36% low in amplitude.
+   Points in this plot are plotted on a character replacement basis : that
+   is if 2 points fall on the same point on the page the second point is
+   plotted. However search points have priority and are not replaced by 
+   points from any of the other plots.
+5] Cross-spectrum amplitude and phase - only plotted if correlation 
+   amplitude is greater than 100x0.01%. 
+    Plot symbols L:UP 
+          L indicates lower sideband
+          : indicates D.C.
+          U indicates upper sideband
+          P indicates phase on scale -180 deg to +180 deg 
+6] Expanded plot of rate spectrum - only plotted if there is a "B" error
+   code. Scale is reduced by a factor of 2. Plot symbol is S. 
+PLOT#2  superimposed time segmented plots of
+1] Fringe amplitude and residual phase for each frequency 
+    Plot symbols 123456789VWXYZ indicating phase and frequency #
+          U indicates that upper sideband predominates
+          L indicates that lower sideband predominates
+          A indicates that both sidebands are equally represented 
+   Scale: phase -180 deg to +180 deg ,amplitude full scale=10% full plot
+         (phase is the residual to sum of COREL and FRNGE models, and has 
+          been corrected for phase cal phases)
+2] Fringe amplitude and phase for all frequencies coherently added
+    Plot symbols P indicates phase and T indicates amplitude
+3] Phase calibration phases by station and frequency
+    Reference station plot symbols 123456789VWXYZ 
+    Remote  station plot symbols   ABCDEFGHIJKLMN 
+    TIME SEGMENTATION for these plots is 50 segments for a single frequency 
+    processed, 11 segments for 7 frequencies and 6 segments for 14 freqs. 
+    The first segment for each frequency,all frequencies combined and 
+    phase cal phases is plotted on the relevant dividing grid.The first 
+    segment starts at the start time indicated and the last segment stops 
+    at the stop time indicated. 
+  
+INFO ON SIDE OF PLOTS 
+  
+RUN - day of year - hour hour min min  FRQG -frequency group 2-letter name
+DATE   SOURCE 
+REFERENCE STATION - REMOTE STATION = 2-letter baseline code 
+elevation of reference station deg ELEV(DEG) elevation of remote station
+FILE NAMR,frnge output extent# B baseline number
+BN(FR/ASEC)= fringes per arcsecond in direction of increasing declination calculated for the REFERENCE frequency
+BN(MHZ/ASEC)=fringe rate/arcsec in milliHertz in dir. of incr.decl. 
+BE(FR/ASEC)= fringes per arcsecond in direction of increasing R.A.
+BE(MHZ/ASEC)=fringe rate/arcsec in milliHertz in dir. of incr. R.A
+EXP experiment name and number
+STARTTIME HHMMSS.SSS  (time of start of first accum period-unless forced) 
+STOP TIME HHMMSS.SSS  (time of start of last accum period-unless forced)
+INTG.TIME effective integration time in seconds 
+SEARCH WINDOW WIDTHS full widths
+SINGLB(=) width in single band delay search = marks region outside search 
+MULTIB(#) width in mult-  band delay search # marks region outside search 
+RATE  (X) width in delay rate in HZ  search X marks region outside search 
+FREQ SB INDEX#S CAL 
+freq.in MHZ(U=USB,L=LSB,blank=DSB) correl USB index# LSB index# 
+reference station cal voltage remote station cal voltage
+cal amplitudes are given in units of 0.1% in voltage.The product of reference 
+and remote give cross-power of phase cal in units of 0.0001%. Phase cal voltages
+should be between 10 and 100x0.1% in voltage. 
+PRG frnge program date YYMMDD  COREL# corel version # 
+KSEL correlator phase increment update mode 
+AMP correlation amplitude in units of 0.01% corrected for smearing that 
+    occurs during accumulation period at large residual fringe rates. 
+    For low SNRs the amplitude is NOT but should be corrected for noise 
+    by reducing the number by 0.5*((1/SNR)**2). 
+SINGLBAND residual single-band delay in microseconds (single band delay 
+          is coherently determined by FRNGE from all frequency channels)
+MULTIBAND resiual multi-band delay in microseconds
+FR.RATE residual fringe rate for reference frequency in Hertz 
+        uncorrected for phasecal. rates 
+DC= percentage of data discarded - actual duration of run (stop-start)
+XP=average parity error rate for all tracks processed for ref.station 
+YP=average parity error rate for all tracks processed for rem.station 
+XCRC=#cyclic redundancy check errors for ref."X"   input to correlator
+      total number in data acceptped and rejected(bit 0 CRCMSK) 
+SUPR=#accum.periods discarded due to suppression by correlator(bit 14 STATM)
+YCRC=#cyclic redundancy check errors for remote "Y" input to correlator 
+      total number in data accepted and rejected(bit 1 CRCMSK)
+PPUP=#accum.periods discarded due to no parameter update(bit 7 STATM) 
+TDIS= total number of times decoded that were unexpected
+YSLP=#accum.periods discarded due to Y sync slip(bit 5 STATM) 
+TSLP=#accum.periods discarded due to Tapes out of sync(bit 13 STATM)
+ERCC=#accum.periods during which an error correction was initiated(bit 3 CRCMSK)
+NDIS=total # of accumulation records not processed through frnge
+XSLP=#accum.periods discarded due to X sync slip(bit 4 STATM) 
+PEXD=#accum.periods discarded due to high parity error rate in X data(set by MAX PER) 
+PEYD=#accum.periods discarded due to high parity error rate in Y data(set by MAX PER) 
+STATM correlator error status mask(normal 70202B) 
+      bits set 14=corr. suppress, 13=tapes out of sync, 12=array overrun
+      7=no pp update, 1=no y clock  - see "FRNGE and "COREL for more details
+CRCMSK crc error mask (normal  4B)  
+SNR signal to noise ratio in units of sigma-NOTE that runs with SNR 
+    less than 7 carefull tests( like comparing fringe delay and rate residuals
+    for adjacent runs) need to be made to be sure that fringes are real and 
+    not just noise. 
+MODE correlation modes see correlator manual for definitions
+ME   MKIIIA module error count
+AP #accum.periods discarded due to AP overrrun in correlator(bit 12 STATM)
+LN #accum.periods discarded due to large numbers from correlator
+DRVS ref. and rem. tape drive #s
+STAT= processing status for module of ref. track of FREQ# 1 
+  
+INFO BELOW PLOT #1
+  
+RATE+/- half scale plot width(4 inches on paper) in Hertz and nanosec/sec 
+DELAY+/- half scale width of multiband delay resolution plot in microsec
+SRCH WIDTH(RATE,SBDLY)+/- half widths of region in the sky covered
+ by the search windows used: width in RA due the rate window,due to single
+ band delay then dec width due to rate window,due to single band delay
+ in units of seconds of arc.
+FRQ# Fringe frequency number
+FREQUENCY frequency in MHZ
+EXT#(R,P) file extent# from which frnge found data for reference/partner sideband 
+PRC#(R,P) correlation processing dates Year(10=1980) DAY# for reference/partner 
+MS#(R,P) module serial numbers (-ve for MKIIIA modeules)
+REFERENCE track#=parity error rate for reference station ,#slip syncs accepted
+REMOTE    track#=parity error rate for remote    station ,#slip syncs accepted
+          error rate=.10E-20 indicates zero error rate
+          error rate=.00E 00 indicates no data processed
+PARTNER      track#=parity error rate for partner(normally USB) tracks
+FRQIN#(R,P) Correl frequency index#s for reference/partner sideband (-ve for LSB) 
+#ACC.PER(R,P) #of acculation periods processed through fringe reference/partner 
+CORR#(R,P) correlator module number reference/partner sideband
+OFFSET(R,P) correlator delay offset for each module in lags 
+#PTS SRCHED #points searched in frnge search  
+PRC Corel proecssing date YYDDD and time  HHMM for freq #1
+PROB.OF FALSE DET. estimated probability of a false detection of fringes
+PCALRATES(MICROSEC/SEC) phasecal drift rates for reference,remote statns. 
+MAX PER parity error rate above which data is discarded 
+FS      minimum frequency spacing -group delay ambiguity =1/FS
+  
+UNDER PLOT#2
+  
+PHASE= phase in deg for each frequency followed by phase for all freqs. 
+PASS#= high density tape pass # 
+NSG= number of segments used by FRNGE to calculate quality code 
+FR.AMPL fringe amplitudes for each frequency in units of 0.01%
+GHA= greenwich hour angle for source in decimal hours 
+PCALPH1 phasecal phases in degrees for reference station
+EP1= time of first accumulation processed through fringe in sec minus epoch 
+EP2= epoch minus average time or center of the run
+PCALPH2 phasecal phases in degrees for remote    station
+        360 degrees indicates that a manual phase cal has been used 
+        whose value is in PCALPH1 
+SBDBOX# single band delay box # for independent search in each frequency
+        at the fringe rate determined for the coherent addition of all
+        frequencies. These numbers are only meaningful in the case of 
+        fringes strong enough to be detected in each frequency independently
+BW= band width of each recorded track in MHZ
+PARAM FILE parameter file used to set up the fringe search parameters 
+           NAMR,pointer number
+SRCH RNGE PARAMS search parameters residual delay rate start,delay rate stop
+       in microsec/sec,multiband delay start,stop in microsec, single 
+       band delay start,stop in microsec
+GROUP DELAY USEC Group delay in microsec ambiguity selected closest 
+       to APRIORI delay (set equal to SNGLBAND DEL if only one freq. present) 
+SNGLBAND DEL USEC Single band delay determined from the coherent addition 
+       of all frequency channels
+PHASE DELAY USEC  Phase delay expressed in microsec ambiguity selected closest
+       to APRIORI delay 
+PHAS DEL RATE US/S phase delay rate after correction for phasecal. rates
+TOTAL PHASE DEG total observed phase at EPOCH given below 
+                phase is positive when wavefront arrives at remote station late 
+                this definition holds regardless of sideband and is consistent
+                with the definition of delay
+EPOCH HHMMSS. epoch for observables number in parenthesis is central epoch
+              computed by FRNGE for accepted data - delay,rate and phase for
+              this epoch are in output file but not on printout 
+              (if there if an "*" in front of this time FRNGE was 
+               with the option NOT to call VDELY and mean epoch 
+               numbers will not be in output) 
+                phase in parenthesis is total phase for an epoch
+                given by the time a wavefront passes the reference
+                station and arrives at the center of the earth at EPOCH.
+                Thus the epochs are defined by a particular wavefront - 
+                the same for all baselines - and not by universal time
+                at the reference station. 
+RESIDUAL PHASE DEG phase residual to the COREL model at EPOCH 
+                   corrected for phase cal phases - to uncal phaseuncal=
+                   phase+PCALPH1-PCALPH2  Phase in parenthesis is the 
+                   residual phase corrected to an EPOCH at which the
+                   wave front reaches the center of the earth.
+AMP     correlation amplitude in units of 10000.Number in parenthesis is
+        the incoherent sum of fringe amplitudes for each segment
+        corrected for the theoretical noise i.e. reduced by the 
+        factor 1+1/(2*(segment SNR)**2) 
+QF= quality factor of the run,0= no fringes 3=poor,9=good 
+            i.e. higher numbers indicate better quality 
+QF quality factor starts at 9 and is reduced by:
+       1 point if RMS PH/SEG >11.46 and theoretical RMS < 5.73
+       2 points if RMS PH/SEG >22.92 and theoretical RMS <11.46 
+the factor is further reduced by: 
+       1 point if RMS AMP/SEG >20.00% and theoretical RMS <10.00% 
+       2 points if RMS AMP/SEG >40.00% and theoretical RMS <20.00%
+the factor is futher reduced by:
+       1 point  if RMS PH/FRQ  > 11.46 and theoretical RMS < 5.73 
+       2 points if RMS PH/FRQ  > 22.92 and theoretical RMS <11.46 
+the factor is further reduced by: 
+       1 point  if RMS AMP/FRQ  > 20.00% and theoretical RMS <10.00%
+       2 points if RMS AMP/FRQ  > 40.00% and theoretical RMS <20.00%
+any error condition sets the quality factor to  letter code in which
+                      A= freqency sequence cannot be handled by FRNGE 
+                         requires an FFT of more than 256 points
+                      B= interpolation error check search range fringes 
+                         may be on the edge of range
+                      C= epoch error condition all frequencies not at same
+                         epoch
+                      D= one or more channels have no data
+                      E= single band delay residual too large CAUTION 
+                         fringe amplitude may be more than 5% low 
+                      F= no data found- dummy FRNGE output
+                   QF=0= probabiltiy of false detection greater than 1.0E-4 
+                         i.e. NO FRNGES (i.e. SNR below approx. 7)
+                   QF=1= one or more phase cal signals less than 1% 
+                   QF=2= one or more channels have amplitude less than half 
+                         the strength of the coherent average and SNR.GT.20 
+QB= ratio of lowest to highest amount of data accepted for each channel in %
+TAPEQ=6 character tape quality code 
+            Char 1=ref.tape error rate exponent i.e. 0=1.0E00  9=1.0E-9 
+            Char 4=rem.tape error rate exponent i.e. 0=1.0E00  9=1.0E-9 
+            Char 2=ref.tape slip sync rate      i.e. 0=10%     9=1% 
+            Char 5=rem.tape slip sync rate      i.e. 0=10%     9=1% 
+            Char 3=QB in units of 10%           i.e. 0=<10%    9=>90% 
+            Char 6=fraction of data processed   i.e. 0=<5%     9=>95% 
+                   that is INTG.TIME/scheduled run duration 
+FPT fringe processing time in YYDDD:HHMM
+REF.ST.CL.EPOCH MS reference station (1st station in baseline ) clock 
+       epoch. The epoch is corrected for the best apriori estimate of 
+       the station clock -UTC.
+RMS PH/SEG DG r.m.s. phase(in deg) deviation of phases(P symbols in plot) 
+RMS AMP/SEG % r.m.s. amplitude(in %) deviation of amplitudes(T symbols) 
+RMS PH/FRQ DG r.m.s. phase deviation amoung frequency channels
+RMS AMP/FRQ % r.m.s. amplitude deviation amoung frequency channels
+TH.RMS theoretical estimates for the 4 quantities above 
+       followed by the FRNGE processing time YYDDD:HHMM:SS
+SG= segment number for special segmented mode 
+  
+CALCULATION OF CLOSURE RATES DELAYS AND PHASES (for 3-stations A,B,C) 
+(from numbers on frnge printouts) 
+  
+CLOSURE rate(in microsec/sec):
+  
+   Closure= rate(AB)-rate(AC)+rate(BC)+acel(BC)*delayg*1.0E-6+
+            rate(AB)*rate(BC)*1.0E-6
+            rates in microsec/sec,acel in microsec/sec/sec,delay in microsec
+  
+CLOSURE delay(in microsec): 
+  
+   Closure= delay(AB)-delay(AC)+delay(BC)+rate(BC)*delayg*1.0E-6
+            delay in microsec, rate in microsec/sec 
+  
+CLOSURE phase (in rotations): 
+  
+   Closure= phase(AB)-phase(AC)+phase(BC)+rate(BC)*delayg*freq*1.0E-6 
+            phase in rotations,rate in microsec/sec,delay in microsec 
+            reference freq in MHZ.
+            This expression omits aceleraion terms which can produce at most
+            approx. 0.3 deg. error at 22GHz. Since observables are used no
+            error results from incorrect values of source position,baselines
+            or Apriori clocks.
+   delayg= measured delay on baseline AB (delay(AB))  minus APRIORI clock 
+               on baseline AB in microsec 
+  
+CAUTION:
+   1] ALL BASELINES MUST BE PROCESSED WITH SAME EPOCH 
+   2] FOR CLOSURE PHASES ALL BASELINES MUST BE PROCESSED WITH 
+      SAME REFERENCE FREQUENCY
+   3] IF MANUAL PHASE CAL PHASES ARE USED THEY MUST CLOSE or phases 
+      must first be "uncalibrated" before deriving closure phase
+NOTE: 
+  1] Since aprioris close,residuals can be used in above expressions
+     but totals must be used for correction term; aprioris only 
+     close if the same source positions etc have been used on all baselines.
+     That is baselines processed from same root file will have aprioris that
+     close while those proceesed from different root files may not close. 
+  
+CLOSURE PHASES -alternate method of calculation(FRNGE PRG800509 and later)
+  
+   Closure phase=phase("(AB)")-phase("(AC)")+phase("(BC)")
+                 phases  are earth center epoch phases which are in 
+                 parentheses in printout. 
+                 Note that this method of obtaining closure phase uses Apiori 
+                 information to move the epoch and a 1 arcsecond error in 
+                 source position or baselines can result in approx. 1 deg.
+                 error at 22GHz.

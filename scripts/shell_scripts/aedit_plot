@@ -1,0 +1,16 @@
+#! /bin/csh
+# Currently, -p means postscript (portait or landscape), while -h
+# means HPGL for laserjet 3s and 4s.  The latter uses hpdriv.f in
+# the pgplot library, which can be found in $HOPS/pgplot/pgplot49h/sys_hp
+# Customize as needed.  To see what is going on, take a peek at the
+# file $AEDIT/auto_hardcopy.c
+
+if ($1 == "-p") then
+    lp -dpost -o nb $2
+else if ($1 == "-h") then
+    lp -deast -o nb $2
+else
+    echo "Unrecognized flag in aedit_plot, '" $1 "'"
+endif
+
+rm $2

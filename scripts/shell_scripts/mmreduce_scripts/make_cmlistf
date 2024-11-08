@@ -1,0 +1,57 @@
+#!/bin/csh -f
+#
+# This sub-script allows the user to examine and edit the coherence
+# time fitted masterlist file using aedit.  Called from mmreduce.
+#
+# Written by CJL, 22 February 1996
+#################################################################
+
+					# Skip option
+if (-e $1.cmlistf) then
+    echo "mmreduce: A 'final' coherence time fitted masterlist already exists."
+    echo "mmreduce: If you want to use it, you should skip this step.  If not,"
+    echo "mmreduce: the existing file will be overwritten"
+    skipask
+    if ($status == 1) exit (0)
+endif
+
+# Force clipping of excessively high coherence time values
+
+aedit -b "batch;read $1.cmlist;coclip 200;write $1.cmlist"
+if ($status != 0) then
+    echo "mmreduce: Error return from aedit.   "
+    exit (1)
+endif
+
+
+while (1)
+    echo "mmreduce: Do you want to use aedit to inspect (and possibly edit)"
+    echo "mmreduce: the coherence time fitted masterlist file? (y/n): \c"
+    set reply=$<
+    if ($reply == "y" || $reply == "Y") then
+	echo "mmreduce: Starting up aedit.  When you write out the data,"
+	echo "mmreduce: please make a note of the filename you choose"
+	aedit -f $1.cmlist
+	if ($status != 0) then
+	    echo "mmreduce: Whoops, error return from aedit.  Let's try again"
+	    continue
+	else
+	    echo "mmreduce: Enter the name of the file you wrote out from aedit,"
+	    echo "mmreduce:       or just hit return to use the unmodified list: \c"
+	    set reply=$<
+	    if ($reply == "") then
+		cp $1.cmlist $1.cmlistf
+	    else
+		cp $reply $1.cmlistf
+	    endif
+	endif
+	break
+    else if ($reply == "n" || $reply == "N") then
+	cp $1.cmlist $1.cmlistf
+	break
+    else
+	echo "mmreduce: Please answer 'y' or 'n'"
+    endif
+end
+
+exit (0)

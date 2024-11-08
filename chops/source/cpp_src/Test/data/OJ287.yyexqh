@@ -1,0 +1,521 @@
+$OVEX_REV;
+rev = 1.5;
+*    SCHED vers: Version 11.3 update 1.  April 14, 2014
+*    VEX/SCHED:  1.5.87
+*    Other versions: Sched:  11.3  Plot: 1.06  JPL-ephem: 1.01
+*------------------------------------------------------------------------------
+$GLOBAL;
+* correlated from input file h_1012.input
+    ref $EOP = EOP_DIFX_INPUT;
+     ref $EXPER = e16b08;
+*                                                      +------------+
+*                         PI revision number:          |    1.0000  |
+*                                                      +------------+
+*    mode:       R2DBE/DBBC3
+*------------------------------------------------------------------------------
+$EXPER;
+*
+def e16b08;
+     exper_name = e16n06;
+     exper_description = "ALMA testing schedule";
+     PI_email = gbc@haystack.mit.edu;
+     exper_num = 3555;
+     PI_name = EHT;
+*    address:   123 Telescope Lane
+*               Fringeville
+*                
+*                
+*    phone:     TBD
+*    during obs:TBD
+*    fax:        
+*
+*    year, doy: 2015,  80
+*    date     : Sat 21 Mar 2015
+*    MJD      : 57102
+     exper_nominal_start=2016y095d00h00m00s;
+     exper_nominal_stop=2016y099d23h59m00s;
+*
+    target_correlator = difx;
+*
+*    integr_time    :     1.000 s
+*    number_channels:    64
+*    number_antenna :  8
+*    cross_polarize : Yes
+*    weight_func    : UNIFORM
+*    distrib_medium : FTP
+*    distrib_format : FITS
+*    source_pos_cat : STANDARD
+*    distribute_to  : 
+*                     TBD
+*
+enddef;
+*------------------------------------------------------------------------------
+$MODE;
+*
+def 1mmlcp;
+    ref $FREQ = ant00:Az;
+    ref $FREQ = ant01:Lm;
+    ref $FREQ = ant02:Sm;
+    ref $FREQ = ant03:Sr;
+    ref $BBC = bbcs;
+    ref $IF = ifs;
+    ref $TRACKS = trax_2bit:Az:Lm:Sm:Sr;
+enddef;
+*------------------------------------------------------------------------------
+*-----------------------  begin $EOP               ----------------------*
+$STATION;
+*
+def Lm;
+     ref $SITE = LMT;
+     ref $ANTENNA = LMT;
+    ref $CLOCK = Lm;
+enddef;
+*
+def Az;
+     ref $SITE = SMTO;
+     ref $ANTENNA = SMTO;
+    ref $CLOCK = Az;
+enddef;
+*
+def Sm;
+     ref $SITE = SMAP;
+     ref $ANTENNA = SMAP;
+    ref $CLOCK = Sm;
+enddef;
+*
+def Sn;
+     ref $SITE = SMAC;
+     ref $ANTENNA = SMAP;
+    ref $CLOCK = Sn;
+enddef;
+*
+def Sr;
+     ref $SITE = SMAR;
+     ref $ANTENNA = SMAP;
+    ref $CLOCK = Sr;
+enddef;
+*
+def Jc;
+     ref $SITE = JCMT;
+     ref $ANTENNA = JCMT;
+    ref $CLOCK = Jc;
+enddef;
+*------------------------------------------------------------------------------
+$SITE;
+def LMT;
+     site_type = fixed;
+     site_name = LMT;
+     site_ID = Lm;
+*    elev= 4593.30 long= 097:18:53. lat= 18:59:08.8
+     site_position = -768715.63200 m:-5988507.07200 m: 2063354.85200 m;
+     site_velocity =  0.000000   m/yr:  0.000000   m/yr:  0.000000  m/yr;
+*    First line below is VEX standard format.  Use only when readers are ready.
+     site_position_epoch = 2008y001d;
+*    site_position_epoch =   54466;
+  mk4_site_ID = L;
+enddef;
+def SMTO;
+     site_type = fixed;
+     site_name = SMTO;
+     site_ID = Az;
+*    elev= 3158.70 long= 109:53:28. lat= 32:42:05.8
+     site_position =-1828796.20000 m:-5054406.80000 m: 3427865.20000 m;
+     site_velocity =  0.000000   m/yr:  0.000000   m/yr:  0.000000  m/yr;
+*    First line below is VEX standard format.  Use only when readers are ready.
+     site_position_epoch = 1997y001d;
+*    site_position_epoch =   50449;
+     horizon_map_az =  4.0 deg: 14.0: 29.0: 34.0: 39.0: 59.0: 61.0: 64.0: 69.0:
+                                74.0: 85.0: 93.0: 98.0:103.0:107.0:113.0:118.0:
+                               133.0:148.0:153.0:158.0:180.0:187.0:192.0:207.0:
+                               218.0:223.0:243.0:248.0:262.0:272.0:295.0:325.0:
+                               337.0:340.0:360.0;
+     horizon_map_el = 20.0 deg: 18.0: 18.0: 19.0: 22.0: 22.0: 24.0: 23.0: 22.0:
+                                24.0: 24.0: 24.0: 28.0: 28.0: 28.0: 20.0: 20.0:
+                                13.0: 12.0: 13.0: 13.0: 11.0: 13.0: 13.0:  6.0:
+                                 9.0: 10.0: 12.0: 15.0: 20.0: 23.0: 24.0: 20.0:
+                                26.0: 19.0: 19.0;
+  mk4_site_ID = Z;
+enddef;
+def SMAP;
+     site_type = fixed;
+     site_name = SMAP;
+     site_ID = Sm;
+*    elev= 4115.06 long= 155:28:39. lat= 19:49:27.2
+*    site_position =-5464555.49300 m:-2492927.98900 m: 2150797.17600 m;
+*    Pad 12 single antenna position from AEER email 10 April 2013
+     site_position  = -5464588.447 m:-2492884.038 m: 2150756.452 m;
+*    Pad position 9 for day 125 (May 4, 2012) test, from AEER email?
+* one used for searches, 2016, late scans (pad 9)
+*    site_position  = -5464577.894 m:-2492863.460 m: 2150800.814 m;
+     site_velocity =  0.000000   m/yr:  0.000000   m/yr:  0.000000  m/yr;
+*    First line below is VEX standard format.  Use only when readers are ready.
+     site_position_epoch = 1997y001d;
+*     site_position_epoch =   50449;
+     horizon_map_az =  0.0 deg: 44.0: 45.0: 56.0: 57.0:359.0;
+     horizon_map_el =  8.0 deg:  8.0: 24.0: 24.0:  8.0:  8.0;
+  mk4_site_ID = S;
+enddef;
+def SMAR;
+     site_type = fixed;
+     site_name = SMAR;
+     site_ID = Sr;
+*    elev= 4115.06 long= 155:28:39. lat= 19:49:27.2
+*    site_position =-5464555.49300 m:-2492927.98900 m: 2150797.17600 m;
+*    Pad 12 single antenna position from AEER email 10 April 2013
+     site_position  = -5464588.447 m:-2492884.038 m: 2150756.452 m;
+*    Pad position 9 for day 125 (May 4, 2012) test, from AEER email?
+* one used for searches, 2016, late scans (pad 9)
+*    site_position  = -5464577.894 m:-2492863.460 m: 2150800.814 m;
+     site_velocity =  0.000000   m/yr:  0.000000   m/yr:  0.000000  m/yr;
+*    First line below is VEX standard format.  Use only when readers are ready.
+     site_position_epoch = 1997y001d;
+*    site_position_epoch =   50449;
+     horizon_map_az =  0.0 deg: 44.0: 45.0: 56.0: 57.0:359.0;
+     horizon_map_el =  8.0 deg:  8.0: 24.0: 24.0:  8.0:  8.0;
+  mk4_site_ID = R;
+enddef;
+$ANTENNA;
+*
+def LMT;
+     axis_type = az : el;
+*    antenna_motion = el :  60.0 deg/min :  5 sec;  *    1.000 deg/sec/sec
+*    antenna_motion = az :  42.0 deg/min :  5 sec;  *    0.500 deg/sec/sec
+     axis_offset = el:    3.30000 m;
+enddef;
+*
+def SMTO;
+     axis_type = az : el;
+*    antenna_motion = el :  60.0 deg/min : 10 sec;  * 1000.000 deg/sec/sec
+*    antenna_motion = az :  60.0 deg/min : 10 sec;  * 1000.000 deg/sec/sec
+     axis_offset = el:    0.00000 m;
+enddef;
+*
+def SMAP;
+     axis_type = az : el;
+*    antenna_motion = el : 120.0 deg/min : 10 sec;  * 1000.000 deg/sec/sec
+*    antenna_motion = az : 240.0 deg/min : 10 sec;  * 1000.000 deg/sec/sec
+     axis_offset = el:    0.00000 m;
+enddef;
+*
+def JCMT;
+     axis_type = az : el;
+*    antenna_motion = el :  42.0 deg/min : 10 sec;  * 1000.000 deg/sec/sec
+*    antenna_motion = az :  66.0 deg/min : 10 sec;  * 1000.000 deg/sec/sec
+     axis_offset = el:    0.00000 m;
+enddef;
+*
+$SCHED;
+  scan 097-0645; 
+  start = 2016y097d06h45m00s; mode = 1mmlcp; source = OJ287; 
+    station = Sm: 0 sec: 240 sec: 2953.839 GB: : : 1; 
+    station = Sr: 0 sec: 240 sec: 2953.839 GB: : : 1; 
+    station = Az: 0 sec: 240 sec: 2953.839 GB: : : 1; 
+    station = Lm: 0 sec: 240 sec: 2953.839 GB: : : 1; 
+    fourfit_reftime = 2016y097d06h47m00s;
+  endscan; 
+$FREQ;
+* Generated from DiFX input by difx2mark4
+*
+  def ant00;
+   chan_def = B00UL : : 224162.000000 MHz : U :    64.000000 MHz : &Ch00 : &BBCL0;
+   chan_def = B01UL : : 224226.000000 MHz : U :    64.000000 MHz : &Ch01 : &BBCL0;
+   chan_def = B02UL : : 224290.000000 MHz : U :    64.000000 MHz : &Ch02 : &BBCL0;
+   chan_def = B03UL : : 224354.000000 MHz : U :    64.000000 MHz : &Ch03 : &BBCL0;
+   chan_def = B04UL : : 224418.000000 MHz : U :    64.000000 MHz : &Ch04 : &BBCL0;
+   chan_def = B05UL : : 224482.000000 MHz : U :    64.000000 MHz : &Ch05 : &BBCL0;
+   chan_def = B06UL : : 224546.000000 MHz : U :    64.000000 MHz : &Ch06 : &BBCL0;
+   chan_def = B07UL : : 224610.000000 MHz : U :    64.000000 MHz : &Ch07 : &BBCL0;
+   chan_def = B08UL : : 224674.000000 MHz : U :    64.000000 MHz : &Ch08 : &BBCL0;
+   chan_def = B09UL : : 224738.000000 MHz : U :    64.000000 MHz : &Ch09 : &BBCL0;
+   chan_def = B10UL : : 224802.000000 MHz : U :    64.000000 MHz : &Ch10 : &BBCL0;
+   chan_def = B11UL : : 224866.000000 MHz : U :    64.000000 MHz : &Ch11 : &BBCL0;
+   chan_def = B12UL : : 224930.000000 MHz : U :    64.000000 MHz : &Ch12 : &BBCL0;
+   chan_def = B13UL : : 224994.000000 MHz : U :    64.000000 MHz : &Ch13 : &BBCL0;
+   chan_def = B14UL : : 225058.000000 MHz : U :    64.000000 MHz : &Ch14 : &BBCL0;
+   chan_def = B15UL : : 225122.000000 MHz : U :    64.000000 MHz : &Ch15 : &BBCL0;
+   chan_def = B16UL : : 225186.000000 MHz : U :    64.000000 MHz : &Ch16 : &BBCL0;
+   chan_def = B17UL : : 225250.000000 MHz : U :    64.000000 MHz : &Ch17 : &BBCL0;
+   chan_def = B18UL : : 225314.000000 MHz : U :    64.000000 MHz : &Ch18 : &BBCL0;
+   chan_def = B19UL : : 225378.000000 MHz : U :    64.000000 MHz : &Ch19 : &BBCL0;
+   chan_def = B20UL : : 225442.000000 MHz : U :    64.000000 MHz : &Ch20 : &BBCL0;
+   chan_def = B21UL : : 225506.000000 MHz : U :    64.000000 MHz : &Ch21 : &BBCL0;
+   chan_def = B22UL : : 225570.000000 MHz : U :    64.000000 MHz : &Ch22 : &BBCL0;
+   chan_def = B23UL : : 225634.000000 MHz : U :    64.000000 MHz : &Ch23 : &BBCL0;
+   chan_def = B24UL : : 225698.000000 MHz : U :    64.000000 MHz : &Ch24 : &BBCL0;
+   chan_def = B25UL : : 225762.000000 MHz : U :    64.000000 MHz : &Ch25 : &BBCL0;
+   chan_def = B26UL : : 225826.000000 MHz : U :    64.000000 MHz : &Ch26 : &BBCL0;
+   chan_def = B27UL : : 225890.000000 MHz : U :    64.000000 MHz : &Ch27 : &BBCL0;
+   chan_def = B28UL : : 225954.000000 MHz : U :    64.000000 MHz : &Ch28 : &BBCL0;
+   chan_def = B29UL : : 226018.000000 MHz : U :    64.000000 MHz : &Ch29 : &BBCL0;
+   chan_def = B00UR : : 224162.000000 MHz : U :    64.000000 MHz : &Ch30 : &BBCR0;
+   chan_def = B01UR : : 224226.000000 MHz : U :    64.000000 MHz : &Ch31 : &BBCR0;
+   chan_def = B02UR : : 224290.000000 MHz : U :    64.000000 MHz : &Ch32 : &BBCR0;
+   chan_def = B03UR : : 224354.000000 MHz : U :    64.000000 MHz : &Ch33 : &BBCR0;
+   chan_def = B04UR : : 224418.000000 MHz : U :    64.000000 MHz : &Ch34 : &BBCR0;
+   chan_def = B05UR : : 224482.000000 MHz : U :    64.000000 MHz : &Ch35 : &BBCR0;
+   chan_def = B06UR : : 224546.000000 MHz : U :    64.000000 MHz : &Ch36 : &BBCR0;
+   chan_def = B07UR : : 224610.000000 MHz : U :    64.000000 MHz : &Ch37 : &BBCR0;
+   chan_def = B08UR : : 224674.000000 MHz : U :    64.000000 MHz : &Ch38 : &BBCR0;
+   chan_def = B09UR : : 224738.000000 MHz : U :    64.000000 MHz : &Ch39 : &BBCR0;
+   chan_def = B10UR : : 224802.000000 MHz : U :    64.000000 MHz : &Ch40 : &BBCR0;
+   chan_def = B11UR : : 224866.000000 MHz : U :    64.000000 MHz : &Ch41 : &BBCR0;
+   chan_def = B12UR : : 224930.000000 MHz : U :    64.000000 MHz : &Ch42 : &BBCR0;
+   chan_def = B13UR : : 224994.000000 MHz : U :    64.000000 MHz : &Ch43 : &BBCR0;
+   chan_def = B14UR : : 225058.000000 MHz : U :    64.000000 MHz : &Ch44 : &BBCR0;
+   chan_def = B15UR : : 225122.000000 MHz : U :    64.000000 MHz : &Ch45 : &BBCR0;
+   chan_def = B16UR : : 225186.000000 MHz : U :    64.000000 MHz : &Ch46 : &BBCR0;
+   chan_def = B17UR : : 225250.000000 MHz : U :    64.000000 MHz : &Ch47 : &BBCR0;
+   chan_def = B18UR : : 225314.000000 MHz : U :    64.000000 MHz : &Ch48 : &BBCR0;
+   chan_def = B19UR : : 225378.000000 MHz : U :    64.000000 MHz : &Ch49 : &BBCR0;
+   chan_def = B20UR : : 225442.000000 MHz : U :    64.000000 MHz : &Ch50 : &BBCR0;
+   chan_def = B21UR : : 225506.000000 MHz : U :    64.000000 MHz : &Ch51 : &BBCR0;
+   chan_def = B22UR : : 225570.000000 MHz : U :    64.000000 MHz : &Ch52 : &BBCR0;
+   chan_def = B23UR : : 225634.000000 MHz : U :    64.000000 MHz : &Ch53 : &BBCR0;
+   chan_def = B24UR : : 225698.000000 MHz : U :    64.000000 MHz : &Ch54 : &BBCR0;
+   chan_def = B25UR : : 225762.000000 MHz : U :    64.000000 MHz : &Ch55 : &BBCR0;
+   chan_def = B26UR : : 225826.000000 MHz : U :    64.000000 MHz : &Ch56 : &BBCR0;
+   chan_def = B27UR : : 225890.000000 MHz : U :    64.000000 MHz : &Ch57 : &BBCR0;
+   chan_def = B28UR : : 225954.000000 MHz : U :    64.000000 MHz : &Ch58 : &BBCR0;
+   chan_def = B29UR : : 226018.000000 MHz : U :    64.000000 MHz : &Ch59 : &BBCR0;
+    sample_rate = 128.0 Ms/sec;
+  enddef;
+  def ant01;
+   chan_def = B00UL : : 224162.000000 MHz : U :    64.000000 MHz : &Ch00 : &BBCL0;
+   chan_def = B01UL : : 224226.000000 MHz : U :    64.000000 MHz : &Ch01 : &BBCL0;
+   chan_def = B02UL : : 224290.000000 MHz : U :    64.000000 MHz : &Ch02 : &BBCL0;
+   chan_def = B03UL : : 224354.000000 MHz : U :    64.000000 MHz : &Ch03 : &BBCL0;
+   chan_def = B04UL : : 224418.000000 MHz : U :    64.000000 MHz : &Ch04 : &BBCL0;
+   chan_def = B05UL : : 224482.000000 MHz : U :    64.000000 MHz : &Ch05 : &BBCL0;
+   chan_def = B06UL : : 224546.000000 MHz : U :    64.000000 MHz : &Ch06 : &BBCL0;
+   chan_def = B07UL : : 224610.000000 MHz : U :    64.000000 MHz : &Ch07 : &BBCL0;
+   chan_def = B08UL : : 224674.000000 MHz : U :    64.000000 MHz : &Ch08 : &BBCL0;
+   chan_def = B09UL : : 224738.000000 MHz : U :    64.000000 MHz : &Ch09 : &BBCL0;
+   chan_def = B10UL : : 224802.000000 MHz : U :    64.000000 MHz : &Ch10 : &BBCL0;
+   chan_def = B11UL : : 224866.000000 MHz : U :    64.000000 MHz : &Ch11 : &BBCL0;
+   chan_def = B12UL : : 224930.000000 MHz : U :    64.000000 MHz : &Ch12 : &BBCL0;
+   chan_def = B13UL : : 224994.000000 MHz : U :    64.000000 MHz : &Ch13 : &BBCL0;
+   chan_def = B14UL : : 225058.000000 MHz : U :    64.000000 MHz : &Ch14 : &BBCL0;
+   chan_def = B15UL : : 225122.000000 MHz : U :    64.000000 MHz : &Ch15 : &BBCL0;
+   chan_def = B16UL : : 225186.000000 MHz : U :    64.000000 MHz : &Ch16 : &BBCL0;
+   chan_def = B17UL : : 225250.000000 MHz : U :    64.000000 MHz : &Ch17 : &BBCL0;
+   chan_def = B18UL : : 225314.000000 MHz : U :    64.000000 MHz : &Ch18 : &BBCL0;
+   chan_def = B19UL : : 225378.000000 MHz : U :    64.000000 MHz : &Ch19 : &BBCL0;
+   chan_def = B20UL : : 225442.000000 MHz : U :    64.000000 MHz : &Ch20 : &BBCL0;
+   chan_def = B21UL : : 225506.000000 MHz : U :    64.000000 MHz : &Ch21 : &BBCL0;
+   chan_def = B22UL : : 225570.000000 MHz : U :    64.000000 MHz : &Ch22 : &BBCL0;
+   chan_def = B23UL : : 225634.000000 MHz : U :    64.000000 MHz : &Ch23 : &BBCL0;
+   chan_def = B24UL : : 225698.000000 MHz : U :    64.000000 MHz : &Ch24 : &BBCL0;
+   chan_def = B25UL : : 225762.000000 MHz : U :    64.000000 MHz : &Ch25 : &BBCL0;
+   chan_def = B26UL : : 225826.000000 MHz : U :    64.000000 MHz : &Ch26 : &BBCL0;
+   chan_def = B27UL : : 225890.000000 MHz : U :    64.000000 MHz : &Ch27 : &BBCL0;
+   chan_def = B28UL : : 225954.000000 MHz : U :    64.000000 MHz : &Ch28 : &BBCL0;
+   chan_def = B29UL : : 226018.000000 MHz : U :    64.000000 MHz : &Ch29 : &BBCL0;
+   chan_def = B00UR : : 224162.000000 MHz : U :    64.000000 MHz : &Ch30 : &BBCR0;
+   chan_def = B01UR : : 224226.000000 MHz : U :    64.000000 MHz : &Ch31 : &BBCR0;
+   chan_def = B02UR : : 224290.000000 MHz : U :    64.000000 MHz : &Ch32 : &BBCR0;
+   chan_def = B03UR : : 224354.000000 MHz : U :    64.000000 MHz : &Ch33 : &BBCR0;
+   chan_def = B04UR : : 224418.000000 MHz : U :    64.000000 MHz : &Ch34 : &BBCR0;
+   chan_def = B05UR : : 224482.000000 MHz : U :    64.000000 MHz : &Ch35 : &BBCR0;
+   chan_def = B06UR : : 224546.000000 MHz : U :    64.000000 MHz : &Ch36 : &BBCR0;
+   chan_def = B07UR : : 224610.000000 MHz : U :    64.000000 MHz : &Ch37 : &BBCR0;
+   chan_def = B08UR : : 224674.000000 MHz : U :    64.000000 MHz : &Ch38 : &BBCR0;
+   chan_def = B09UR : : 224738.000000 MHz : U :    64.000000 MHz : &Ch39 : &BBCR0;
+   chan_def = B10UR : : 224802.000000 MHz : U :    64.000000 MHz : &Ch40 : &BBCR0;
+   chan_def = B11UR : : 224866.000000 MHz : U :    64.000000 MHz : &Ch41 : &BBCR0;
+   chan_def = B12UR : : 224930.000000 MHz : U :    64.000000 MHz : &Ch42 : &BBCR0;
+   chan_def = B13UR : : 224994.000000 MHz : U :    64.000000 MHz : &Ch43 : &BBCR0;
+   chan_def = B14UR : : 225058.000000 MHz : U :    64.000000 MHz : &Ch44 : &BBCR0;
+   chan_def = B15UR : : 225122.000000 MHz : U :    64.000000 MHz : &Ch45 : &BBCR0;
+   chan_def = B16UR : : 225186.000000 MHz : U :    64.000000 MHz : &Ch46 : &BBCR0;
+   chan_def = B17UR : : 225250.000000 MHz : U :    64.000000 MHz : &Ch47 : &BBCR0;
+   chan_def = B18UR : : 225314.000000 MHz : U :    64.000000 MHz : &Ch48 : &BBCR0;
+   chan_def = B19UR : : 225378.000000 MHz : U :    64.000000 MHz : &Ch49 : &BBCR0;
+   chan_def = B20UR : : 225442.000000 MHz : U :    64.000000 MHz : &Ch50 : &BBCR0;
+   chan_def = B21UR : : 225506.000000 MHz : U :    64.000000 MHz : &Ch51 : &BBCR0;
+   chan_def = B22UR : : 225570.000000 MHz : U :    64.000000 MHz : &Ch52 : &BBCR0;
+   chan_def = B23UR : : 225634.000000 MHz : U :    64.000000 MHz : &Ch53 : &BBCR0;
+   chan_def = B24UR : : 225698.000000 MHz : U :    64.000000 MHz : &Ch54 : &BBCR0;
+   chan_def = B25UR : : 225762.000000 MHz : U :    64.000000 MHz : &Ch55 : &BBCR0;
+   chan_def = B26UR : : 225826.000000 MHz : U :    64.000000 MHz : &Ch56 : &BBCR0;
+   chan_def = B27UR : : 225890.000000 MHz : U :    64.000000 MHz : &Ch57 : &BBCR0;
+   chan_def = B28UR : : 225954.000000 MHz : U :    64.000000 MHz : &Ch58 : &BBCR0;
+   chan_def = B29UR : : 226018.000000 MHz : U :    64.000000 MHz : &Ch59 : &BBCR0;
+    sample_rate = 128.0 Ms/sec;
+  enddef;
+  def ant02;
+   chan_def = B00UL : : 224162.000000 MHz : U :    64.000000 MHz : &Ch00 : &BBCL0;
+   chan_def = B01UL : : 224226.000000 MHz : U :    64.000000 MHz : &Ch01 : &BBCL0;
+   chan_def = B02UL : : 224290.000000 MHz : U :    64.000000 MHz : &Ch02 : &BBCL0;
+   chan_def = B03UL : : 224354.000000 MHz : U :    64.000000 MHz : &Ch03 : &BBCL0;
+   chan_def = B04UL : : 224418.000000 MHz : U :    64.000000 MHz : &Ch04 : &BBCL0;
+   chan_def = B05UL : : 224482.000000 MHz : U :    64.000000 MHz : &Ch05 : &BBCL0;
+   chan_def = B06UL : : 224546.000000 MHz : U :    64.000000 MHz : &Ch06 : &BBCL0;
+   chan_def = B07UL : : 224610.000000 MHz : U :    64.000000 MHz : &Ch07 : &BBCL0;
+   chan_def = B08UL : : 224674.000000 MHz : U :    64.000000 MHz : &Ch08 : &BBCL0;
+   chan_def = B09UL : : 224738.000000 MHz : U :    64.000000 MHz : &Ch09 : &BBCL0;
+   chan_def = B10UL : : 224802.000000 MHz : U :    64.000000 MHz : &Ch10 : &BBCL0;
+   chan_def = B11UL : : 224866.000000 MHz : U :    64.000000 MHz : &Ch11 : &BBCL0;
+   chan_def = B12UL : : 224930.000000 MHz : U :    64.000000 MHz : &Ch12 : &BBCL0;
+   chan_def = B13UL : : 224994.000000 MHz : U :    64.000000 MHz : &Ch13 : &BBCL0;
+   chan_def = B14UL : : 225058.000000 MHz : U :    64.000000 MHz : &Ch14 : &BBCL0;
+   chan_def = B15UL : : 225122.000000 MHz : U :    64.000000 MHz : &Ch15 : &BBCL0;
+   chan_def = B16UL : : 225186.000000 MHz : U :    64.000000 MHz : &Ch16 : &BBCL0;
+   chan_def = B17UL : : 225250.000000 MHz : U :    64.000000 MHz : &Ch17 : &BBCL0;
+   chan_def = B18UL : : 225314.000000 MHz : U :    64.000000 MHz : &Ch18 : &BBCL0;
+   chan_def = B19UL : : 225378.000000 MHz : U :    64.000000 MHz : &Ch19 : &BBCL0;
+   chan_def = B20UL : : 225442.000000 MHz : U :    64.000000 MHz : &Ch20 : &BBCL0;
+   chan_def = B21UL : : 225506.000000 MHz : U :    64.000000 MHz : &Ch21 : &BBCL0;
+   chan_def = B22UL : : 225570.000000 MHz : U :    64.000000 MHz : &Ch22 : &BBCL0;
+   chan_def = B23UL : : 225634.000000 MHz : U :    64.000000 MHz : &Ch23 : &BBCL0;
+   chan_def = B24UL : : 225698.000000 MHz : U :    64.000000 MHz : &Ch24 : &BBCL0;
+   chan_def = B25UL : : 225762.000000 MHz : U :    64.000000 MHz : &Ch25 : &BBCL0;
+   chan_def = B26UL : : 225826.000000 MHz : U :    64.000000 MHz : &Ch26 : &BBCL0;
+   chan_def = B27UL : : 225890.000000 MHz : U :    64.000000 MHz : &Ch27 : &BBCL0;
+   chan_def = B28UL : : 225954.000000 MHz : U :    64.000000 MHz : &Ch28 : &BBCL0;
+   chan_def = B29UL : : 226018.000000 MHz : U :    64.000000 MHz : &Ch29 : &BBCL0;
+   chan_def = B00UR : : 224162.000000 MHz : U :    64.000000 MHz : &Ch30 : &BBCR0;
+   chan_def = B01UR : : 224226.000000 MHz : U :    64.000000 MHz : &Ch31 : &BBCR0;
+   chan_def = B02UR : : 224290.000000 MHz : U :    64.000000 MHz : &Ch32 : &BBCR0;
+   chan_def = B03UR : : 224354.000000 MHz : U :    64.000000 MHz : &Ch33 : &BBCR0;
+   chan_def = B04UR : : 224418.000000 MHz : U :    64.000000 MHz : &Ch34 : &BBCR0;
+   chan_def = B05UR : : 224482.000000 MHz : U :    64.000000 MHz : &Ch35 : &BBCR0;
+   chan_def = B06UR : : 224546.000000 MHz : U :    64.000000 MHz : &Ch36 : &BBCR0;
+   chan_def = B07UR : : 224610.000000 MHz : U :    64.000000 MHz : &Ch37 : &BBCR0;
+   chan_def = B08UR : : 224674.000000 MHz : U :    64.000000 MHz : &Ch38 : &BBCR0;
+   chan_def = B09UR : : 224738.000000 MHz : U :    64.000000 MHz : &Ch39 : &BBCR0;
+   chan_def = B10UR : : 224802.000000 MHz : U :    64.000000 MHz : &Ch40 : &BBCR0;
+   chan_def = B11UR : : 224866.000000 MHz : U :    64.000000 MHz : &Ch41 : &BBCR0;
+   chan_def = B12UR : : 224930.000000 MHz : U :    64.000000 MHz : &Ch42 : &BBCR0;
+   chan_def = B13UR : : 224994.000000 MHz : U :    64.000000 MHz : &Ch43 : &BBCR0;
+   chan_def = B14UR : : 225058.000000 MHz : U :    64.000000 MHz : &Ch44 : &BBCR0;
+   chan_def = B15UR : : 225122.000000 MHz : U :    64.000000 MHz : &Ch45 : &BBCR0;
+   chan_def = B16UR : : 225186.000000 MHz : U :    64.000000 MHz : &Ch46 : &BBCR0;
+   chan_def = B17UR : : 225250.000000 MHz : U :    64.000000 MHz : &Ch47 : &BBCR0;
+   chan_def = B18UR : : 225314.000000 MHz : U :    64.000000 MHz : &Ch48 : &BBCR0;
+   chan_def = B19UR : : 225378.000000 MHz : U :    64.000000 MHz : &Ch49 : &BBCR0;
+   chan_def = B20UR : : 225442.000000 MHz : U :    64.000000 MHz : &Ch50 : &BBCR0;
+   chan_def = B21UR : : 225506.000000 MHz : U :    64.000000 MHz : &Ch51 : &BBCR0;
+   chan_def = B22UR : : 225570.000000 MHz : U :    64.000000 MHz : &Ch52 : &BBCR0;
+   chan_def = B23UR : : 225634.000000 MHz : U :    64.000000 MHz : &Ch53 : &BBCR0;
+   chan_def = B24UR : : 225698.000000 MHz : U :    64.000000 MHz : &Ch54 : &BBCR0;
+   chan_def = B25UR : : 225762.000000 MHz : U :    64.000000 MHz : &Ch55 : &BBCR0;
+   chan_def = B26UR : : 225826.000000 MHz : U :    64.000000 MHz : &Ch56 : &BBCR0;
+   chan_def = B27UR : : 225890.000000 MHz : U :    64.000000 MHz : &Ch57 : &BBCR0;
+   chan_def = B28UR : : 225954.000000 MHz : U :    64.000000 MHz : &Ch58 : &BBCR0;
+   chan_def = B29UR : : 226018.000000 MHz : U :    64.000000 MHz : &Ch59 : &BBCR0;
+    sample_rate = 128.0 Ms/sec;
+  enddef;
+  def ant03;
+   chan_def = B00UL : : 224226.000000 MHz : U :    64.000000 MHz : &Ch00 : &BBCL0;
+   chan_def = B01UL : : 224290.000000 MHz : U :    64.000000 MHz : &Ch01 : &BBCL0;
+   chan_def = B02UL : : 224354.000000 MHz : U :    64.000000 MHz : &Ch02 : &BBCL0;
+   chan_def = B03UL : : 224418.000000 MHz : U :    64.000000 MHz : &Ch03 : &BBCL0;
+   chan_def = B04UL : : 224482.000000 MHz : U :    64.000000 MHz : &Ch04 : &BBCL0;
+   chan_def = B05UL : : 224546.000000 MHz : U :    64.000000 MHz : &Ch05 : &BBCL0;
+   chan_def = B06UL : : 224610.000000 MHz : U :    64.000000 MHz : &Ch06 : &BBCL0;
+   chan_def = B07UL : : 224674.000000 MHz : U :    64.000000 MHz : &Ch07 : &BBCL0;
+   chan_def = B08UL : : 224738.000000 MHz : U :    64.000000 MHz : &Ch08 : &BBCL0;
+   chan_def = B09UL : : 224802.000000 MHz : U :    64.000000 MHz : &Ch09 : &BBCL0;
+   chan_def = B10UL : : 224866.000000 MHz : U :    64.000000 MHz : &Ch10 : &BBCL0;
+   chan_def = B11UL : : 224930.000000 MHz : U :    64.000000 MHz : &Ch11 : &BBCL0;
+   chan_def = B12UL : : 224994.000000 MHz : U :    64.000000 MHz : &Ch12 : &BBCL0;
+   chan_def = B13UL : : 225058.000000 MHz : U :    64.000000 MHz : &Ch13 : &BBCL0;
+   chan_def = B14UL : : 225122.000000 MHz : U :    64.000000 MHz : &Ch14 : &BBCL0;
+   chan_def = B15UL : : 225186.000000 MHz : U :    64.000000 MHz : &Ch15 : &BBCL0;
+   chan_def = B16UL : : 225250.000000 MHz : U :    64.000000 MHz : &Ch16 : &BBCL0;
+   chan_def = B17UL : : 225314.000000 MHz : U :    64.000000 MHz : &Ch17 : &BBCL0;
+   chan_def = B18UL : : 225378.000000 MHz : U :    64.000000 MHz : &Ch18 : &BBCL0;
+   chan_def = B19UL : : 225442.000000 MHz : U :    64.000000 MHz : &Ch19 : &BBCL0;
+   chan_def = B20UL : : 225506.000000 MHz : U :    64.000000 MHz : &Ch20 : &BBCL0;
+   chan_def = B21UL : : 225570.000000 MHz : U :    64.000000 MHz : &Ch21 : &BBCL0;
+   chan_def = B22UL : : 225634.000000 MHz : U :    64.000000 MHz : &Ch22 : &BBCL0;
+   chan_def = B23UL : : 225698.000000 MHz : U :    64.000000 MHz : &Ch23 : &BBCL0;
+   chan_def = B24UL : : 225762.000000 MHz : U :    64.000000 MHz : &Ch24 : &BBCL0;
+   chan_def = B25UL : : 225826.000000 MHz : U :    64.000000 MHz : &Ch25 : &BBCL0;
+   chan_def = B26UL : : 225890.000000 MHz : U :    64.000000 MHz : &Ch26 : &BBCL0;
+   chan_def = B27UL : : 225954.000000 MHz : U :    64.000000 MHz : &Ch27 : &BBCL0;
+   chan_def = B28UL : : 226018.000000 MHz : U :    64.000000 MHz : &Ch28 : &BBCL0;
+    sample_rate = 128.0 Ms/sec;
+  enddef;
+$BBC;
+  def bbcs;
+    BBC_assign = &BBCL0  : 01 : &IFL0;
+    BBC_assign = &BBCL1  : 03 : &IFL1;
+    BBC_assign = &BBCL5  : 05 : &IFL5;
+    BBC_assign = &BBCL10 : 07 : &IFL10;
+    BBC_assign = &BBCL200: 09 : &IFL200;
+    BBC_assign = &BBCR0  : 02 : &IFR0;
+    BBC_assign = &BBCR1  : 04 : &IFR1;
+    BBC_assign = &BBCR5  : 06 : &IFR5;
+    BBC_assign = &BBCR10 : 08 : &IFR10;
+    BBC_assign = &BBCR200: 10 : &IFR200;
+  enddef;
+$IF;
+  def ifs;
+    if_def = &IFL0  : 1N : L : 10000.0 MHz : U :  0 MHz : 0 Hz;
+    if_def = &IFL1  : 1N : L : 10000.0 MHz : U :  1 MHz : 0 Hz;
+    if_def = &IFL5  : 1N : L : 10000.0 MHz : U :  5 MHz : 0 Hz;
+    if_def = &IFL10 : 1N : L : 10000.0 MHz : U : 10 MHz : 0 Hz;
+    if_def = &IFL200: 1N : L : 10000.0 MHz : U :200 MHz : 0 Hz;
+    if_def = &IFR0  : 2N : R : 10000.0 MHz : U :  0 MHz : 0 Hz;
+    if_def = &IFR1  : 2N : R : 10000.0 MHz : U :  1 MHz : 0 Hz;
+    if_def = &IFR5  : 2N : R : 10000.0 MHz : U :  5 MHz : 0 Hz;
+    if_def = &IFR10 : 2N : R : 10000.0 MHz : U : 10 MHz : 0 Hz;
+    if_def = &IFR200: 2N : R : 10000.0 MHz : U :200 MHz : 0 Hz;
+  enddef;
+$TRACKS;
+  def trax_1bit;
+    bits/sample = 1;
+  enddef;
+  def trax_2bit;
+    bits/sample = 2;
+  enddef;
+$SOURCE;
+* Generated from DiFX input by difx2mark4
+def OJ287;
+ source_name = OJ287;
+ ra = 08h54m48.8749300s; dec =  20d06'30.640780"; ref_coord_frame = J2000;
+enddef;
+
+$CLOCK;
+* Generated from DiFX input by difx2mark4
+ def Az; clock_early = 2016y097d06h45m00s : 2.627 usec : 2016y096d08h42m00s : -1.163000e-12 ; enddef;
+ def Lm; clock_early = 2016y097d06h45m00s :-0.727 usec : 2016y096d06h36m00s : -2.380000e-12 ; enddef;
+ def Sm; clock_early = 2016y097d06h45m00s : 1.881 usec : 2016y096d08h42m00s : 1.770000e-13 ; enddef;
+ def Sr; clock_early = 2016y097d06h45m00s : 0.716 usec : 2016y096d08h42m00s : 1.770000e-13 ; enddef;
+
+$EOP;
+* Generated from DiFX input by difx2mark4
+def EOP_DIFX_INPUT;
+enddef;
+
+$EVEX_REV;
+ rev = 1.0;
+$EVEX;
+ def 1234_std;
+ corr_exp#   = 1234;
+ ovex_file   = dummy;
+ cvex_file   = dummy;
+ svex_file   = dummy;
+ AP_length =  1.0000 sec;
+ speedup_factor = 1.0;
+ ref $CORR_CONFIG = CDUM;
+ ref $SU_CONFIG  = SDUM;
+ enddef;
+$IVEX_REV;
+ rev = 1.0;
+$CORR_INIT;
+ def INIT_DUMMY;
+ system_tempo = 1.00;
+ bocf_period = 40000;
+*subintNS = 1250000;
+ ref $PBS_INIT = PBS_DUMMY;
+ enddef;
+$PBS_INIT;
+ def PBS_DUMMY;
+ enddef;
+$LVEX_REV;
+ rev = 1.0;
+$LOG;
+ def log_dummy;
+ enddef;

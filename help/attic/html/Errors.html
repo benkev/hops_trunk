@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.06 [en] (X11; I; HP-UX B.10.20 9000/785) [Netscape]">
+   <TITLE> Error Explanations for the Mark 4 Correlator </TITLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFF00" LINK="#0000FE" VLINK="#980066" ALINK="#FE0000">
+
+<H1> Mark 4 Correlator Error Explanations </H1>
+<A NAME="0"></A><B>0:</B> Error number 0 is not defined. You are on your
+own for this one.
+<P><A NAME="1"></A><B>1:</B> The building is on fire. Please shut down
+the correlator in an orderly fashion before saving yourself. 
+
+<P> <A NAME="1002"></A> <B>1002:</B> Opera was unable to open and read 
+the named task-stream (.tsf) file.  Did you spell it correctly?  Is it 
+really in that directory? 
+
+<P> <A NAME="1004"></A> <B>1004:</B> Opera was unable to open and write to 
+the named task-stream (.tsf) file.  Did you spell it correctly?  Is it 
+really in that directory?  Do you have write permission? 
+
+<P><A NAME="2000"></A><B>2000:</B> The correlator control manager, corrman,
+has rejected a configuration request. The possible errors are encoded within
+the return_code; see the Cu_Resource_Error structure in 
+<A HREF="/correlator/prog/src/include/message_structs.h">message_structs.h
+</A> for details. 
+
+<P><A NAME="2001"></A><B>2001:</B> The station unit manager, suman, was
+unable to be configure the indicated station unit. The return_code denotes
+the cause. 
+
+<P><A NAME="3000"></A><B>3000:</B> Suman was unable to initialize the indicated
+station unit. If re-initialization doesn't correct the situation, then
+the SU may need to be re-booted. 
+
+<P><A NAME="6000"></A><B>6000:</B> Sutrx has encountered a non-recoverable
+socket error for the indicated SU. Quite likely the cause is flaky SU code
+that has decided to go on holidays. If this station unit is needed, it
+may be necessary to exit the correlator software, reboot the SU, and start
+the software up again. 
+
+<P> Revised:  2000 June 21, JAB 
+
+</BODY>
+</HTML>

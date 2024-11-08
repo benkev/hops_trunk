@@ -1,0 +1,38 @@
+## $MK4_DIST_D/src/sub/afio/Makefile
+SHELL := /bin/ksh
+
+##-----------------------------------------------------------------------------
+ifeq "$(MK4_MK_ENV)" ""
+  include $(shell echo $${PWD%/src/*})/cfg/env.mk
+  default $(MAKECMDGOALS) :
+	@mkdir -p $(MK4_MK_BLD_D)
+	@$(MAKE) -f $(MK4_MK_SRC_D)/Makefile -C $(MK4_MK_BLD_D) $(MAKECMDGOALS)
+
+##-----------------------------------------------------------------------------
+else # ifeq "$(MK4_MK_ENV)" ""
+  include $(MK4_MK_CFG_D)/common.mk
+  include $(MK4_MK_CFG_D)/$(MK4_MK_ARCH).mk 
+
+  ##---------------------------------------------------------------------------
+  language := c
+
+  ##---------------------------------------------------------------------------
+  ## lib
+  lib := libafio.a
+  lib_srcs := $(strip \
+   clear_rsumm.c      clear_csumm.c   clear_fsumm.c \
+   parse_rsumm.c      parse_csumm.c   parse_fsumm.c \
+   write_rsumm.c      write_csumm.c   write_fsumm.c \
+   clear_tsumm.c      write_tsumm.c   parse_tsumm.c \
+   rootname.c         corelname.c     fringename.c \
+   get_unique_name.c  aline_id.c      afile_header.c \
+  )
+
+  ##
+  ipath := $(MK4_MK_INC_D) 
+
+  ##
+  include $(MK4_MK_CFG_D)/rules.mk 
+
+##-----------------------------------------------------------------------------
+endif # ifeq "$(MK4_MK_ENV)" ""

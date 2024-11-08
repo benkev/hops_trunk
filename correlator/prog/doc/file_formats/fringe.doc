@@ -1,0 +1,1038 @@
+Algorithms used in FRNGE
+NORMV-Normalization routine 
+1. Normalization
+   RCos(k)=F*(2*a(k)-c)/c 
+   RSin(k)=F*(2*b(k)-c)/c 
+          where a(k)="cosine" output of the correlator
+                b(k)="sine" output of the correlator
+                c=# of bits correlated in the accumalation period 
+                k=correlation lag index 1 to 8
+                F=normalization factor
+                RCos=real component of the normalized correlation 
+                     in units where 10,000 = 100% correlation 
+                RSin=imaginary component
+   F=(PI/2)*(3/4)*(PI/(4*cos(PI/8)))*(1/(1-PI*PI/288))*10,000 
+          where 1st factor=clipping correction
+                2nd factor=ratio # bits correlated to # bits in accumulation
+                           period(1/4 of the time the 3 level approximations
+                                  of the sine and cosine functions are zero)
+                3rd factor=rotator correction from Whitney et al
+                           Radio Science,vol 11,pp 421-432,May 1976 
+                4th factor=correction for loss in making fractional 
+                           bit correction automatically within the correlator 
+2. Derive Spectrum - using 16-point FFTs
+        k=8 
+   S(w)=SUM(RCos(k)-SIGN*i*RSin(k))exp(-2*PI*i*(k-5)*w/16)
+        k=1 
+         where  w=1 to 7=frequency index(w=1=12.5%bandedge,w=7=87.5%bandedge) 
+                SIGN=+1 for positive fringe rate
+                SIGN=-1 for negative fringe rate - to compensate for the
+                        correlators ability to perform only positive rotation 
+                i=SQRT(-1)
+3. Fractional bit correction -if no bit shifts are made in correlator 
+                              during an accumulation period 
+   S'(w)=S(w)(exp(-2*PI*i*w*FB/16))*(1-PI*PI/288) w=1 to 7
+          where FB=Apriori delay minus delay applied through bit shift
+                   at the center of the accumulation period 
+                FB is in units of the sample interval 
+   Fractional bit correction -if bit shifts are made in the correlator and
+                              are accompanied by 90 deg jump in rotator phase 
+   S'(w)=S(w)exp(-2*PI*i*(w-4)*(FB+DD)*(1-INT(SH)/SH)/16) w=1 to 7
+          where SH=# bit shifts in accumulation period
+                   a positive floating point number 
+                INT(SH)= integer # of shifts applied - a positive number  
+                DD=+0.5 if INT(SH) is odd and FB<0
+                DD=-0.5 if INT(SH) is odd and FB>0
+                DD=0 if INT(SH) is even 
+4. Add together both sidebands
+             Su+l(w)=Su(w)    w=1 to 7
+             Su+l(w)=CONJ(Sl(-w)) w=-1 to -7 if lower sideband present
+                    =0        w=0 (D.C.)  and w>7 and w<-7
+                              i.e. rest of array is filed out with zeroes 
+             where  Su+l  is the combined cross-spectral function 
+                    Su    is the upper sideband 
+                    Sl    is the lower sideband 
+5. Derive the "single band" delay function - using 32-point FFTs
+        w=7 
+   D(d)=SUM S(w)(exp(-2*PI*i*(d-9)*w/32))/7 
+        w=-7
+          where d=delay index 1 to 16 (d=9=central index) 
+                d has units of half the sample interval 
+               (note that the delay function is a complex function and is NOT 
+               the same as (Rcos(k)-SIGN*i*RSin(k)) ) 
+SEARC-Fringe search routine 
+1. FFT-to fringe rate domain -using at most 14 1024-point FFTs
+          t=tmax
+   D(L,d)=SUM D(t,d)exp(-2*PI*i*(L-LD/2-1)*(t-1)/LD)
+          t=1 
+          where t=1 to tmax = time sample number
+                tmax less than equal to 512 
+                D(t,d)=delay function D(d) for time sample #t 
+                L=fringe rate index number 1to LD 
+                LD.LE.1024.and.LD.GE.tmax*2 
+                i.e.LD is made as large as practical for best interpolation 
+                D(L,d)=single band delay func. as a func. of fringe rate
+2. Sort(or "grid") into delay rate domain and correct for phase cal phase 
+   D(n,L,d)=(D(n,L',d)*(1-a+L')+D(n,L'+1,d)*(a-L'))exp(-i*A(n)) 
+            a=AMOD((L-LA/2-1)*(f(n)/f(1))*(LD/LA)+(LD*3/2),LD)+1  
+            L'=INT(a) 
+            where n=frequency channel index number 1 to 14(max) 
+                  f(n)=magnitude of total LO frequency of nth ch. in MHZ
+                  L=delay rate channel number from 1 to LA in units of  
+                    1/(LA*f(1)*DT)  microsec per second 
+                  LA.GE.tmax.and.LA.LE.LD 
+                  DT=time interval between time samples in seconds
+                     i.e. DT= accumulation period 
+                  A(n)=phase cal. phase(difference station 1 -stn.2) for nth channel
+                  AMOD=modulo function
+                  INT=truncate to integer value 
+3. Calculate multi-band delay function  -using at most 512 256-point FFTs 
+            n=nmax
+   D(k,L,d)=SUM D(n,L,d)exp(-2*PI*i*FS(n)*(k-N/2-1)/N)
+            n=1 
+  
+            FS(n)=(f(n)-f(1))/(largest common denominator in the spacing
+                                                      between frequencies)
+            where k=fine delay in units of
+                  1/((largest common spacing)*N)  microseconds
+                  N=number of points in FFT required to cover all spacings
+                    i.e. N>(maximum value of FS(n)- minimum value of FS(n)) 
+4. SEARC finds values of k,L and d which maximize the magnitude of D(k,L,d) 
+            where (in a full range search)
+                   k runs from 1 to N (k=N/2+1 = central index) 
+                   L  "     "  1  " LA(=512 maximum)  
+                   d  "     "  1  " 16
+INTR-interpolation routine to find interpolated values of k,L and d 
+1. Calculate multi-band delay function at single points by direct rotation
+            n=nmax t=tmax 
+   D(T,R,d)=SUM   SUM D(n,t,d)*VROT(T,R,d,n,t)
+            n=1   t=1 
+   VROT(T,R,d,t)=exp(-2*PI*i*(f(n)*R*(DT*(t-1)-E(n))+A(n) 
+                     +(f(n)-f(1))*T+(d'-d)*B/8))
+           where  R=delay rate in microsec per sec
+                  T=muli-band delay in microsec 
+                  E(n)=Epoch of Apriori calculations relative to time of
+                       1st sample (t=1) 
+                       +ve sign Apiori calculated for a time earlier than 
+                       the time of the 1st sample 
+                  d'=interpolated single band delay index 
+                  B=+1 for upper sideband 
+                  B=-1 for lower sideband 
+                  B=0 if both sidebands are added 
+2. A parabola is fit through 3 points (using the magnitude of D)
+   where the central point is the current 
+   best estimate of T,R and d and the other two points are equally spaced 
+   on either side of the central point. 
+        To estimate the delay rate R the spacing between points is
+   initially: 
+                  1/(LA*f(1)*DT) (i.e.=spacing between delay rate points  
+                                                                in SEARC) 
+   and to estimate delay T the spacing between points is: 
+                  1/((largest common denominator of freq. spacing)*N) 
+        To estimate the single band delay the spacing between points is 
+   half the sample interval.
+3. INTR estimates R,T and then d in two iterations and then a 3rd iteration 
+   is performed in which the spacing between points for R and T is reduced
+   by a factor of 2.
+    
+*********************************************************************** 
+Amplitude Corrections Made by FRNGE 
+  
+1. Clipping/Rotation Correction 
+    
+       (PI/2)*(3/4)*(PI/(4*cos(PI/8)))*(1/(1-PI*PI/288))=1.0375 
+          where 1st factor=Van Vleck small-amplitude clipping correction
+                2nd factor=ratio #bits correlated to #bits in accumulation
+                           period(~1/4 of the time the 3 level approximations 
+                           of the sine and cosine functions are zero). This 
+                           factor is normally close to 3/4, but is computed 
+                           individually for each accumulation period. 
+                3rd factor=rotator correction from Whitney et al
+                           Radio Science,vol 11,pp 421-432,May 1976 
+                4th factor=correction for loss in making fractional 
+                           bit correction automatically within the correlator 
+
+2. 'Automatic Bit Shift' Correction 
+    
+       1.035 -FRNGE multiplies correlation coefficient by this factor 
+
+3. Residual Fringe-Rate Correction
+  
+      Amplitudes are multiplied by a factor=1/SINC(RESIDUAL RATE) 
+      which has value PI/2 at the edge of the fringe-rate search window.
+  
+5. Other small corrections NOT made by FRNGE
+      a. Because FRNGE uses only the central 93.75% of the band,
+         the amplitude is over-estimated by ~3.2% 
+      b. Because FRNGE uses only 8 lags, the amplitude is under-estimated 
+         by ~2% 
+      c. Because the bandpass is not square, the amplitude is 
+         underestimated by ~2%
+   The combination of all these effects cancels to ~1% level. 
+
+*********************************************************************** 
+MODES OF RUNNING FRNGE
+1.RU,FRNGE,LUOP,LULIST,FILENAME::CR#,PARAM FILE NAMR,BK# IN PARAM FILE,BASE#
+  ,FREQUENCY GROUP 2-LETTER CODE
+  (BASELINE# CAN BE NUMBER OR 2-LETTER CODE and BASE#:EXT# forces FRNGE to
+   process only one COREL extent) 
+  (IF BK# IS NEGATIVE FRNGE WILL PROCESS ONLY THAT COREL INDEX #) 
+  (NEGATIVE LUOP SUPPRESSES ALL OUTPUT INCLUDING OUTPUT FILE) 
+  (LUOP+100 SUPRESSES ERROR OUTPUT I.E. USE RU,FRNGE,126,6   )
+  (NEGATIVE LULIST GENERATES DEBUG OUTPUT)
+  (IF YOU WANT TO SUPPRESS TERMINAL AND VERSATEC OUTPUT USE LU=64)
+  
+FRNGE OUTPUT:TYPE 52 EXTENT 
+  
+A. Frnge output page images 
+  
+    Page images of the frnge output follow the type 5000
+output. 
+  
+B. FRNGE OUTPUT FOR DATA BASE 
+  
+    I*2 
+     1          4000            Record Type INTEGER 
+     2          IBASE           Baseline# as defined in root extent 
+     3          XY              2-letter baseline code
+    4-6         spare 
+    7-12       UTC TAG(6)       UTC time tag (YMDHMS) EPOCH for delay and rate
+   13-18       VLB2 UTC(6)      UTC time of FRNGE processing (YMDHMS) 
+   19-22       ARCHIV 
+    23         SAMPRATE         Sample rate in kbits/sec
+    24          FR/PP           #Frames/Parameter Period
+    25          PASS#           PASS# (A2) (USED TO BE #PARAMS/ACCUM) 
+    26         #CHANELS         #U/L sideband pairs included in this processing 
+                                (i.e. # of discrete LO frequencies) 
+   27-54       NO.OF AP(2,14)   #Accumulation periods by sideband by channel
+   55-110      RECTRACK(2,2,14) Track# table in order of: 
+                                          Station#
+                                          Refer/partn Sideband
+                                          Channel#
+  111         COREL version # and format type 
+                Bits 15-9: # of conversion between HP & IEEE formats that 
+                           this file has undergone
+                        8: 0 - current format is HP 
+                           1 - current format is IEEE 
+                      7-0: COREL version #
+  112-117     UTCM TAG(6)  UTC time tag (YMDHMS) EPOCH for "central" EPOCH
+  118         LU OF PRINTOUT (FOR FRNGP)
+  119         REF. TAPE DRIVE # 
+  120         REM. TAPE DRIVE # 
+  121         SPECIAL OPTIONS NAME(211) 
+  122         INTEGER VALUE OF PARAM(250) 
+  123         IF D CODE GIVES PROBABLE BAD DRIVE
+  124-128       spare 
+  
+  ------------------------------
+  
+    I*2 
+     1          4100            Record Type INTEGER 
+     2          IBASE           Baseline # as defined in root extent
+    3-6         spare 
+    7-34       CORELXTNT(2,14)   COREL extent# from which each track is taken 
+                                in order of:
+                                         Sideband 
+                                         Channel
+   35-118      CALBYFRQ(3,2,14) Phase-cal amp,phase,and freq by station and 
+                                channel, normalized as follows: 
+                                     AMP  0 to 10000(IN VOLTAGE) -1=manual cal
+                                     PHS  -18000 to +18000
+                                     FRQ   khz
+************ note ************* 
+  WHEN pcal by accum. AND manual offsets
+                CALBYFRQ(3,2,14) Phase-cal amp, phase corrected with    
+                                 offset phase, pcal freq
+                                 where pcal amp is given as negative num. 
+change made 21 DEC 89 
+******************************* 
+  119-128       spare 
+  
+  ----------------------------- 
+  
+    I*2 
+     1          4200            Record Type INTEGER 
+     2          IBASE           Baseline# as defined in root extent 
+    3-6         spare 
+    7-34       PROCUTC(2,14)    COREL processing UT (YDDD)   by sideband and
+                                channel 
+   35-90        ERRORATE(2,2,14) Tape error rate by station,sideband, 
+                                 and channel encoded as : 
+                                 1000*LOGT(error rate)
+                                 (=-32000 if no errors) 
+   91-118       INDEX(2,14)      COREL index #s by sideband and FRNGE CH# 
+   119          FRNGE ERROR CODE 0=O.K. NE.0 DONT USE 
+   120          SBDOFFST FLAG 1=THIS RUN HAD SBDOFFSET FIX-UP 
+                              2=THIS RUN HAD PHASE FIX-UP 
+   121          FLAG=1= SCAN HAD PCAL CORR. AP BY AP
+   122-128       spare
+  
+  ----------------------------- 
+  
+    I*2 
+     1          4300            Record type ASCII 
+     2          IBASE           Baseline# as defined in root extent 
+    3-6         spare 
+    7-10       STAR ID (A8)     Radio source name 
+   11-18       BASELINE(2A8)    Reference and remote site names.
+   19-21       CORELFILE(A6)     COREL correlation output file name.
+   22-29        TAPEID (2A8)    Raw-data tape ID labels for each station. 
+   30-32        VLB2PRG(A6)     FRNGE program version YYMMDD
+   33-36        RUN CODE(A8)    Run code, e.g., "329-1300"
+   37           FRNGE QUALITY CODE 0=NO GOOD,1=VERY POOR,9=VERY GOOD
+                A=HAS FRNGE ERROR CODE=1,B=2 ETC. CODE IS A SINGLE CHARACTER
+                IS A 16-BIT WORD WHERE 1 ST 8-BITS REPRESENT A BLANK
+   38           FREQUENCY GROUP CODE(A2)
+   39-41        ORIGINAL COREL FILE NAME
+   42-44        TAPE Q CODE (A6)
+   45-48        spare 
+   49-52        Ref station occupation code (4A2) 
+   53-56        Rem station occupation code (4A2) 
+   57-128       spare 
+  
+  ----------------------------- 
+    I*2     R*8 
+     1       -      4400            Record Type DOUBLE PRECISION
+     2       -      IBASE           Baseline# as defined in root extent 
+    3-4      -      spare 
+    5-60    2-15    RFREQ(14)       LO frequencies (MHz) by channel 
+    61-64   16      REF FREQ        RF freq (MHz) to which phase is referred
+    65-68   17      DEL OBSV        Observed group delay in microseconds. 
+                                    Equals single band delay if only one freq.processed.
+                                    DEL OBSV=T2-T1,T1=time of signal arrival
+                                    at site 1 (reference site) as measured  by
+                                    the site clock at site 1,T2=time of signal
+                                    arrival at site 2 as measured by site 
+                                    clock at site 2. The signal in question is
+                                    the one which arrives at site 1 at a UTC
+                                    time equal to that given as the UTC epoch.
+    69-72   18      RAT OBSV        Observed delay rate (usec/sec) corrected
+                                    for phase cal rate
+    73-76   19      NB DELAY        Narrow-band group delay (usec)
+    77-80   20      DGPD            Double prec.group delay ambig.(usec)
+    81-84   21      BTE0            Apriori clock (usec)
+    85-88   22      EPOCH0          ref.st.clock epoch (usec) 
+    89-92   23      DEL OBSVM       observed delay at central epoch 
+    93-96   24      RAT OBSVM       observed delay rate at central epoch
+    97-100  25      DLY2            phase delay at EPO+1 sec
+    101-104 26      DLY3            phase delay at EPO-1 sec
+    105-108 27      DRATSIGMA       delay-rate error calc. from data
+    109-128                         spare 
+  
+  ----------------------------- 
+  
+    I*2     R*4 
+     1       -      4500            Record Type SINGLE PRECISION
+     2       -      IBASE           Baseline# as defined in root extent 
+    3-58    2-29   AMBYFRQ(2,14)    Amp and phase by channel 1=100% phase -180 to 180 degrees 
+                                    residual to corel and uncorrected for pcal rate 
+    59-62  30-31    PHASECAL(2)     Phase-cal rate by station (usec/sec)
+                                    TO "UN"CAL DATA RATE=RATE+PHASCAL(1)-PHASCAL(2) 
+    63-64   32      DELRESID        Delay residual to COREL a priori
+    65-66   33      DELSIGMA        Calculated delay error (usec) 
+    67-68   34      RATRESID        Delay-rate residual to COREL a priori (usec/sec)
+                                    corrected for phase cal rates 
+    69-70   35      RATSIGMA        Calculate delay-rate error (usec/sec) 
+    71-72   36      COHERCOR        Coherent multi-freq correlation coefficient 
+                                    (1.0=100% corr) 
+    73-74   37      TOTPHASE        Total observed fringe phase (degrees )
+    75-78   38-39   UVF/ASEC (2)    Fringes/asec in N-S and E-W 
+    79-82   40-41   STARELEV(2)     Calculated star elevations run reference time 
+                                    by station (degrees)
+    83-84   42      AAMP            Frnge amplitude from incoherent 
+                                    addition of frequency channels
+    85-88   43-44   URVRSEC(2)      Rate derivatives mHz/sec arc
+    89-100  45-50   SRCHPAR(6)      search parameters 
+    101-102 51      DEPSBRES        single band delay residual(usec)
+    103-104 52      SNR             SNR in sigmas 
+    105-106 53      PROB            probability of false detection
+    107-108 54      INCOH           incoherent segmented fringe amp 
+                                    in units of 10,000
+    109-110 55      EARP            total phase refered to an epoch at
+                                    time the signal reaches the center of 
+                                    the earth.
+    111-112 56      REARP           residual phase corrected to earth centered
+                                    epoch 
+    113-114 57      START           Start time in seconds past hour 
+    115-116 58      STOP            Stop  time in seconds past hour 
+    117-118 59      EPD             Epoch offset from center of run in sec
+    119-120 60      DUR             Effective run duration in seconds 
+    121-122 61      DELSS           Single-band delay error in microsec 
+    123-124 62      QB              ratio of min to max data accepted in %
+    125-126 63      DISCD           % data discarded
+    127-128 64      TOTPM           total phase at central epoch
+  
+  ----------------------------- 
+  
+C. ACCUMULATION PERIOD BY ACCUMULATION PERIOD OUTPUT
+  
+ I*2           R*4
+  1                    Block I.D=5000 
+  2                    continuation # (or delay ch# for large output mode)
+ 3-4                   RSB and PSB #'s (from COREL)   (2 integers)
+                          RSB=reference frequency sideband
+                          PSB=parter sideband 
+ 5-6            3      Start time of first accumlation record in this block 
+                       in decimal seconds from the start of the hour
+ 7-8            4      Accumulation period in seconds 
+ 9-10           5      Start time of first accumulation record in 
+                       this block, in decimal seconds from the EPOCH time.
+11-14                  Unused 
+29-128  IAP(4,25)      I*2 array of info for 25 AP's
+           1           Amplitude: 
+                          30,000 = 100% corr
+                          -1 = deleted or no data 
+                          -2 = to fill out array
+           2           Residual phase to COREL+FRNGE models, uncorrected
+                       for phase-cal rates (i.e. phase residual will rotate 
+                       with differential phase cal rates) 
+                           0 - 9999  = 0-360 deg USB+LSB
+                           10000-19999=0-360 deg USB
+                           20000-29999=0-360 deg LSB
+                           -1 = deleted or no data
+                           -2 = to fill out array 
+           3           Stn1 phase cal phase 
+           4           Stn2 phase cal phase 
+                           0-9999 = 0-360 deg 
+                           -1 = deleted or no data
+                           -2 = to fill out array 
+ Notes: 
+         1. Block I.D, continuation and freq  # are integers
+         2.128 integer word blocks are continued as necessary to a maximum
+           of 14x21=294 
+
+----------------------------------------------------------------------------
+
+ASCII FRNGE printout page images follow the type 5000 records and have
+the following characteristics:
+  1. Each 128-word record contains two 128-character lines of printout. 
+  2. New page has '*' as first character of line; all other lines have
+     ASCII space as first character of line.
+
+----------------------------------------------------------------------------
+
+  
+INTERNAL ARRAYS IN FRNGE
+  
+NAME(1) COREL OUTPUT FILE NAME
+NAME(2) COREL OUTPUT FILE NAME
+NAME(3) COREL OUTPUT FILE NAME
+NAME(4) =1 FOR COMPACT PRINTOUT =0 TO INCLUDE ID ARRAYS 
+NAME(5) =1 TO SUPPRESS ACCUMULATION PERIOD MESSAGES 
+NAME(6) COREL FILE CR#
+NAME(7) FRNGE PROGRAM DATE YY 
+NAME(8) FRNGE PROGRAM DATE MM 
+NAME(9) FRNGE PROGRAM DATE DD 
+NAME(10) BASELINE # 
+NAME(11) EXTENT # FOR FRNGE OUTPUT
+NAME(12) # ID BLOCKS TO BE OUTPUT 
+NAME(13) START TIME IND,-1=START AT FIRST ACCUM.PER.,-2=START ACTIVATED 
+NAME(14) LU OPERATOR
+NAME(15) ERROR CONDITION 0=NO ERROR,>0 ERROR COND ABORT FRNGE 
+NAME(16) INDEX# TO BE PROCESSED 0=PROCESS ALL 
+NAME(17) CR# FOR FRNGE OUTPUT,0=NO OUTPUT 
+NAME(18) CR# FOR FRNGE SCATCH FILE *FRNGE  (set in file .PARM::M3)
+NAME(19) # OF ACCUM PERIODS IN FFT TO FRINGE RATE MAX=512 
+NAME(20) # OF FREQUENCIES PROCESSED 
+NAME(21) INDEX # OF 1 ST. CH PROCESSED FOR FREQ # 1 
+NAME(22) INDEX # OF MATE  CH PROCESSED FOR FREQ # 1 
+      . 
+NAME(48) INDEX # OF MATE  CH PROCESSED FOR FREQ # 14
+NAME(49) YEAR OF OBSERVATION
+NAME(50) DAY# OF OBSERVATION
+NAME(51) CORR  # OF 1 ST  CH PROCESSED FOR FREQ # 1 
+NAME(52) CORR  # OF MATE  CH PROCESSED FOR FREQ # 1 
+NAME(78) CORR  # OF MATE  CH PROCESSED FOR FREQ # 14
+NAME(79) 2-LETTER BASELINE CODE 
+NAME(80) COREL MODE (0=SOFTWARE FSB,1=HARDWARE FSB) 
+NAME(81) FILE EXTENT # FOR 1 ST. CH PROCESSED FOR FREQ # 1
+NAME(82) FILE EXTENT # FOR MATE  CH PROCESSED FOR FREQ # 1
+NAME(108) FILE EXTENT # FOR MATE  CH PROCESSED FOR FREQ # 14
+NAME(109) HIGHEST LOC. USED IN FFT
+NAME(110) REC# BEING PROCESSED
+NAME(111) COREL FREQ# (-VE=LOWER SIDEBAND) FOR FREQ # 1 
+NAME(112) COREL FREQ# (-VE=LOWER SIDEBAND) FOR MATE  FOR FREQ # 1 
+NAME(138) COREL FREQ# (-VE=LOWER SIDEBAND) FOR MATE  FOR FREQ # 14
+NAME(139) CURRENT REC# ON OUTPUT
+NAME(140) 2-LETTER FREQUENCY SEQUENCE CODE
+NAME(141) FRNGE PROC TIME YY
+NAME(142) FRNGE PROC TIME MM
+NAME(143) FRNGE PROC TIME DD
+NAME(144) FRNGE PROC TIME HH
+NAME(145) FRNGE PROC TIME MM
+NAME(146) COREL PROC TIME HHMM
+NAME(147) SEARCH FILE PARAM ID #
+NAME(148) =1 TO GENERATE SEARCH PLOTS 
+NAME(149) = COREL OFFSET -IF UNIVERSAL
+NAME(150) ERROR FLAG WHEN NE.0
+          1= FREQ SPACING TOO LARGE FOR FFT 
+          2= INTERPOLATION ERROR
+          3= EPOCH ERROR CONDX NOT ALL FREQS AT SAME EPOCH
+          4= NO PCAL OR MANUAL CALS 
+          5= SB RESIDUAL DELAY TOO LARGE CAUTION AMPLITUDES MAY BE
+             IN ERROR BY MORE THAN 5% 
+          6= NO DATA FOUND
+NAME(151) TRACK FOR 1 ST. CH FOR FREQ #1
+NAME(152) TRACK FOR REMOTE    ST. CH FOR FREQ #1
+NAME(153) TRACK FOR MATE  CH  FOR ST.1 FOR FREQ #1
+NAME(154) TRACK FOR REMOTE ST. FOR MATE CH FOR FREQ #1
+       .
+NAME(206) TRACK FOR REMOTE ST. FOR MATE CH FOR FREQ #14 
+NAME(207) PARAM FILE NAME 
+NAME(208) PARAM FILE NAME 
+NAME(209) PARAM FILE NAME 
+NAME(210) PARAM FILE CR#
+NAME(211) SPECIAL OPTIONS BIT 0 SET=NO CALL TO VDELY
+                              1 SET=REDUCE SIZE OF FFT FOR FASTER RUNNING 
+                                -CAUTION MAY REDUCE SENSITIVITY 
+                              3 SET=TO INHIBIT REMAINDER FB 
+                              4 SET=FOR HOLOG/HIGH CORRELATION
+                                - DIVIDES ACCUM. OUTPUT BY 1.2
+                                - TO PREVENT OVERFLOW 
+                              5 - SET TO OUTPUT ALL DELAYS
+                              6 - SET TO DELETE LSB WITHOUT USB MATE
+                              7 - DELETE PHASECAL WHEN CORREL OUTPUT=0
+                              8 - TURN ON PCAL CORR. BY AP
+                              9 - OUTPUT REF. STATION PHASE CAL. INSTEAD OF CORRELATION 
+                             10 - OUTPUT REM. STATION PHASE CAL. INSTEAD OF CORRELATION 
+NAME(212) CURRENT LINE# ON OUTPUT 
+NAME(213) FLAG 1=COREL PULSAR PROCESSING
+NAME(214) FLAG 1=COREL LO2HI MODE 
+NAME(215) SYSTEM LU 
+NAME(216) EXTENT TO BE PROCESSED 0=PROCESS ALL
+NAME(217) LONG OUTPUT FLAG 1=OUTPUT ALL DELAYS
+NAME(218) PHASE CHANGE USB VS LSB FOR VLBA VS MKIII 
+NAME(219) OPERATING SYSTEM UNDER WHICH FRINGE IS RUNNING
+NAME(220) # LSB RECORDS DELETED BECAUSE OF NO MATES     
+NAME(221) =1 FOR MKIIIA 
+NAME(222) # MKIIIA MODULE ERRORS
+NAME(223) FREQUENCY SWITCHING MODE 1=FROM SCAN START 2=FROM HOUR MARK 
+NAME(224) USE PCAL BY ACCUM PER FLAG =1 
+NAME(225) COREL VERSION # 
+NAME(226) =1 RESTRICTED SEARCH FLAG 
+NAME(227) LAST 2-CHAR OF ORIGINAL COREL FILENAME
+NAME(228) SBDOFFSET FLAG 1=SBDOFFSETS USED
+                         2=PHSOFFSETS USED
+NAME(229) SECURITY CODE OF ROOT FILE
+NAME(230) FRNGE PROC. TIME DAY# 
+NAME(231) CORRELATOR OFFSET (OR SBDOFFSET WHEN NAME(228)=1)FOR FREQ#1 
+NAME(232) CORRELATOR OFFSET FOR FREQ#1 MATE(PSB)
+NAME(258) CORRELATOR OFFSET FOR FREQ#14 MATE(PSB) 
+NAME(259) CORRELATOR ERROR STATUS MASK
+NAME(260) CRC ERROR STATUS MASK 
+NAME(261) PROC.CODE YDDD OF FREQ # 1
+NAME(262) PROC.CODE YDDD OF FREQ # 1    MATE
+NAME(288) PROC.CODE YDDD OF FREQ # 14   MATE
+NAME(289) NOMINAL RUN DURATION IN SECONDS 
+NAME(290) MANUAL PHASE CAL FLAG 
+NAME(291) #SAMPLES IN COHERENT INT SEGMENTS - USED ONLY IN INCOH AV.MODE
+NAME(292) #LARGE DELAYZ VALUES
+NAME(293) #SMALL #S 
+NAME(294) #AP OVERRUNS (AND ARRAY OVERRUNS) 
+NAME(295) #TIMES OUT OF SYNC
+NAME(296) #ERROR.CORRECTION ATTEMPT INITIATED 
+NAME(297) REF. DRIVE #
+NAME(298) REM. DRIVE #
+NAME(299) STATUS OF RUN 
+NAME(300) ORDER # OF RSB CH BEING PROCESSED IN #FRNGE TABLE OR PSB IF NO RSB
+NAME(301) START OF SCRATCH STORE FOR SEARCH 
+NAME(812) END   OF SCRATCH STORE FOR SEARCH 
+NAME(813) LU
+NAME(814) COREL OFFSET FOR FREQ BEING PROCESSED 
+NAME(815) ASCII VERSION OF NAME(4)
+NAME(816) PASS# ASCII A2 (REF,REM)
+NAME(817) TOTAL # LARGE # ERRORS
+NAME(819) LSB  REVERSAL FLAG
+NAME(820) =0 PROCESS BY INDEX #S =5 PROCESS BY COREL FREQ #S
+NAME(821) INDEX # TO BE PROCESSED 
+NAME(848) INDEX # TO BE PROCESSED 
+NAME(849) #XSLIP IN DATA ACCEPTED 
+NAME(850) #YSLIP IN DATA ACCEPTED 
+NAME(851) # SLIP SYNC FOR FREQ# 1 
+NAME(852) # SLIP SYNC FOR FREQ# 1 MATE
+NAME(906) # SLIP SYNC FOR FREQ# 14 MATE 
+NAME(907) BITS 0-7 OF KSEL  
+NAME(908) NUMBER OF APs IN A BLOCK  NORMALLY 128
+NAME(909) =1 TO FLAG USE OF INDEXN IN CNTRL. FILE 
+NAME(910) SEGMENT NUMBER IN SPECIAL SEGMENTING MODE 
+NAME(911) MODULE SERIAL# FOR FREQ# 1  -VE FOR IIIA
+NAME(938) MODULE # FOR FREQ# 14 MATE
+NAME(939) FLAG BITS FOR REFERENCE DRIVE BIT 0 = FREQ #1 
+NAME(940) FLAG BITS FOR REMOTE    DRIVE BIT 0 = FREQ #1 
+PARAM(1) FREQUENCY OF FREQ#1  MHZ 
+PARAM(14) FREQUENCY OF FREQ#14 MHZ
+PARAM(15) FRINGE AMP FROM INCOHERENT ADDITION OF FREQUENCY CHANNELS 
+PARAM(16) WEIGHT OF FREQ #1 1=NORMAL
+PARAM(29) WEIGHT OF FREQ #14 1=NORMAL 
+PARAM(30) ERROR RATE LIMIT ABOVE WHICH DATA IS DELETED
+PARAM(31) PHASECAL PHASE FOR FREQ #1 STATION #1 DEG 
+PARAM(32) PHASECAL PHASE FOR FREQ #1 STATION #2 DEG 
+PARAM(58) PHASECAL PHASE FOR FREQ #14 STATION #2 DEG
+PARAM(59) PULSE PERIOD OR COHERENCE INTERVAL IF -VE  OR #SECS TO BE DELETED 
+PARAM(60) RMS VARIATION IN DATA ACCEPTED IN % 
+PARAM(61) FRINGE AMP FOR FREQ #1 100% CORR. = 10,000.0
+PARAM(74) FRINGE AMP FOR FREQ #14 100% CORR. = 10,000.0 
+PARAM(75) % OF DATA DISCARDED 
+PARAM(76) FRINGE PHASE FOR FREQ #1 DEGREES
+PARAM(89) FRINGE PHASE FOR FREQ #14 DEGREES 
+PARAM(90) FRINGE PHASE FOR COHERENT AV. OF ALL FREQS
+PARAM(91) 1/(1 SIGMA NOISE) 
+PARAM(92) RMS FREQ.RANGE
+PARAM(93) EFFECTIVE RUN DURATION IN SECONDS 
+PARAM(94) START TIME OF CH BEING PROCESSED
+PARAM(95) STOP TIME OF CH BEING PROCESSED 
+PARAM(96) #  CORR. SUPPRESSSESS 
+PARAM(97) SINGLE PRECISION SAMPLE PERIOD MICROSEC 
+PARAM(98) # NO PP UPDATES 
+PARAM(99) # X SLIP SYNC IN DISCARDED DATA 
+PARAM(100) # Y SLIP SYNC  IN DISCARDED DATA 
+PARAM(101) DELAY RATE SEARCH START MICROSEC/SEC 
+PARAM(102) DELAY RATE SEARCH STOP  MICROSEC/SEC 
+PARAM(103) DELAY SEARCH START MICROSEC
+PARAM(104) DELAY SEARCH STOP  MICROSEC
+PARAM(105)  SINGLE BAND DELAY SEARCH START MICROSEC 
+PARAM(106)  SINGLE BAND DELAY SEARCH STOP  MICROSEC 
+PARAM(107) DEL RATE SEARCH WINDOW USEC/SEC
+PARAM(108) DEL  SEARCH WINDOW USEC
+PARAM(109) SINGLE BAND WINDOW USEC
+PARAM(110) NORMALIZATION CONSTANT USED
+PARAM(111) DELAY RATE AT MAX MICROSEC/SEC 
+PARAM(112) DELAY  AT MAX MICROSEC 
+PARAM(113) SINGLE BAND DELAY  AT MAX MICROSEC 
+PARAM(114) DATA MAX AT MAX 10,000.0=100% CORR.
+PARAM(115) SINGLE BAND CH # 1-16  9=CENTRAL DELAY 
+PARAM(116) # POINTS SEARCHED
+PARAM(117) PROB OF FALSE DET. 
+PARAM(118) 50% OF # OF BITS IN AN ACCUMULATION PERIOD 
+PARAM(119) EPOCH TIME 
+PARAM(120) START TIME OF FREQ # 1 
+PARAM(121) MIN. FREQ SPACING  MHZ 
+PARAM(122) DELAY SPACING OF SINGLE BAND MICROSEC
+PARAM(123) TIME SEPARATION BETWEEN ACCUM PERIODS SEC
+PARAM(124) RATE SEPARATION OF FFT POINTS FOR FREQ # 1 MICROSEC/SEC
+PARAM(125) FINE DELAY SEPARATION OF FFT POINTS MICROSEC 
+PARAM(126) NEW EPOCH IN SEGMENT MODE
+PARAM(127) TOTAL APRIORI PHASE DEG
+PARAM(128) TOTAL PHASE DEG
+PARAM(129) RATE RA HALF-WIDTH ASEC
+PARAM(130) SB DELAY RA HALF-WIDTH ASEC
+PARAM(131) ERRORS FOR FREQ # 1 ST 1 TRACK 
+PARAM(132) ERRORS FOR FREQ # 1 ST 2 TRACK 
+PARAM(133) ERRORS FOR FREQ # 1 MATE ST 1 TRACK
+PARAM(134) ERRORS FOR FREQ # 1 MATE ST 2 TRACK
+PARAM(186) ERRORS FOR FREQ # 14 MATE ST 2 TRACK 
+PARAM(187) AMP CORRECTION FACTOR FOR PARABOLIC INTERPOLATION AND RATE 
+PARAM(188) # DISCARDED RECORDS
+PARAM(189) RATE DEC HALF-WIDTH ASEC 
+PARAM(190) SB DELAY DEC HALF-WIDTH ASEC 
+PARAM(191) TOTAL #PE ON STN 1 
+PARAM(192) TOTAL #PE ON STN 2 
+PARAM(193) TOTAL #X-CRC ERRORS
+PARAM(194) TOTAL #Y-CRC ERRORS
+PARAM(195) TOTAL #TIMES THAT ARE UNEXPECTED 
+PARAM(196) TOTAL #CHANNELS
+PARAM(197) TOTAL #PHASE CAL RECORDS FOR CH BEING PROCESSED
+PARAM(198) # LARGE PE RECORDS DELETED FROM STN 1
+PARAM(199) # LARGE PE RECORDS DELETED FROM STN 2
+PARAM(200) CENTER OF DELETION BLOCK 
+PARAM(201) # OF ACCUM RECORDS PROCESSED FOR FREQ #1 
+PARAM(202) # OF ACCUM RECORDS PROCESSED FOR FREQ #1 MATE
+PARAM(228) # OF ACCUM RECORDS PROCESSED FOR FREQ #14 MATE 
+PARAM(229) MAX # PE ERRORS IN AP
+PARAM(230) TOTAL # OF ACCUM RECORDS PROCESSED 
+PARAM(231) SIDEBANDS ACTIVE FOR FREQ #1 1.0=USB(NOT RSB),-1.0=LSB,0.0=USB+LSB 
+PARAM(244) SIDEBANDS ACTIVE FOR FREQ #14 1.0=USB,-1.0=LSB,0.0=USB+LSB 
+PARAM(245) R.M.S. PHASE(DEG) WITH TIME
+PARAM(246) R.M.S. AMP (%)    WITH TIME
+PARAM(247) R.M.S. PHASE(DEG) WITH FREQ
+PARAM(248) R.M.S. AMP (%)    WITH FREQ
+PARAM(249) # TIME SEGMENTS
+PARAM(250) DELAY RATE OFFSET MICROSEC SEC  - SPECIAL MODE 
+PARAM(251) EPOCH ERROR FOR FREQ #1
+PARAM(264) EPOCH ERROR FOR FREQ #14 
+PARAM(265) REF.ST.EPOCH MS
+PARAM(266) RATE CORRECTION TO AMP 
+PARAM(267) STN1 PCAL AMP INTERPOL 
+PARAM(268) STN2 PCAL AMP INTERPOL 
+PARAM(269) STN1 PCAL RATE MICROSEC PER SEC
+PARAM(270) STN2 PCAL RATE MICROSEC PER SEC
+PARAM(271) PHASE CAL FREQ FOR FREQ BEING PROCESSED
+PARAM(272) EXPECTED #BITS TO BE CORRELATED PER ACCUM PER. FOR PULSAR MODE 
+PARAM(273) PULSAR FREQUENCY HZ
+PARAM(274) LO2 HI PHASE DEG 
+PARAM(275) LO2 HI FREQ HZ 
+PARAM(276) TEMPORY STORE OF AVERAGE PULSAR GATE LOCATION IN ACCUM.PER.
+PARAM(277) EPOCH SHIFT FOR SPECIAL EPOCH ENTRY
+PARAM(278) CORRECTION FOR 3-LEVEL PCAL
+PARAM(283) COUNT OF POINTS SEARCHED 
+PARAM(284) NOISE LEVEL FROM SUM OF SQUARES OF ALL 
+PARAM(285) INCOHERENT SUM OF SEGMENTED FRINGE AMPS CORRECTED FOR NOISE
+PARAM(286) EPOCH OFFSET FROM CENTER OF OBS. IN SECS 
+PARAM(287) FRINGE AMP FROM SEARCH 
+PARAM(288) FRINGE AMP FROM INTRP
+PARAM(289) LIGHT TRAVEL TIME FROM REF.ST. TO CENTER OF EARTH
+PARAM(290) GHA IN HRS 
+PARAM(291) PHASE CAL AMP  FOR FREQ # 1 STN1 
+PARAM(292) PHASE CAL AMP  FOR FREQ # 1 STN2 
+PARAM(318) PHASE CAL AMP  FOR FREQ # 14 
+PARAM(319) STOP TIME
+PARAM(320) SNR IN SIGMAS
+PARAM(321) MANUAL PHASE CAL PHASE IN DEG. FOR FREQ #1 STATN #1
+PARAM(322) MANUAL PHASE CAL PHASE IN DEG. FOR FREQ #1 STATN #2
+PARAM(348) MANUAL PHASE CAL PHASE IN DEG. FOR FREQ #14 STATN #2 
+PARAM(349) MILLIHZ PER ASEC WEST
+PARAM(350) MILLIHZ PER ASEC NORTH 
+PARAM(351) ACTUAL PHASECAL PHASE FOR FREQ #1 STATN #1 
+PARAM(378) ACTUAL PHASECAL PHASE FOR FREQ #14 STATN #2
+  
+CONDITIONS UPON WHICH FRNGE THROWS OUT DATA 
+  
+  A)   DATA DISCARDED WITH  CORR STATUS BITS    4- X-SLIPPED SYNC 
+                                                5- Y-SLIPPED SYNC 
+                                                7- NO PP UPDATE 
+                                                13-SET IF TAPES OUT OF SYNC 
+                                                14-CORR SUPPRESS
+       ADDED 1 OCT 82                            1- MISSING Y CLOCK 
+  
+       SINCE MODIFICATION OF CORRELATOR MODULES BOTH X AND Y SLIPS
+       ARE USUALLY IGNORED - STATM MASK DISABLES BITS 
+  
+  B)   DATA DISCARDED WITH CRC ERROR IN 
+       TIME CODE
+                           - SET CRC MASK BITS TO ZERO TO DISABLE 
+  
+  C)   DATA IS DISCARDED WITH P.E.R. RATE GREATER THAN THE CLIP LEVEL 
+       SET IN THE FRNGE PARAM FILE (default 1%) 
+  
+  D)   DATA IS DISCARDED IF THE TIME IS NOT AN INTEGRAL NUMBER
+       OF ACCUMULATION PERIODS PAST THE MINUTE MARK. THIS CHECK 
+       IS MADE TO 1 MILLISEC. 
+  
+  E)   DATA IS DISCARDED IF THE TIME FROM A PARTICULAR CORRELATOR MODULE
+       DOES NOT INCREMENT BY +1,+2, OR -1 ACCUMULATION PERIODS. 
+       [THERE IS A "FLYWHEEL" SO THAT BAD TIMES WHICH ARE           
+       DISCARDED ARE ASSUMED TO INCREMENT CORRECTLY - SO THAT THE 
+       NEXT VALID TIME IS NOT DISCARDED AS THE RESULT OF A PREVIOUS 
+       INVALID TIME.] 
+  
+  F)   DATA IS DISCARDED IF THE AP OVERRUN FLAG IS SET
+
+  G)   MKIIIA MODULE ERRORS FLAGS ANY BITS 15-8 IN WORD 3 
+
+  H)   Fewer than 50% of the nominal number of bits are correlated
+       within an AP 
+  
+CONDITIONS COUNTED: 
+  
+  1) PARAM(96)=TOTAL # CORRELATOR SUPPRESSES(SUPR)(bit 14 word 2) 
+  2) PARAM(98)=TOTAL # NO PP UPDATES(PPUP)(bit 7 word 2)
+  3) PARAM(99)=TOTAL # X SLIP SYNC(XSLP)(bit 4 word 2)
+  3) PARAM(100)=TOTAL # Y SLIP SYNC(YSLP)(bit 5 word 2) 
+  4) PARAM(193)=TOTAL # CRC  ERRORS (XCRC)(bit 0 word 6)
+  5) PARAM(194)=TOTAL # CRC ERRORS (YCRC)(bit 1 word 6) 
+  6) PARAM(195)=TOTAL # TIMES THAT ARE UNEXPECTED(TDIS)(bit 2 word 6 + time diss) 
+  7) NAME(295)= TOTAL # ACCUM.PERIODS WITH TAPES OUT OF SYNC(TSLP)(bit 13 word 2) 
+  8) NAME(294)= TOTAL # AP OVERRUNS+APRIORI ARRAY OVERRUNS(bit 12 w 2 +bit 14 w 1)
+  9) NAME(296)= TOTAL # ERROR CORRECTION ATTEMPTS INITIATED(ERCC)(bit 3 word 6) 
+ 10) NAME(817)= TOTAL # OUT OF RANGE CORRELATION NUMBERS
+  
+SAMPLE FRNGE PARAM FILE 
+  
+FRNGE PARAMETERS
+  
+  
+*  RU,FRNGE,LUOP,LUPRINT,DATA FILE NAMR,PARAMETER FILE NAMR,BK#,BASELN#,FRQG
+*  BK#=PARAMETER FILE BLOCK#
+*  IF -VE IDM= COREL INDEX # TO BE PROCESSED
+  
+* IF START TIME IS - MMSS.00 FRNGE WILL FORCE START FORCE START 
+* AT MMSS.00 AFTER THE NOMINAL START TIME IN ROOT FILE
+* IF STOP TIME IS - MMSS.00 FRNGE WILL FORCE FRNGE TO STOP MMSS.00
+* BEFORE NOMINAL STOP TIME
+*FOR MANUAL CALS ENTER COREL FRQ #S TO BE PROCESSED ALL RSB FIRST 
+*RUN FRNGE WITH 0.0 AS P CALS 
+*PUT OBS FRNGE PHASES IN AS PCALS IN SAME ORDER AS FRQ #S TO BE PROCESSED 
+*SINCE RSB S ARE FIRST YOU ONLY NEED PUT IN AT MOST 14 PCALS. 
+* PCAL AMP OF -1
+* -999 MEANS USE PHASE CAL(DEFUALT) 
+* +999 MEANS USE PHASE CAL(DEFUALT)-BUT REVERSE PARTNER PHASE 
+* >360 MEANS USE MANUAL CAL(DEFUALT)-BUT REVERSE PARTNER PHASE
+  
+    
+*FOR MANUAL CALS AT ONE STATION AND REGULAR PCAL SIGNALS AT ANOTHER 
+*MAKE FRNGE CONTROL FILE AND SPECIFY  PHASE1 IF REFERENCE OR PHASE2 IF REMOTE 
+*RUN FRNGE WITH PHASE1 OR 2  SET TO ALL ZEROES
+*IF REFERENCE PUT OBSERVED PHASES INTO PHASE1 
+*IF REMOTE PUT THE COMPLEMENT (CHANGE SIGNS) OBSERVED PHASES INTO PHASE2
+*******   WARNING Do Not Use PHASES Option without consulting AEER
+*IF THE SAME STATION NOW CHANGES FROM REF. TO REM. THE SAME NUMBERS CAN BE
+*USED FOR PHASE1 AND 2
+    
+* FRNGE NORMALLY ORDERS CHANNELS IN ORDER OF INCREASING COREL FREQ.#
+* HOWEVER WHEN KEYWORD FREQNS IS USED THE ORDER IS FORCED TO THE SAME 
+* ORDER AS THAT FOLLOWING FREQNS
+* NOTE THAT TO FORCE FRNGE TO PICK A PARTICULAR FREQUENCY AS REFERENCE
+* MAKE THAT FREQUENCY THE FIRST IN THE LIST FOLLOWING FREQNS
+  
+*FILE USES KEYWORDS 
+*RULE:
+      1.ALL 6 LETTERS OF KEYWORDS MUST BE USED
+*KEYWORDS:
+*FREQNS-PRESCIBE COREL FREQUENY NUMBERS -UNLESS YOU WANT ALL
+       -ONLY COREL FREQUENCY NUMBERS WITHIN ONE POL. GROUP WILL 
+       -BE COMBINED 
+ (FREQNS 99 WILL FORCE NO FRNGE OUTPUT, FREQNS -999 WILL CANCEL FREQNS 99)
+*INDEXN-PRESCIBE COREL INDEX    NUMBERS -UNLESS YOU WANT ALL
+       -CAN BE USED TO FORCE FRINGE TO COMBINE TO FREQ GROUPS 
+       -OR POLARIZATIONS
+*SEARCH-SEARCH RANGE WINDOWS -NEEDS 6 NUMBERS 
+     1. DELAY RATE START MICROSEC/SEC 
+     2. DELAY RATE STOP  MICROSEC/SEC 
+     3. MULTIBAND DELAY START MICROSEC
+     4. MULTIBAND DELAY STOP  MICROSEC
+     5. SINGLEBAND DELAY START MICROSEC 
+     6. SINGLEBAND DELAY STOP  MICROSEC 
+*BEGINT-START IN MMSS.SS
+       - -VE FORCES START MMSS.SS BEYOND NOMINAL START
+       - -999 USES START OF FIRST DATA FROM COREL FOR FREQ #1 
+*FINISH-STOP  IN MMSS.SS
+       - -VE FORCES STOP  MMSS.SS BEFORE NOMINAL STOP 
+*PHASE1 - MANUAL PHASE CAL PHASES FOR REF. STN. IN DGREES AND IN SAME ORDER 
+          AS PRESCRIBED BY 'FREQNS' OR 'INDEXN' KEYS. 
+          NOTE THAT EITHER 'FREQNS' OR 'INDEXN' LINES MUST ALSO BE PRESENT. 
+*PHASE2 - MANUAL PHASE CAL PHASES FOR REMOTE STN. 
+*PERIOD-PULSAR PERIOD IN SECONDS
+       - -VE INCOHERENT AVERAGE IN SECONDS
+*ERRORS-ERROR STATUS MASK,CRC ERROR MASK,MAX PE RATE,SPECIAL OPTIONS
+ (60200 = NORMAL  60260 =DELETE SLIP SYNCS) 
+[SPECIAL OPTIONS NORMAL= @5    FOR PCAL BY AP USE @405 ]
+* FOR NEW COREL #4  USE 60202B   CRCMSK  4B  OR CRCMSK 7B FOR CRC DELETION
+  FOR NEW COREL #4  USE 70202B   CRCMSK  4B  OR CRCMSK 7B FOR CRC DELETION
+  AND ARRAY OVERRUN DELETION (FRNGE CONTROL FILES CHANGED 17 AUG 83)
+*BLOCKN-A BLOCK NUMBER CAN BE INSERTED TO ALLOW MANY SETS OF KEYWORDS 
+        IN A FILE --FRNGE WILL ONLY LOOK AT KEYWORDS WHICH ARE NOT
+                    PRECEEDED WITH A BLOCK NUMBER AND THOSE KEYWORDS
+                    WHICH FOLLOW THE BLOCK NUMBER IN THE FRNGE CALL 
+*SBDOFF- FIX-UP "SBD OFFSETS" USED FOR FORMATTER PROBLEMS 
+       - AN INTEGER WHERE 1= 1 FRNGE "BOX #"=1/2 LAG
+       - MUST BE IN SAME ORDER AS FROM FRNGE
+       - NUMBERS SHOULD BE PAIRED USB THEN LSB (WITH ZERO IF THERE IS NO  
+       - LSB OR LSB REQUIRES NO OFFSET) 
+       - THUS FOR EXAMPLE THE X-BAND 8 FREQUENCY SEQUENCE REQUIRES
+       - 8 PAIRS OF NUMBERS - THESE OFFSETS WILL BE PRINTED OUT 
+       - UNDER HEADING SBDOF(R,P) ON FRNGE PRINTOUT 
+       - RUN FRNGE WITHOUT SBDOFF AND CHECK SBDBOX#
+       - IF HIGH BY 1 THEN SBDOFF SHOULD BE 1 TO DECREASE BY 1
+*PHSOFF- FIX-UP "PHS OFFSETS" USED
+       - AN INTEGER WHERE 1= 1 TENTH OF A DEGREE
+       - MUST BE IN SAME ORDER AS FROM FRNGE
+       - NUMBERS SHOULD BE PAIRED USB THEN LSB (WITH ZERO IF THERE IS NO  
+       - LSB OR LSB REQUIRES NO OFFSET) 
+       - THUS FOR EXAMPLE AN 8 FREQUENCY SEQUENCE REQUIRES
+       - 8 PAIRS OF NUMBERS - THESE OFFSETS WILL BE PRINTED OUT 
+       - UNDER HEADING PHSOF(R,P) ON FRNGE PRINTOUT 
+*DELETE-DELETE NSEC OF DATA CENTERED AT MMSS. 
+*VLBACR-MKIII - VLBA PHASE CORRECTION 
+        NEEDED FOR OPTIMAL ADDITION OF USB AND LSB ON BASELINES 
+        BETWEEN MKIII AND VLBA  found value of 130 deg. for 2MHz BW 
+        with PieTown as remote station
+        150 DEG. FOR 4MHz BW
+*SWITCH-KEYWORD NEEDED TO GATE FREQUENCY SWITCHED DATA
+       -SWITCH mode,lag(secs),duration(secs)for freq#1,lag,dur for #2 
+*PRINT- PRINT ALL OUTPUT WHEN USING FRNAA (USED BY AUTOB) 
+*SAMPLE 
+FREQNS 1 2 3 4 5 6 7
+BEGINT 0215.00
+FINISH 0216.00
+SEARCH -25.E-6 25.E-6 -1. 1. -1. 1. 
+PHASES 12.0 13.0 16.0 180.6 129.0 -146.0 25.9 
+BLOCKN 129
+PHASES 13.0 15.0 14.0 124.78 245.67 123.9 -98.99
+  
+*BLOCKN- THE BLOCKN KEYWORD CAN ALSO BE USED TO SPECIFY CONTROL PARAMETERS
+         FOR A PARTICULAR SCAN OR RANGE OF SCANS
+  
+         I.E. BLOCKN 077-1200 077-1300,3C84,KG,S
+  
+                WILL CAUSE FRNGE TO EXAMINE ALL KEYWORDS WHICH FOLLOW 
+                FOR ALL SCANS BETWEEN 077-1200 AND 077-1300 INCLUSIVE 
+                ON 3C84 FOR BASELINE KG, FREQUENCY GROUP S
+  
+              BLOCKN 077-1200 
+  
+                WILL CAUSE FRNGE TO EXAMINE ALL KEYWORDS WHICH FOLLOW 
+                FOR SCAN AT 077-1200 ON ALL BASELINES AND FREQ. GROUPS
+  
+              BLOCKN ,3C84       -ALL SCANS ON 3C84 
+              BLOCKN ,,K-        -ALL SCANS WITH K AS FIRST STATION 
+              BLOCKN ,,--,S      -ALL S-BAND SCANS
+              BLOCKN ,,,S        -SAME -ALL S-BAND
+  
+*RULES FOR BLOCKN USE:
+      1.0 ALL KEYWORDS IN FILE BEFORE BLOCKN ARE GLOBAL 
+      2.0 BLOCKN FILTERS ARE "ORED" TOGETHER IF ADJACENT I.E. NOT SEPARATED 
+          BY ANOTHER KEYWORD
+      3.0 IF BLOCKN FILTER PASSES MORE THAN ONE KEYWORD OF THE SAME TYPE
+          THE LAST ONE OVERIDES 
+      4.0 BLOCKN FOLLOWED BY RUNS,SOURCE,BASELINE,FREQ GROUP USES COMMAS
+          AS DELIMITERS 
+      5.0 MORE THAN ONE KEYWORD CAN OCCUR ON A LINE IN FRNGE VERSIONS 
+          LATER THAN DEC 81 
+  
+  
+  
+
+NEW FEATURES
+
+Review of control file protocol 
+
+The BLOCKN keywork is equivalent to an IF THEN in Fortran where the 
+following BLOCKN implies an ENDIF for the previous BLOCKN.  Thus
+global statements should be placed ahead of the first BLOCKN. 
+[BLOCKN filters are "ORED" together when adjacent.]  A new keyword
+is SWITCH - see below.
+
+Frequency switching 
+
+Frequency switching (as now being tested by Pie Town) is supported
+as follows: 
+
+PERIOD 20.0 - sets switching period to 20 seconds 
+
+SWITCH 1 0 999 5 9 - sets switchmode to 1 and lag (to the center
+of the "on" time) for first frequency of 0 seconds and duration 999 
+seconds (essentially on all the time), a lag of 5 seconds and 
+duration of 9 seconds for the second frequency - and so on for up 
+to 14 frequencies in the same order as they occur in FRNGE.  A
+switchmode equal to 1 makes the switching cycle start at the scan 
+start while switchmode=2 makes the cycle start on the hour. 
+
+Phasecal modes
+
+The normal (default) phasecal mode is one in which the vector 
+average of the phasecal for the entire scan is used to correct each 
+frequency.
+
+Phasecal can be ignored and "manual" values can be entered. 
+
+A new mode in which the phasecal phase correction is made every 
+accumulation period can be activated by setting bit 8 of the
+options (@405).  In this mode "manual" cals if they are entered 
+will be added to the corrections and in this way any instrumental 
+dispersion can be eliminated.  In this new mode individual
+frequency channels can be made entirely manual by making the manual 
+cal >360 degrees. 
+
+Delay-rate error based on data
+
+Acting on popular request, I have added the delay rate error (in
+type 4400 record - double precision word 27) - computed from the
+actual observed phase noise.  This should aid in deciding how much
+ionospheric noise is present. 
+      
+    
+*PROGRAMS TO GENERATE FRNGE PARAMETER FILES 
+      
+      TRGEM can be used to fit observed delays and rates and then 
+            to generate parameter files 
+      TRCKK will generate pseudo "A" file from windows in parameter file
+      BSOLV can be used to get revised station coordinates
+      ASOLV can be used to do LSQ for source or station coord updates 
+    
+          Various FRNGE and post-processing options now available 
+
+
+
+a)  Constrained FRNGE processing
+
+  If there are fringes on 2 baselines of a triangle but none on the 
+third to determine the rate, single and multi-band delays for the third 
+baseline and RE-FRNGE with constraints in FRNGE parameter file.  (A 
+program called TRGEN can be used to generate the FRNGE parameter file.) 
+
+b)  Constrained FRNGE processing in the presence of severe atmospheric
+    phase fluctuations
+
+  If there are fringes on 2 baselines of a triangle but none or weak fringes
+on the third determine the approximate rate, single and multi-band delays 
+for the third baseline and RE-FRNGE.  Then run FRNGX on FRNGE output to generate  
+segmented complex outputs.  A program called AVPHS will then perform the
+following operation from the FRNGX "A" file output: 
+
+
+    AMP (BC) exp iP(BC)=<AMP(BC,t)exp i(P(BC,t)-P(AC,t)+P(AB,t))> 
+
+
+  AMP(BC) and P(BC) are optimal estimates of the amplitude and phase  
+(closure phase) on the third baseline.  The segments should be made short 
+enough to minimize loss due to atmospheric phase fluctuations.  AMP(BC) 
+should be corrected for phase noise loss on baselines 1 and 2 according to the
+loss factor theorem (see attached memo).
+
+c)  Global FRNGE search on 3 baselines simultaneously 
+
+  FRNGE data with expected single band delay (use calibrator data to  
+determine) then run FRNGR on each of the 3 baselines (using adjacent calibrator,
+scans for reference).  Map size should be chosen large enough to accomadate 
+both position uncertainties and clock rate uncertanties (translated into
+RA and DEC).  Run FRNGT to add together the 3 baselines either incoherently 
+or coherently.  A coherent addition is appropriate if there is an apriori 
+reason to assume the closure phase is close to zero.  Incoherent addition 
+is appropriate if there is no constraint on the closure phase.  A significant 
+peak in the map will indicate the presence of fringes.  Clock rate errors 
+will produce an apparent position error while clock closure is constrained. 
+
+d)  Global FRNGE search on independent baselines
+
+  Same as in c) but add together all independent baselines from 
+as many scans as desired. 
+
+e)  Phase reference mapping 
+
+  Run FRNGR on FRNGE output for all scans and all baselines with appropriate
+coordinate offsets and map width.  Run FRNGT on the FRNGR output to construct 
+the "dirty" phase reference map.  A clean map can be generated by  running  
+any standard mapping package on the "offset" complex amplitudes from FRNGT. 
+Region being mapped must be within one single-band delay beamwidth of the   
+reference or FRNGE must be forced to run with appropriate single-band delay.  
+The reason is that the FRNGE output contains complex amplitudes for all 
+frequency channels but for a only one value of single-band delay. 
+
+f)   "Export" interfaces
+  
+  For geodesy/astrometry the best interface is via the GSFC CDP database
+generator which runs directly on the FRNGE output files. The normal astronomy 
+interface is via FRNGX which generates visibility data for a selectable 
+coherent integration period from the FRNGE output files. One minute coherent
+integration in normally selected and the data from all frequency channels 
+are normally coherently added. For mapping which requires a field of view 
+greater than the size of the multiband delay beam the visibilties 
+from each frequency channel can be used separately. The visibility phases 
+from the FRNGX output are normally selected to be residual to the COREL 
+apriori values which close so that the FRNGE/FRNGX process just filters 
+the visibilities and GLOBAL fringe fitting can be done in the AIPS package
+provided the fringes were strong enough to determine delay and rate filters 
+or adequately precise control windows must be derived from calibrator sources.
+  
+Additional notes: 
+
+  1)  Without constraints FRNGE searches through a range of delay and 
+delay rate for a maximum magnitude.  Statistics of magnitude is Rayleigh
+and a "significant" detection depends on number of delay-rate beams 
+searched (see probability of false detection of FRNGE printout), but  
+generally an SNR of greater than 7 is required for high confidence.  If   
+FRNGE is run in a contrained mode it rotates the COREL output with
+specified delay and rate i.e. it determines the complex amplitude within
+a specified delay-rate beam.
+
+  2)  FRNGT forms a "dirty" map in which each point has gaussian statistics 
+so that significant detections can be made at SNR's below 7.  However if
+a very large region is searched it should be realized that SNR _> 3 will be 
+seen every 100 points.  On the other hand there is an SNR = 3 at the expected point   
+in a map will only be a false detection 1% of the time.   
+
+  3)  Transfer files exist to facilitate many of the special FRNGE, FRNGX,
+FRNGR, FRNGT operations:
+
+        *CLOSE    transfer file for proceedure b) 
+         TRGEN    generates transfer files for running FRNGR

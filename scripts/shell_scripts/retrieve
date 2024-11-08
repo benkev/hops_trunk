@@ -1,0 +1,219 @@
+#!/bin/csh -f
+#
+# This script leads the user through the steps required to retrieve
+# data to the disk.  It is preferable to manually tar'ing the data
+# because it enforces retrieval to the correct, officially
+# sanctioned data areas, reduces the chance of faulty and damaging
+# invocation of tar by the user, and ensures that the permissions
+# of the retrieved data are compatible with the programs of the
+# HOPS system
+#
+# Written by CJL, April 25 1994
+##############################################################
+
+					# Check out the environment
+env_check retrieve
+if ($status != 0) exit (1)
+					# Introduce ourselves
+echo "retrieve: This script retrieves MkIII/IV VLBI correlator data from a tar"
+echo "retrieve: archive tape onto a reserved correlator data disk area"
+echo "retrieve: At any prompt, type 'exit' to abort the process\n"
+					# Figure out what experiment directory
+					# this stuff should go in, because
+					# the archive script is run from within
+					# the experiment directory
+echo "retrieve: What is the experiment number of the data"
+echo "retrieve: you wish to retrieve?  Enter the 3 or 4 digit number: \c"
+set expt_no=$<
+if ($expt_no == "exit") then
+    echo "retrieve: Aborting retrieval process"
+    exit (0)
+endif
+if ($expt_no == "") then
+    echo "retrieve: You must supply the correct experiment number, otherwise"
+    echo "retrieve: many programs in the HOPS systems will not be able to"
+    echo "retrieve: locate your data files.  Try again."
+    exit (1)
+endif
+					# This modifies script behaviour
+					# in several places
+if (`whoami` == "operator") then
+    set op = 1
+else
+    set op = 0
+endif
+					# Be informative
+echo "retrieve: Below is a list of available disk areas.  Choose which one"
+echo "retrieve: you want by typing in the corresponding number from column 1"
+if ($op == 1) then
+    echo "retrieve: WARNING: Please do not restore data to the operational areas"
+    echo "retrieve: unless you are quite sure you are not going to interfere with"
+    echo "retrieve: active experiments.  DO NOT FILL UP THE DISK."
+endif
+echo ""
+
+echo "retrieve: area#     Env. var      Real dir. name          free space (Kb)"
+echo "retrieve: -----     --------      --------------          ---------------"
+
+set ddir=(1 2 3 4 5 6 7)
+set n=1
+					# Only operator gets option to write
+					# into operational area
+if ($op == 1) then
+    set space=`bdf $CORDATA | grep -v File | awk '{print $4}'`
+    printf "retrieve:  %-4s     CORDATA       %-23s %s\n" $n $CORDATA $space
+    set ddir[$n]=$CORDATA
+    @ n++
+endif
+					# Treat each scratch area individually
+if ($?SCRATCH1 != 0) then
+    set space=`bdf $SCRATCH1 | grep -v File | awk '{print $4}'`
+    printf "retrieve:  %-4s     SCRATCH1      %-23s %s\n" $n $SCRATCH1 $space
+    set ddir[$n]=$SCRATCH1
+    @ n++
+endif
+if ($?SCRATCH2 != 0) then
+    set space=`bdf $SCRATCH2 | grep -v File | awk '{print $4}'`
+    printf "retrieve:  %-4s     SCRATCH2      %-23s %s\n" $n $SCRATCH2 $space
+    set ddir[$n]=$SCRATCH2
+    @ n++
+endif
+if ($?SCRATCH3 != 0) then
+    set space=`bdf $SCRATCH3 | grep -v File | awk '{print $4}'`
+    printf "retrieve:  %-4s     SCRATCH3      %-23s %s\n" $n $SCRATCH3 $space
+    set ddir[$n]=$SCRATCH3
+    @ n++
+endif
+if ($?SCRATCH4 != 0) then
+    set space=`bdf $SCRATCH4 | grep -v File | awk '{print $4}'`
+    printf "retrieve:  %-4s     SCRATCH4      %-23s %s\n" $n $SCRATCH4 $space
+    set ddir[$n]=$SCRATCH4
+    @ n++
+endif
+if ($?SCRATCH5 != 0) then
+    set space=`bdf $SCRATCH5 | grep -v File | awk '{print $4}'`
+    printf "retrieve:  %-4s     SCRATCH5      %-23s %s\n" $n $SCRATCH5 $space
+    set ddir[$n]=$SCRATCH5
+    @ n++
+endif
+if ($?SCRATCH6 != 0) then
+    set space=`bdf $SCRATCH6 | grep -v File | awk '{print $4}'`
+    printf "retrieve:  %-4s     SCRATCH6      %-23s %s\n" $n $SCRATCH6 $space
+    set ddir[$n]=$SCRATCH6
+    @ n++
+endif
+					# Get answer, accept only if valid digit
+					# After a ridiculous amount of trial and
+					# error, I CANNOT figure out how to make
+					# this robust against arbitrary strings
+while (1)
+    echo "\nretrieve: Enter number of desired data area: \c"
+    set reply=$<
+    if ($reply == "exit") then
+	echo "retrieve: Aborting retrieval process"
+	exit (0)
+    else if ($reply >= $n || $reply <= 0) then
+	echo "retrieve: Please respond with a single digit corresponding to the data"
+	echo "retrieve: area you want to use.  If you want to exit this script, type 'exit'"
+    else
+	break;
+    endif
+end
+					# Move to the chosen area
+set dest_area=$ddir[$reply]
+set overwrite=0
+if (-d $dest_area) then
+    cd $dest_area
+					# If the expt dir exists, we need to find
+					# out what the user wants to do
+    if (-d $expt_no) then
+	echo "retrieve: Experiment directory " $expt_no " already exists"
+	echo "retrieve: If you want the tape contents to append to or overwrite"
+	echo "retrieve: the contents of the existing directory, just hit"
+	echo "retrieve: return, otherwise, type the name of a subdirectory in"
+	echo "retrieve: which you want the data  restored, or exit to quit: \c"
+	set reply=$<
+	if ($reply == "exit") then
+	    echo "retrieve: Aborting retrieval process"
+	    exit (0)
+					# This adds/overwrites tape data to disk
+	else if ($reply == "") then
+	    set overwrite=2
+					# while this sticks it in a separate dir.
+	else 
+	    set overwrite=1
+	    set tempdir=$reply
+	endif
+    endif
+else
+    echo "retrieve: Error, directory " $dest_area " appears not to exist."
+    echo "retrieve: Consult your local HOPS guru, who appears to have made a"
+    echo "retrieve: mistake in the setup.csh file"
+    exit (1)
+endif
+					# Do actual restore to the experiment directory
+					# or a user-defined temporary directory if
+					# overwrite is to be avoided
+if ($overwrite == 0) then
+    mkdir $expt_no
+    cd $expt_no
+else if ($overwrite == 1) then
+    mkdir $tempdir
+    mkdir $tempdir/$expt_no
+    cd $tempdir/$expt_no
+else if ($overwrite == 2) then
+    cd $expt_no
+endif
+echo "\nretrieve: Data will be restored to " `pwd`
+					# Get the tape loaded into the drive
+set tape=/dev/rmt/4mn
+echo "\nretrieve: Will you be reading from the default drive = " $tape "?"
+echo "retrieve: If this is the case, hit return,"
+echo "retrieve: otherwise, enter the correct full device pathname: \c"
+set reply=$<
+if ($reply == "exit") then
+    echo "retrieve: Aborting retrieval process"
+    exit (0)
+endif
+if ($reply != "") then
+    if (-e $reply) then
+	set tape=$reply
+    else
+	echo "retrieve: I'm sorry, but " $reply " does not seem to exist.  Exiting."
+	exit (1)
+    endif
+endif
+
+echo "\nretrieve: Insert the tape into the DAT drive and hit return when ready: \c"
+set reply=$<
+if ($reply == "exit") then
+    echo "retrieve: Aborting retrieval process"
+    exit (0)
+endif
+					# Do it ...
+echo "retrieve: Extracting data ... \c"
+
+tar xf $tape
+set tarstatus=$status
+					# Chmod to give group write, then move
+					# to proper directory location
+					# Complicated by overwrite modes
+if ($overwrite == 0 || $overwrite == 2) then
+    cd ..
+    if ($op == 0) chmod -R g+w $expt_no
+else if ($overwrite == 1) then
+    cd ../..
+    if ($op == 0) chmod -R g+w $tempdir
+endif
+
+					# Exit appropriately
+if ($tarstatus == 0) then
+    echo "Done."
+    echo "retrieve: Remember to set DATADIR to point to your chosen data area."
+    exit (0)
+else
+    echo "\nretrieve: Failure in the 'tar' command ... your data may be incomplete"
+    echo "retrieve: or corrupt.  If you cannot identify the error, consult your"
+    echo "retrieve: local HOPS guru"
+    exit (1)
+endif

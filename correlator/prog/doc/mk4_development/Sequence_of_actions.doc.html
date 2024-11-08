@@ -1,0 +1,3204 @@
+<!--noncomplex document-->
+
+<html>
+			<head>
+	  		<META HTTP-EQUIV="Content-Type" CONTENT="text/html; 
+			charset=iso-8859-1">
+	  		<title>Budget explanation to Charlotte</title>
+	  		</head>
+	  		<body>
+
+<!--newpara-->
+<img width=1 height=8 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+
+<CENTER>
+<!--Normal Para Begin-->
+<font face="CG Times (WN),helvetica"  size="+2"><b>MASSACHUSETTS INSTITUTE OF TECHNOLOGY<br>
+
+<!--newpara-->
+<img width=1 height=8 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+HAYSTACK OBSERVATORY</b><br>
+
+<!--newpara-->
+<img width=1 height=8 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+<i>WESTFORD, MASSACHUSETTS 01886</I><br>
+
+<!--newpara-->
+<img width=1 height=8 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+</font><br>
+
+<!--newpara-->
+<img width=1 height=6 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+<font face="CG Times (WN),helvetica"  ><img height=1 width=48 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><i>Telephone:<img height=1 width=42 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif">978-692-4764<br>
+
+<!--newpara-->
+<img height=1 width=48 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif">Fax:<img height=1 width=30 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif">781-981-0590</I></font><font face="CG Times (WN),helvetica"  size="+2"><br>
+
+<!--newpara-->
+<img width=1 height=6 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+14:07:20<br>
+
+<!--newpara-->
+<img width=1 height=6 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+<br>
+
+<!--newpara-->
+<img width=1 height=6 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+TO:<img height=1 width=36 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><img height=1 width=48 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif">Mark 4 Development Group<br>
+
+<!--newpara-->
+<img width=1 height=6 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+FROM:<img height=1 width=24 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif">Alan R. Whitney<br>
+
+<!--newpara-->
+<img width=1 height=6 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+SUBJECT:<img height=1 width=48 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif">Sequence of operations in task execution<br>
+
+<!--newpara-->
+<img width=1 height=6 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+</font><br>
+
+<!--newpara-->
+<img width=1 height=6 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+<font face="Times New Roman,helvetica"  size="+2">Following is a strawman sequence of operations for executing a correlator task.The sequence numbers are tied to the accompanying diagram.<br>
+
+<!--newpara-->
+<img width=1 height=6 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+Definitions:<img height=1 width=30 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif">.ivex <img height=1 width=18 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif">global correlator initialization vex file<BR>
+<img height=1 width=48 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><img height=1 width=48 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif">.evex<img height=1 width=24 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif">global experiment vex file<BR>
+<img height=1 width=48 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><img height=1 width=48 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif">.cvex<img height=1 width=24 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif">correlator configuration vex file<BR>
+<img height=1 width=48 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><img height=1 width=48 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif">.svex<img height=1 width=24 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif">experiment schedule vex file<BR>
+<img height=1 width=48 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><img height=1 width=48 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif">.lvex<img height=1 width=24 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif">experiment log file<BR>
+<img height=1 width=48 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><img height=1 width=48 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif">.task<img height=1 width=24 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif">task file<br>
+
+<!--newpara-->
+<img width=1 height=6 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+<b>1.Initialize correlator</b><br>
+<img width=1 height=6 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+
+<!--newpara-->
+1.a</font><br>
+<img width=1 height=6 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >From:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >opera</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >To</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Conductor</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message Contents</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Ivex key</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Operator enters name of ivex key </font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2">1.b</font><br>
+<img width=1 height=6 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >From:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Conductor</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >To</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Corr_man</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message Contents</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >ivex key</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Initialize correlator</font>
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2">1.c</font><br>
+<img width=1 height=6 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >From:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Conductor</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >To</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >SU_man</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message Contents</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >ivex key<BR>
+list of station units</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Initialize specified SU's</font>
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2">1.d</font><br>
+<img width=1 height=6 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >From:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Corr_man</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >To</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >conductor</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message Contents</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Success or failure of correlator initialization</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2">1.e</font><br>
+<img width=1 height=6 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >From:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >SU_man</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >To</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >conductor</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message Contents</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Success or failure of SU initializations</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2"><b>2. Initiate task stream</b></font><br>
+<img width=1 height=6 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >From:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >opera</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >To:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >conductor</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message Contents</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >.task filename</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Operator enters .task filename</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+<!--Normal Para End-->
+
+</CENTER>
+</table>
+<font face="Times New Roman,helvetica"  size="+2"><b>3. Get scan to be processed</b></font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action by:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >conductor</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >read and parse .task file to get evex, svex, cvex keys, and station list for a single task</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2"><b>4. Create root file</b><br>
+
+<!--newpara-->
+4.a. Request genaroot to create root file</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >From:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Conductor</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >To:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >genaroot</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message<BR>
+Contents</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >ivex, evex, svex, cvex keys<br>
+station list<br>
+(AP length, mirror overrides)</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Genaroot extracts all relevant portions ivex, evex, svex, cvex, lvex files and concatenates them to create the root.</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2">4.b. Acknowledge root file creation done</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >From:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Genaroot</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >To:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >conductor</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message<BR>
+Contents</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Root filename</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Conductor will parse root file to get the general scan information.</font>
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2"><b>5. Station unit setup</b><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+5.a. Send SU setup request to SU_man</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >From:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Conductor</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >To:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >SU_man</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message<BR>
+Contents</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Root filename</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >SU_man has responsibility to configure SU's, mount tape, position heads and tape</font>
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2">5.a.1. Read and parse root for SU setup parameters.</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action by</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >SU_man</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Read and parse root file for SU setup information, including log information (VSN, footage, head position, tape start/stop times)</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2">5.a.2. Get tape library positions<br>
+
+<!--newpara-->
+Get tape library position only if required tape not already mounted</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >From</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >SU_man</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >To:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Library server</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message<BR>
+Contents</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >VSN</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >With VSN in hand, send message to library server for library position information;<br>
+Initially, the A900 tape-library data base will be used</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2">5a.3 Send message to operator to mount tape</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >From</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >SU_man</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >To:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Operator interface</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message<BR>
+Contents</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >VSN<BR>
+Library slot<br>
+A priori tape position for start of scan</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Operator mounts tape; SU_man is automatically notified when bar code is successfully read</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2">5.b Confirm SU setup</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >From:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >SU_man</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >To:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Conductor</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message<BR>
+Contents</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >For each participating:<br>
+<img height=1 width=48 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif">Station Unit Table</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Confirms all SU's configured, all tapes properly positioned, ready to go</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Note that multiple station may occur on single tape.</font>
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2"><u>Station Unit Table</U><br>
+
+<!--newpara-->
+The Station Unit Table specifies the channel name and associated station code for each physical output channel of each participating SU.The format of the Station Unit Table is</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="28%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+<td valign="top" width="12%" >
+<font face="Times New Roman,helvetica"  >Bytes</font>
+</td>
+
+<td valign="top" width="60%" >
+<font face="Times New Roman,helvetica"  >Comment</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="28%" >
+<font face="Times New Roman,helvetica"  >Task ID</font>
+</td>
+
+<td valign="top" width="12%" >
+<font face="Times New Roman,helvetica"  >4</font>
+</td>
+
+<td valign="top" width="60%" >
+<font face="Times New Roman,helvetica"  >Unique Task ID assigned by conductor</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="28%" >
+<font face="Times New Roman,helvetica"  >#Station Unit Arrays</font>
+</td>
+
+<td valign="top" width="12%" >
+<font face="Times New Roman,helvetica"  >1</font>
+</td>
+
+<td valign="top" width="60%" >
+<font face="Times New Roman,helvetica"  ># of participating SU's</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="28%" >
+<font face="Times New Roman,helvetica"  >Unused</font>
+</td>
+
+<td valign="top" width="12%" >
+<font face="Times New Roman,helvetica"  >3</font>
+</td>
+
+<td valign="top" width="60%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="28%" >
+<font face="Times New Roman,helvetica"  >N x Station Unit Arrays</font>
+</td>
+
+<td valign="top" width="12%" >
+<font face="Times New Roman,helvetica"  >N x 171</font>
+</td>
+
+<td valign="top" width="60%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<CENTER><font face="Times New Roman,helvetica"  >Table 1: Station Unit Table</font>
+</CENTER><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+<font face="Times New Roman,helvetica"  size="+2">where each Station Unit Array is</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="28%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+<td valign="top" width="12%" >
+<font face="Times New Roman,helvetica"  >Bytes</font>
+</td>
+
+<td valign="top" width="60%" >
+<font face="Times New Roman,helvetica"  >Comment</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="28%" >
+<font face="Times New Roman,helvetica"  >SU#</font>
+</td>
+
+<td valign="top" width="12%" >
+<font face="Times New Roman,helvetica"  >1</font>
+</td>
+
+<td valign="top" width="60%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="28%" >
+<font face="Times New Roman,helvetica"  >VSN</font>
+</td>
+
+<td valign="top" width="12%" >
+<font face="Times New Roman,helvetica"  >8</font>
+</td>
+
+<td valign="top" width="60%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="28%" >
+<font face="Times New Roman,helvetica"  >Status</font>
+</td>
+
+<td valign="top" width="12%" >
+<font face="Times New Roman,helvetica"  >1</font>
+</td>
+
+<td valign="top" width="60%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="28%" >
+<font face="Times New Roman,helvetica"  >Pass#</font>
+</td>
+
+<td valign="top" width="12%" >
+<font face="Times New Roman,helvetica"  >1</font>
+</td>
+
+<td valign="top" width="60%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="28%" >
+<font face="Times New Roman,helvetica"  >16 x SU Channel Array</font>
+</td>
+
+<td valign="top" width="12%" >
+<font face="Times New Roman,helvetica"  >160</font>
+</td>
+
+<td valign="top" width="60%" >
+<font face="Times New Roman,helvetica"  >In order by physical SU output channel#</font>
+</td>
+
+</tr>
+
+</table>
+
+<CENTER><font face="Times New Roman,helvetica"  >Table 2: Station Unit Array</font>
+</CENTER><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+<font face="Times New Roman,helvetica"  size="+2">where SU Channel Array is</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="28%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+<td valign="top" width="12%" >
+<font face="Times New Roman,helvetica"  >Bytes</font>
+</td>
+
+<td valign="top" width="60%" >
+<font face="Times New Roman,helvetica"  >Comment</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="28%" >
+<font face="Times New Roman,helvetica"  >Channel name</font>
+</td>
+
+<td valign="top" width="12%" >
+<font face="Times New Roman,helvetica"  >8</font>
+</td>
+
+<td valign="top" width="60%" >
+<font face="Times New Roman,helvetica"  >ASCII ('X2R'); as defined in $FREQ section of .svex file</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="28%" >
+<font face="Times New Roman,helvetica"  >Station code</font>
+</td>
+
+<td valign="top" width="12%" >
+<font face="Times New Roman,helvetica"  >1</font>
+</td>
+
+<td valign="top" width="60%" >
+<font face="Times New Roman,helvetica"  >1-char ASCII station code</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="28%" >
+<font face="Times New Roman,helvetica"  >Status</font>
+</td>
+
+<td valign="top" width="12%" >
+<font face="Times New Roman,helvetica"  >1</font>
+</td>
+
+<td valign="top" width="60%" >
+<font face="Times New Roman,helvetica"  >Active/inactive</font>
+</td>
+
+</tr>
+
+</table>
+
+<CENTER><font face="Times New Roman,helvetica"  >Table 3: SU Channel Array</font>
+</CENTER><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+<font face="Times New Roman,helvetica"  size="+2">5.c Position Tapes to first TOT in scan</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >From:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Conductor</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >To:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >SU_man</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message<BR>
+Contents</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Position and peak heads, if necessary; find first TOT within scan recording interval;<BR>
+back up tape as necessary to prepare for synchronization</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2">5.d Confirm Tape TOT and ready to synchronize</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >From:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >SU_man</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >To:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Conductor</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message<BR>
+Contents</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >TOT position of each participating tape</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Position and peak heads, if necessary; find first TOT within scan recording interval;<BR>
+back up tape as necessary to prepare for synchronization</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2"><b>6. Correlator setup</b><br>
+
+<!--newpara-->
+6.a Send corr setup request</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >From:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Conductor</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >To:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Corr_man</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message<BR>
+Contents</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Root filename;<br>
+Station Unit Table;<br>
+Force correlator reconfig flag (optional)</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Note that multiple stations may occur on single tape</font>
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2">6.a.1 Read and parse .cvex file</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action by:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Corr_man</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Parse relevant sections of root file.Using this information plus information passed from conductor, corr_man can fully configure correlator.</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Corr_matches channel names to determine correlation pairs;<br>
+for cross-polarization processing, L/R pairs are identified by last char of channel name</font>
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2">6.a.2 Confirm correlator setup</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >From:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Corr_man</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >To:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >conductor</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message<BR>
+Contents</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >For each participating correlator board:<br>
+Snake Head Table<br>
+Block Allocation Table</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2"><u>Snake Head Table</U><br>
+
+<!--newpara-->
+The Snake Head Table identifies the head block in each snake on each correlator board.A maximum of 136 snakes may reside on a single correlator board:</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="15%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+<td valign="top" width="27%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+<td valign="top" width="14%" >
+<font face="Times New Roman,helvetica"  >Bytes</font>
+</td>
+
+<td valign="top" width="45%" >
+<font face="Times New Roman,helvetica"  >Comment</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="15%" >
+<font face="Times New Roman,helvetica"  >Slice 0</font>
+</td>
+
+<td valign="top" width="27%" >
+<font face="Times New Roman,helvetica"  >4 x Board Snake Array</font>
+</td>
+
+<td valign="top" width="14%" >
+<font face="Times New Roman,helvetica"  >4352</font>
+</td>
+
+<td valign="top" width="45%" >
+<font face="Times New Roman,helvetica"  >In segment order</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="15%" >
+<font face="Times New Roman,helvetica"  >Slice 1</font>
+</td>
+
+<td valign="top" width="27%" >
+<font face="Times New Roman,helvetica"  >4 x Board Snake Array</font>
+</td>
+
+<td valign="top" width="14%" >
+<font face="Times New Roman,helvetica"  >4352</font>
+</td>
+
+<td valign="top" width="45%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="15%" >
+<font face="Times New Roman,helvetica"  >Slice 2</font>
+</td>
+
+<td valign="top" width="27%" >
+<font face="Times New Roman,helvetica"  >4 x Board Snake Array</font>
+</td>
+
+<td valign="top" width="14%" >
+<font face="Times New Roman,helvetica"  >4352</font>
+</td>
+
+<td valign="top" width="45%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="15%" >
+<font face="Times New Roman,helvetica"  >Slice 3</font>
+</td>
+
+<td valign="top" width="27%" >
+<font face="Times New Roman,helvetica"  >4 x Board Snake Array</font>
+</td>
+
+<td valign="top" width="14%" >
+<font face="Times New Roman,helvetica"  >4352</font>
+</td>
+
+<td valign="top" width="45%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<CENTER><font face="Times New Roman,helvetica"  >Table 4: Correlator Snake Table</font>
+</CENTER><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+<font face="Times New Roman,helvetica"  size="+2">Each Board Snake Array consists of 136 entries, as follows:</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="15%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+<td valign="top" width="10%" >
+<font face="Times New Roman,helvetica"  >Bytes</font>
+</td>
+
+<td valign="top" width="76%" >
+<font face="Times New Roman,helvetica"  >Comment</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="15%" >
+<font face="Times New Roman,helvetica"  >Index#</font>
+</td>
+
+<td valign="top" width="10%" >
+<font face="Times New Roman,helvetica"  >2</font>
+</td>
+
+<td valign="top" width="76%" >
+<font face="Times New Roman,helvetica"  >Unique for each snake in task</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="15%" >
+<font face="Times New Roman,helvetica"  >Mirrored index#</font>
+</td>
+
+<td valign="top" width="10%" >
+<font face="Times New Roman,helvetica"  >2</font>
+</td>
+
+<td valign="top" width="76%" >
+<font face="Times New Roman,helvetica"  >Primary snake # being mirrored (relevant only if this is a mirror snake)</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="15%" >
+<font face="Times New Roman,helvetica"  >Head blk#</font>
+</td>
+
+<td valign="top" width="10%" >
+<font face="Times New Roman,helvetica"  >1</font>
+</td>
+
+<td valign="top" width="76%" >
+<font face="Times New Roman,helvetica"  >First block in snake (chip#*16+block#);<BR>
+Block order within chip is B2,B3,A0,A1,A2,B1,B0,A3)</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="15%" >
+<font face="Times New Roman,helvetica"  >Mode</font>
+</td>
+
+<td valign="top" width="10%" >
+<font face="Times New Roman,helvetica"  >1</font>
+</td>
+
+<td valign="top" width="76%" >
+<font face="Times New Roman,helvetica"  >Auto|cross<BR>
+validity_on|validity_off<BR>
+Primary|mirror<br>
+Compare|nocompare<BR>
+Always_save|save_on_miscompare|no_save</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="15%" >
+<font face="Times New Roman,helvetica"  >Ref SU/Chn</font>
+</td>
+
+<td valign="top" width="10%" >
+<font face="Times New Roman,helvetica"  >1</font>
+</td>
+
+<td valign="top" width="76%" >
+<font face="Times New Roman,helvetica"  >SU#*16+chan# (physical)</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="15%" >
+<font face="Times New Roman,helvetica"  >Rem SU/Chn</font>
+</td>
+
+<td valign="top" width="10%" >
+<font face="Times New Roman,helvetica"  >1</font>
+</td>
+
+<td valign="top" width="76%" >
+<font face="Times New Roman,helvetica"  >SU#*16+chan# (physical)</font>
+</td>
+
+</tr>
+
+</table>
+
+<CENTER><font face="Times New Roman,helvetica"  >Table 5: Board Snake Array</font>
+</CENTER><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+<font face="Times New Roman,helvetica"  size="+2"><u>Block Allocation Table</U><br>
+
+<!--newpara-->
+The Block Allocation Table defines the snakes on each board</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="15%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+<td valign="top" width="27%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+<td valign="top" width="14%" >
+<font face="Times New Roman,helvetica"  >Bytes</font>
+</td>
+
+<td valign="top" width="45%" >
+<font face="Times New Roman,helvetica"  >Comment</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="15%" >
+<font face="Times New Roman,helvetica"  >Slice 0</font>
+</td>
+
+<td valign="top" width="27%" >
+<font face="Times New Roman,helvetica"  >4 x Board Block Array</font>
+</td>
+
+<td valign="top" width="14%" >
+<font face="Times New Roman,helvetica"  >4096</font>
+</td>
+
+<td valign="top" width="45%" >
+<font face="Times New Roman,helvetica"  >In segment order</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="15%" >
+<font face="Times New Roman,helvetica"  >Slice 1</font>
+</td>
+
+<td valign="top" width="27%" >
+<font face="Times New Roman,helvetica"  >4 x Board Block Array</font>
+</td>
+
+<td valign="top" width="14%" >
+<font face="Times New Roman,helvetica"  >4096</font>
+</td>
+
+<td valign="top" width="45%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="15%" >
+<font face="Times New Roman,helvetica"  >Slice 2</font>
+</td>
+
+<td valign="top" width="27%" >
+<font face="Times New Roman,helvetica"  >4 x Board Block Array</font>
+</td>
+
+<td valign="top" width="14%" >
+<font face="Times New Roman,helvetica"  >4096</font>
+</td>
+
+<td valign="top" width="45%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="15%" >
+<font face="Times New Roman,helvetica"  >Slice 3</font>
+</td>
+
+<td valign="top" width="27%" >
+<font face="Times New Roman,helvetica"  >4 x Board Block Array</font>
+</td>
+
+<td valign="top" width="14%" >
+<font face="Times New Roman,helvetica"  >4096</font>
+</td>
+
+<td valign="top" width="45%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<CENTER><font face="Times New Roman,helvetica"  >Table 6: Block Allocation Table</font>
+</CENTER><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+<font face="Times New Roman,helvetica"  size="+2">Each Board Block Array consists of 256 entries, corresponding to the 256 correlator blocks on each correlator board.</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="15%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+<td valign="top" width="10%" >
+<font face="Times New Roman,helvetica"  >Bytes</font>
+</td>
+
+<td valign="top" width="76%" >
+<font face="Times New Roman,helvetica"  >Comment</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="15%" >
+<font face="Times New Roman,helvetica"  >Next block</font>
+</td>
+
+<td valign="top" width="10%" >
+<font face="Times New Roman,helvetica"  >1</font>
+</td>
+
+<td valign="top" width="76%" >
+<font face="Times New Roman,helvetica"  >Pointer to next block in snake; tail block points to head block.</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="15%" >
+<font face="Times New Roman,helvetica"  >Static parms</font>
+</td>
+
+<td valign="top" width="10%" >
+<font face="Times New Roman,helvetica"  >3</font>
+</td>
+
+<td valign="top" width="76%" >
+<font face="Times New Roman,helvetica"  >Block static parameters</font>
+</td>
+
+</tr>
+
+</table>
+
+<CENTER><font face="Times New Roman,helvetica"  >Table 7: Board Block Array</font>
+</CENTER><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+<font face="Times New Roman,helvetica"  size="+2"><b>7. Set ROT clock</b><br>
+
+<!--newpara-->
+At this point, the TOT position of each participating tape is known, and synchronization can be achieved simply by appropriately setting ROT and instructing the participating SU's to syncrhonize to it.</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >From:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Conductor</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >To:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >ROT_man</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message<BR>
+Contents</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >ROT set time and rate</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2">7.a Set ROT and Broadcast to SU's</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >From:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >ROT_man</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >To:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Broadcast to SU's participating in task (e.g. SU 'subarray') and to CUCC's</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message<BR>
+Contents</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >ROT set time and rate</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Set ROT clock on next SYSTICK</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Synchronizes ROT in the SU subarray.<br>
+ROT_man must then confirm that all subarray ROT clocks are properly set.</font>
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2">7.b Confirm ready to start correlation</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >From:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >ROT_man</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >To:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Conductor</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message<BR>
+Contents</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Confirm ROT is set and ticking in SU subarray</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2"><b>8. Initiate tape sync and start of correlation</b><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+8.a </font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >From:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Conductor</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >To:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >SU_man</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message<BR>
+Contents</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Go!</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Start tapes on ROTq (as necessary), download polynomials, synchronize tapes, start scan</font>
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2">8.b</font><br>
+
+<!--oldbottom--><img width=1 height=6 src="file:/opt/mswordview/lib/mswordview/patterns/clear.gif"><br>
+
+<!--newpara-->
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >From:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Conductor</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >To:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Corr_man</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Message<BR>
+Contents</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  >Configure correlator and start correlation</font>
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Action:</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+
+<table border=1 width="464">
+
+<tr>
+
+<td valign="top" width="13%" >
+<font face="Times New Roman,helvetica"  >Comments</font>
+</td>
+
+<td valign="top" width="87%" >
+<font face="Times New Roman,helvetica"  ></font>&nbsp;
+</td>
+
+</tr>
+
+</table>
+<font face="Times New Roman,helvetica"  size="+2"><br>
+
+<hr width="50%">
+</font>
+<!--newpara-->
+<font face="Times New Roman,helvetica" color="#7f5555" size="+2">1</font><br>
+
+<!--newpara-->
+<font face="Times New Roman,helvetica" color="#7f5555" >Sequence_of_actions.doc 09/13/99</font><br>
+
+<!--newpara-->
+<img width=1 height=6 src=file:/opt/mswordview/lib/mswordview/patterns/clear.gif><br>
+<font face="Times New Roman,helvetica" color="#7f5555" size="+2"></font>
+<br><img src="file:/opt/mswordview/lib/mswordview/patterns/documentend.gif">
+			<hr><p>
+			Document converted from ms word 8 by 
+			<a href="http://www.csn.ul.ie/~caolan/docs/MSWordView.html">
+			MSWordView</a>(mswordview 0.5.14)<br>
+			MSWordView written by <a href="mailto:Caolan.McNamara@ul.ie">
+			Caolan McNamara</a>
+			</body>
+			</html>

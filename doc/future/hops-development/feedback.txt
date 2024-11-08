@@ -1,0 +1,53 @@
+
+From: "Schonfeld, Jonathan" <jonathan.schonfeld@cfa.harvard.edu>
+Date: Thu, 5 Sep 2019 12:46:46 -0400
+Subject: Re: MSRI Gantt chart
+To: Michael Hecht <mhecht@haystack.mit.edu>
+Cc: Crew Geoff <gbc@haystack.mit.edu>, Fish Vincent <vfish@haystack.mit.edu>,
+        "Doeleman, Sheperd" <sdoeleman@cfa.harvard.edu>,
+        Lindy Blackburn <lblackburn@cfa.harvard.edu>,
+        "Johnson Michael D." <mjohnson@cfa.harvard.edu>,
+        Jonathan Weintroub <jweintroub@cfa.harvard.edu>,
+        Kari Haworth <kari.haworth@cfa.harvard.edu>
+
+[-- Autoview using links -dump '/tmp/mutt.html' --]
+   I am in favor of making them explicit.  In some sense they are the
+   "heart" of the project.
+
+     Jonathan,
+     Good questions, thinking out loud here…
+     These items would naturally be addressed as part of a project review
+     sequence. For the items you mention, architecture belongs in an MCR and
+     requirements in an SRR; Selecting test data and defining FOMs should be
+     part of a V&V review. We obviously haven’t explicitly called out
+     either MCR and SRR because for a task of this sort and this size it
+     seems reasonable to fold them into a single design review. Similarly, we
+     merged a V&V review into a Test Readiness review in our latest
+     iteration. But they are implicitly there.
+     So we could include these items in the Gantt chart as part of the run-up
+     to the corresponding reviews, or merely call them out in an
+     implementation plan as part of a review scope description. The risk of
+     explicitly calling review items out on a schedule is that it may give
+     them undue emphasis over other items that should feed into those
+     reviews. But since you have astutely called out items that are the
+     backbone of the implicit longer review sequence, this may not be a
+     reasonable concern.
+     Thoughts?
+     Mike
+
+       Hi - Here are some initial comments from my own review of the
+       schedule. - Jonathan
+
+         * I think the schedule should explicitly call out an architecture
+           task.
+         * I think the schedule should explicitly call out a requirements
+           task.
+         * Should there be a task for choosing the (presumably archived) data
+           you'll use to test and validate the new software?
+         * Should there be a task for defining the figures of merit that will
+           be used when evaluating the new software?  I understand it will
+           be straightforward to tell when the new SW gets the same numerical
+           results as the old SW.  But we also want it to be faster and/or
+           more user friendly and/or more extensible and/or.....  How will
+           we verify that we've achieved those forward-looking goals?
+

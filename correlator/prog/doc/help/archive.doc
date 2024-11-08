@@ -1,0 +1,45 @@
+Documentation for the script "archive", CJL 30 November 1993
+------------------------------------------------------------
+
+COMMAND NAME:   archive
+
+SYNOPSIS:  Archives a complete experiment to DAT tape
+
+SYNTAX:  archive nnnn
+		Where nnnn is the experiment number to archive
+
+OPTION FLAGS:   None
+
+ARGUMENTS:	Experiment number
+			This mandatory argument is a number which
+			tells "archive" which experiment to write
+			to tape.  This script is not intended for
+			use by the casual investigator, but rather
+			by the person responsible for maintenance
+			of the main data areas.
+
+ENVIRONMENT:	CORDATA, DATA1 ... DATAn, DOC
+
+DESCRIPTION:
+
+When an experiment is complete and all useful processing of the data is
+ended, the data need to be archived to tape.  This script accomplishes that
+job, invoking tar on the scan directories, and logging information in
+the experiment directory.  It makes an A-file of the entire experiment,
+which not only goes on tape, but is also left behind in the experiment
+directory, along with a log of the archive process which contains a list
+of all files on tape.
+
+Archive supports incremental additions to a pre-existing archive for a given
+experiment, using the tar "u" option as necessary.  For efficiency reasons,
+such incremental archives should be avoided if possible.  Because updates
+write to a tape with existing data on it, errors have the potential to
+destroy important information.  For that reason, the archive script urges
+the user to make a backup before appending to the tape.  If this is
+impractical, and you are placing a non-blank tape in the drive, take a
+moment to be sure that the file "archive.log" exists in the experiment
+directory.  If it does not, your tape will be blown away.
+
+The archive script is intended only for operator-initiated archiving of the 
+main correlator data areas.  Private data or private tapes should be dealt
+with directly using the tar command (see also linkdata).

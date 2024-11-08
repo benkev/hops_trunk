@@ -1,0 +1,276 @@
+
+               Mark-4 Tape Library--ASCII Version
+
+     The ASCII version of the Mark-4 tape library has been tested
+at Haystack.  We recommend that this version be implemented at
+the other Mark-4 correlators.  This note is a discussion of the
+configuration and hardware needed and some information about
+Haystack's software.
+
+     There are (at least) two possible configurations: 
+
+1)  All the operations can be done on ccc.  This requires that
+the new barcode printer (discussed below) be connected to ccc
+even if located in the shipping room.  An appropriate spigot
+needs to be available on ccc (the printer we've chosen can use
+either parallel or RS-232 serial), and the cable length needs to
+be acceptable to whichever type is chosen.  We recommend a
+terminal in the shipping room, and, regardless of where the
+terminal is placed, we recommend a barcode reader (discussed
+below) connected between keyboard and terminal to simulate
+typing.
+
+2)  Alternatively, a Unix or Linux machine can be placed in the
+shipping room with barcode printer and barcode reader attached. 
+In this case, the software runs on this Unix or Linux box with
+the databases on ccc through NFS.  The only connection to ccc is
+Ethernet.  Haystack is using this option 2).
+
+     Haystack's tape-library software comprises several Tcl
+scripts and will operate on either machine or, with minor
+changes, on any machine with a Tcl shell (tclsh, not to be
+confused with tcsh) provided that the databases and the printer
+are accessible directly--no filters.  These scripts expect to
+find tclsh or a symbolic link to tclsh in /usr/local/bin/tclsh.
+
+     The barcode printer that we've chosen is a Zebra model T402
+thermal-transfer label printer.  The street price in USA is $450
+to $500 (with peel option).  This is the cheapest Zebra printer
+that prints with the thermal-transfer process (separate label and
+ribbon) on 4-inch-wide labels.  We chose this process because it
+gives more rugged longer-lasting labels compared with the direct-
+thermal process.  We chose Zebra for their apparent value and
+because their printers offer a good high-level control language,
+ZPL II.  Other sites may wish to upgrade to a more expensive
+printer but, to use Haystack's software, should stay with the
+Zebra ZPL-II line.  We have a Zebra T402 printer (with peel
+option not in use) in test operation now in the Haystack shipping
+room.  We like this barcode printer, and we've had no problems
+with it except that it is extraordinarily persnickety about
+installing or changing the ribbon.
+
+     This Zebra printer includes a roll of a hundred 4-by-3-inch
+white paper labels and a black wax ribbon roll.  We used most of
+these labels for tests.  But to match the standard VLBI label
+size, 4 by 1.4375 inches, we needed to order several rolls of
+custom-cut labels because this is no longer a standard size.  We
+might be able to send some of these rolls of labels to the other
+sites.  We ordered Zebra Z-Ultimate 3000 white polyester labels
+and Zebra 5095 black resin ribbons, which offer better print
+quality than wax ribbons.  The alternative of a continuous label
+strip and a printer with a built-in cutter makes labels with
+square corners, which tend to catch on fingers and peel.
+
+     Haystack has a new Symbol Model LS 4006I-I100 laser barcode
+reader that attaches between keyboard and computer.  We like this
+barcode reader, but there is no requirement for other sites to
+have the same brand and model.  Our software expects the barcode
+to appear just as if typed, and the system can operate, of
+course, without a barcode reader.
+
+     The ASCII version of the Mark-4 tape library is now
+available for installation at other sites.  The notes below are a
+preliminary writeup for its installation and use.
+
+     Creating this new tape library involves converting
+information from the original tape library on the A-900 into two
+ASCII files and copying these files to ccc:/correlator/tapelib,
+alias $TAPELIB, a new directory created for this purpose.  A
+writeup by ARW reproduced in Appendix A describes the process of
+creating these files on the A-900.  Then use ftp to transfer them
+to ccc.  The files in $TAPELIB should be named inventory.txt from
+ARW's *TAPES and slots.txt from ARW's *SLOTS.  This directory and
+these files therein should be writable by group vlbi.
+
+     Check that slots.txt contains an entry for each slot that is
+present in the physical library regardless of whether the slot
+contains a tape.  The order of slots in slots.txt is important
+whenever you select automatic slot assignment in tuba (described
+below) because the slots are assigned in this order.  Use your
+favorite editor to add or delete slots as appropriate.
+
+     Check that inventory.txt contains an entry for each tape
+that you deal with regardless of where the tape is and regardless
+of whether it is also in slots.txt.  Use your favorite editor to
+add to inventory.txt whenever you acquire or receive new tapes
+for the first time.  The order of tapes in inventory.txt is not
+important.  There are typically many more tapes in inventory.txt
+than in slots.txt.
+
+     Two Tcl scripts are used to "fix" these two ASCII files
+after initial creation or later in case they were damaged by
+careless editing.  These scripts are fixtll to fix slots.txt and
+fixtli for inventory.txt.  These scripts make backups named
+slots.bak.txt and inventory.bak.txt (but only one of each) before
+editing.  The most important part of this "fixing" is to create
+fixed-length lines so that replacement editing can be done
+automatically on each line without damaging other lines.
+
+     Important:  After transferring these files from the A-900,
+run fixtll and fixtli before using tuba as described below.
+
+     Library updating and label printing are done with another
+Tcl script called tuba.  This script, in effect, replaces the LE
+(library enter), LR (library remove), PL (print library label),
+PP (print permanent label), PB (print both labels), and FT (find
+tape) functions of TLUP on the A-900 with most of the same
+features.  For folks who have used TLUP on the A-900, tuba is
+intended to be self-explanatory.
+
+     A new-used Linux machine, named shipping, is now available
+in Haystack's shipping room.  This machine has ccc:/correlator
+NFS mounted and has logins for most of the folks who might want
+to use the tape library.  Shipping has the three scripts
+mentioned above in Linux $BIN.  Shipping has the new Symbol laser
+barcode reader, as reconfigured by ARW, and has the Zebra barcode
+printer on $BCPRINT (which is now /dev/lp1 on shipping but
+/dev/null on ccc).
+
+     If other sites choose to use this configuration--a separate
+Linux or Unix machine in the shipping room--then this machine
+needs:  ccc:/correlator NFS mounted and tclsh (Tcl shell)
+available in a standard place now set to /usr/local/bin/tclsh. 
+In any case, the tuba Tcl script needs to run on a machine that
+has /correlator/tapelib available either locally or by NFS and,
+to print labels, direct unfiltered access to the barcode printer
+in BCPRINT.
+
+     Another environment variable, SITE, is printed as the first
+word of the heading on library labels.  At Haystack, SITE is set
+to "Haystack," but, at other sites, should be set to whatever is
+wanted on library labels.
+
+     The new Zebra barcode printer is in place and functional on
+shipping at Haystack, and the proper media (4 by 1.4375-inch
+labels and ribbons) are now installed.  We experimented with
+various fonts on labels including some fonts in Zebra's
+downloadable format (*.zst) in $TAPELIB.  We chose a version of
+Goudy Heavyface Condensed modified to have a slash through zero. 
+This font is in $TAPELIB/ghc.zst configured to download to flash
+(permanent) memory in the Zebra printer by just a cp to $BCPRINT. 
+The default version of tuba uses this font, but various
+commented-out lines in tuba use other fonts.
+
+     The default settings in the Zebra printer are for wax
+ribbons, but, as noted above, we prefer a resin ribbon.  In tuba,
+the media darkness (MD) is set for resin ribbons; if you use a
+wax ribbon, you should comment out lines 16 and 45 (in the
+present version of tuba) as noted therein.
+
+     Other library or inventory functions, such as adding tapes
+to inventory.txt or correcting errors, are to be done with an
+editor, such as vi or emacs, with the admonition to use replace
+commands to preserve line lengths and, in inventory.txt, column
+locations, which have significance because blank fields are
+permitted preceding fields (in and out dates) written by tuba.
+
+     The latest version of m4tl() in two programs, tgen (called
+by composer) and suman, contains a check for the existence of
+$TAPELIB/slots.txt.  If this file exists at program startup, then
+it is read in lieu of socket calls to the A-900 tape library. 
+This means that during beta testing, both the A-900 and the ASCII
+tape libraries should be kept up-to-date.  If you don't want
+m4tl() to use slots.txt, rename it to something else.
+
+
+                                     Revised:  2000 April 28, JAB
+
+                  Appendix A:  A-900 Procedures
+
+Procedure for creating an ASCII tape inventory file from the A900
+IMAGE tape-library data base:
+
+Turn Caps Lock 'on'
+
+RU,QUERY  (might have to specify cartridige - RU,QUERY::3)
+
+NEXT? XEQ=TLOPEN;    ('NEXT?' is QUERY prompt)
+
+NEXT? FIND TAPE1.LABEL IGT "00000000" END;
+
+NEXT? LIST=*TAPES::XX:4:1024   (where 'XX' is the FMGR cartref
+for the output file)
+
+NEXT? REPORT NAME=RP1::TL;
+
+(report will be generated -- may take an hour or more)
+(make sure there is plenty of space of first-mounted cartridge in
+FMGR cartridge list,
+ which QUERY uses as a scratch space)
+ 
+NEXT? EXIT;
+
+(report will be in *TAPES::XX, which can be ftp'ed to ccc to set
+up tape library there)
+
+
+
+
+
+
+
+Procedure for creating an ASCII library-slot file from the A900
+IMAGE tape-library data base:
+
+
+RU,TLIST,@,*SLOTS::XX    (where 'XX' is the FMGR cartref for the
+output file)
+
+This will create a report with all the defined slots in your
+library.  Please edit it
+as necessary to remove any slots which do not exit, or add any
+slots which don't appear
+in the list.
+
+
+
+ARW 22 Mar 00
+
+       Appendix B:  Notes on TAPELIB = /correlator/tapelib
+
+(This appendix is a copy of $TAPELIB/README.txt)
+
+This is the directory containing the ASCII Mark-4 tape library.  The
+library itself is slots.txt and the inventory is inventory.txt.  These
+files can be manipulated with vi or your favorite editor, but this
+should not normally be necessary.  See scripts fixtli, fixtll, and
+especially tuba. 
+
+Files ending in .zst are downloadable fonts in the format used by the
+Zebra label printer.  For example, courbd.zst is Courier Bold, ghc.zst
+is Ghoudy Heavyface Condensed modified to have a slash through zero, and
+jbg.zst is Garamond Bold also modified to have a slash through zero. 
+(The Zebra printer has, of course, several internal fonts.)  To download
+one of these fonts to the printer, just copy it, that is:
+     cp  $TAPELIB/ghc.zst  $BCPRINT 
+or substitute your favorite font for ghc. 
+
+The ghc font is required to have been downloaded to the printer for the
+default version of tuba.   The ghc font downloads automatically to the
+flash (permanent) memory; other fonts go to temporary memory and will
+disappear on printer power off.
+
+
+                                            Revised:  2000 April 27, JAB
+
+                  Appendix C:  Column Headings
+
+Column headings for inventory.txt are: 
+
+ VSN Location Type SP Serial# ManufactureDate Lot# Reel \
+   PurchaseDate Owner Q InDate OutDate Comment 
+
+(VSN is volume serial number.)  Only InDate and OutDate in
+inventory.txt are modified by tuba.  Column headings for
+slots.txt are: 
+
+ Slot ExperimentTapeNumber Experiment VSN Status Date Type 
+
+All the entries in slots.txt can be modified by tuba.
+
+These column headings are the same as the corresponding headings
+from the A-900 except that some information has been deleted off
+the end in inventory.txt.  Several printings from tuba show this
+same ordering of information because they are just selected lines
+from inventory.txt or slots.txt.
+

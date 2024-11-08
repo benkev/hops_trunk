@@ -1,0 +1,45 @@
+Documentation for the program "cdump", CJL, 19 January 1994
+-----------------------------------------------------------
+
+COMMAND NAME:   cdump
+
+SYNOPSIS:  Peruses binary data files and displays them in ascii form
+
+SYNTAX:  cdump [input file]
+
+OPTION FLAGS:	None
+
+ARGUMENTS:	input file
+			This optional argument starts cdump with the
+			specified file read in.  The "read" command
+			inside this interactive program overwrites
+			whatever data, if any, has already been read
+			in.
+
+ENVIRONMENT:	None
+
+DESCRIPTION:
+
+As essentially the first program to be written on the unix systems, cdump
+does not conform as well to established conventions of coding or operation
+as would be desired.  Nevertheless, it works reasonably well, and upgrading
+it is therefore not a high priority.  Several commands are available
+inside cdump, a list of which can be obtained by typing "?" at the prompt
+at any time.
+
+Commands currently supported are:
+
+        mode    (hexadecimal, decimal) for certain data types
+        skip nnn    (skips over nnn records, default 1)
+        find 'type'    (positions at next record of specified type)
+        bdump filename    (switches on binary dump of records to file)
+        file filename    (directs output to file or printer)
+        display nnn    (produces ascii summary of record(s))
+        columns nnn    (number of columns to use for print)
+        open filename    (opens a new data file)
+        status    (shows current program settings)
+        index    (sets corel index # filter, type 1 files only)
+        summary nnn    (as display but one-line hex summary)
+                        (type 1 files only)
+        ! command    (shell escape)
+        quit

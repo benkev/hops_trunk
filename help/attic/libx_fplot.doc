@@ -1,0 +1,51 @@
+Documentation for the X_FPLOT (fringe plot popup) library
+---------------------------------------------------------
+
+Documentor:  CJL 26 October 1992
+	     Revised 30 March 1995
+
+This library provides access to a mechanism for displaying fringe plots
+on an X-window display.  The library uses two-dimensional character
+arrays as found in type-2 fringe binary correlator files.  These files
+must be read in (using the BFIO library) and the fringe-plot element of
+the resulting memory-resident structure is what you feed to this
+library.  For a fairly concise example of how to use this library, the
+UTIL library, and the BFIO library, look in $FPLOT.  There are only four 
+routines of interest to the application programmer in this library:
+
+int				File: $X_FPLOT/open_x_fplot.c
+open_x_fplot (argc, argv)		Opens the popup window on the
+char **argv;				user's display, with the title
+int argc;				bar displaying argv[0].  argc
+					should be set to 1.  This is
+					a workaround to keep low-level
+					X happy.  Window is not mapped.
+					Return: 0=good, else bad
+
+int				File: $X_FPLOT/show_x_fplot.c
+show_x_fplot (fplot, mode)		Maps (makes visible) window, and
+char **fplot;				puts the fringe plot contained
+int mode;				in "fplot" in the window.  The
+					plot may be split in two halves
+					depending on the screen height.
+					User input is supported:
+					user types     action
+					  space        toggle half page
+					  n            return 1
+					  p            return -1
+                                          q            return 0 and unmap
+					 ctrl-h        call hcopy_x_fplot()
+
+void				File: $X_fplot/hcopy_x_fplot.c
+hcopy_x_fplot (fplot)			Sends the fringe plot to the
+char **fplot;				shell script:
+					/usr/local/bin/fplot_print
+					(this should be an environment
+					variable).  Can be used without
+					opening the popup window.
+
+int				File: $X_FPLOT/close_x_fplot.c
+close_x_fplot ()			Shuts down the popup window.
+					After this call, you must use
+					open_x_fplot() again before
+					show_x_fplot() will work.

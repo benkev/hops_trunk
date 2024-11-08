@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+# chipid  rjc 2000.2.21
+# mod for more modes  rjc 2005.5.4
+# identify a chip by channel and data file
+#
+if ($#ARGV != 1)
+   {
+   print ("Correct run sequence: chipid <basefile> <chanid>\n");
+   print ("e.g. chipid JB..osgekc X7R\n");
+   }
+else
+   {
+   $basefile = @ARGV[0];
+   $chanid = @ARGV[1];
+   $t101 = `CorAsc2 101 < $basefile`;
+   @feld = split (' ',$t101);
+   while (shift (@feld) ne "nblocks")
+      {}
+   $nblocks = $feld[1];
+   print ("# of correlation blocks used: $nblocks\n");
+   
+   while (shift (@feld) ne $chanid)
+      {}
+   print ("correlator board was in slot $feld[8] of 0..15\n");
+
+   print ("chips: ");
+   for ($i=0; $i<$nblocks; $i++)
+       {
+       $chip = (hex ($feld[20 + 3 * $i]) >> 27) + 1;
+       print ("$chip ");
+       }
+   print ("\n");
+   }
+endif

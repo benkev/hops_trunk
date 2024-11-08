@@ -1,0 +1,61 @@
+## $MK4/src/postproc/fourfit/Makefile
+SHELL := /bin/ksh
+
+##-----------------------------------------------------------------------------
+ifeq "$(MK4_MK_ENV)" ""
+  include $(shell echo $${PWD%/src/*})/cfg/env.mk
+  default $(MAKECMDGOALS) :
+	@mkdir -p $(MK4_MK_BLD_D)
+	@$(MAKE) -f $(MK4_MK_SRC_D)/Makefile -C $(MK4_MK_BLD_D) $(MAKECMDGOALS) 
+
+##-----------------------------------------------------------------------------
+else # ifeq "$(MK4_MK_ENV)" ""
+  include $(MK4_MK_CFG_D)/common.mk
+  include $(MK4_MK_CFG_D)/$(MK4_MK_ARCH).mk
+
+  ##---------------------------------------------------------------------------
+  language := fortran
+
+  png_lib := $(subst .so,,\
+              $(subst lib,,\
+               $(notdir $(wildcard $(MK4_SYS_LIB_PATH)/*png12.so))))
+
+  ##---------------------------------------------------------------------------
+  ## prg
+  prg := fourfit
+  prg_srcs := $(strip \
+   fourfit.c        set_defaults.c      parse_cmdline.c \
+   check_rflist.c  organize_data.c     make_passes.c       fringe_search.c \
+   get_corel_data.c parse_control_file.c refringe_list.c   time_range.c \
+   set_pointers.c  pcal_interp.c       fill_param.c        skip_data.c \
+   clear_pass.c    generate_cblock.c   apply_filter.c      precorrect.c \
+   search.c        postcorrect.c       output.c\
+   read_control_file.c init_tokens.c   lex.c               create_fsm.c \
+   parser.c        make_flist.c        nullify_cblock.c    clear_freq_corel.c \
+   default_cblock.c criteria_match.c   copy_cblock_parts.c gate_off.c \
+   norm.c          freq_spacing.c      search_windows.c    read_sdata.c \
+   delay_rate.c    fft1.c              update.c            interp.c \
+   create_fname.c  comp_func.c \
+   parabola.c      vrot.c              get_bfstring.c      skip_index.c \
+   make_plotdata.c clear_plotdata.c    calc_rms.c          fill_fringe_info.c \
+   display_fplot.c print_at.c \
+   plot_complex.c      plot_graph.c        grid.c \
+   put_char_at.c   print_left.c        sprint_char_arr.c \
+   fill_200.c  fill_201.c  fill_202.c  fill_203.c  fill_204.c \
+   fill_205.c  fill_206.c  fill_207.c  fill_208.c  fill_210.c \
+   compute_qf.c  compute_model.c make_postplot.c tpstat_interp.c \
+   ap_mean.c     linterp.c   rotate_pcal.c fill_212.c  fill_230.c \
+   stcount_interp.c calc_normalization.c apply_passband.c max555.c \
+   interp555.c pcalibrate.c \
+  )
+  prg_libs := cpgplot pgplot $(png_lib) dfio vex x_fplot afio mk4util X11 m
+  prg_lpath := $(MK4_MK_LIB_D) $(PGPLOT_DIR) $(X11_DIR) $(MK4_SYS_LIB_PATH)
+
+  ##
+  ipath := $(MK4_MK_INC_D) $(MK4_MK_SRC_D) $(PGPLOT_DIR)
+
+  ##
+  include $(MK4_MK_CFG_D)/rules.mk 
+
+##-----------------------------------------------------------------------------
+endif # ifeq "$(MK4_MK_ENV)" ""

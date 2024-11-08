@@ -1,0 +1,34 @@
+<HTML> <HEAD> 
+<TITLE> Log Help </TITLE> 
+<H1> Log Help </H1> 
+</HEAD> <BODY> 
+<P> 
+<H2> ---- Logging ---- </H2> 
+<P> 
+     A separate program, Log, and a script, largo (alias llog), 
+provide message logging.  From your window manager, get an xterm 
+or hpterm to be used only for logging.  In this term, run the csh 
+script largo.  This script first edits the message alias file, 
+MesAlias, to append LOG@ to all active lines, which causes a 
+copy to be sent to LOG of all messages that are sent to aliases
+in this alias file.  Then largo starts the Log (LOG) program, 
+which sends a one-line note to the screen and to the log file 
+$TMP/mlog for each message that it receives.  Log also sends
+a copy of the whole message (binary) to the binary log file 
+$TMP/blog.  The last (hex) number on each line in the mlog 
+file is the byte offset from the start of the blog file to the 
+start of the corresponding binary message therein. 
+<P> 
+     Note that Log does not receive and cannot log any messages 
+that are sent directly, that is without using an alias. 
+<P> 
+     To terminate logging, ^C (Ctrl-C) or whatever your term uses 
+for interrupt in the log window.  The largo script then terminates 
+Log and--this is important--restores the alias file.  Whenever you 
+restart the largo script, any previous contents of mlog and blog 
+are saved in mlog.bak and blog.bak, but only once. 
+<P> 
+     Revised:  2000 August 9, JAB 
+<P> 
+</BODY> </HTML> 
+

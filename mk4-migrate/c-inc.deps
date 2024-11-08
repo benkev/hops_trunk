@@ -1,0 +1,682 @@
+sub/dfio/copy_308.c : bytflp.h type_308.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_100.c : type_100.h mk4_dfio.h mk4_util.h 
+sub/dfio/addr_221.c : bytflp.h type_221.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_306.c : type_306.h mk4_dfio.h mk4_util.h 
+sub/dfio/copy_306.c : bytflp.h type_306.h mk4_dfio.h mk4_util.h 
+sub/dfio/copy_101.c : bytflp.h type_101.h mk4_dfio.h mk4_util.h 
+sub/dfio/copy_304.c : bytflp.h type_304.h mk4_dfio.h mk4_util.h 
+sub/dfio/addr_204.c : bytflp.h type_204.h mk4_dfio.h mk4_util.h 
+sub/dfio/addr_201.c : bytflp.h type_201.h mk4_dfio.h mk4_util.h 
+sub/dfio/copy_202.c : bytflp.h type_202.h mk4_dfio.h mk4_util.h 
+sub/dfio/addr_220.c : type_220.h mk4_dfio.h mk4_util.h 
+sub/dfio/addr_203.c : bytflp.h type_203.h mk4_dfio.h mk4_util.h 
+sub/dfio/alloc_t120_array.c : mk4_data.h mk4_dfio.h 
+sub/dfio/write_mk4fringe.c : mk4_data.h fstruct.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_206.c : type_206.h mk4_dfio.h mk4_util.h 
+sub/dfio/copy_303.c : bytflp.h type_303.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_221.c : type_221.h mk4_dfio.h 
+sub/dfio/copy_300.c : bytflp.h type_300.h mk4_dfio.h mk4_util.h 
+sub/dfio/addr_120.c : bytflp.h type_120.h mk4_dfio.h mk4_util.h 
+sub/dfio/addr_308.c : bytflp.h type_308.h mk4_dfio.h mk4_util.h 
+sub/dfio/copy_301.c : bytflp.h type_301.h mk4_dfio.h mk4_util.h 
+sub/dfio/read_mk4sdata.c : mk4_data.h mk4_sizes.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_207.c : type_207.h mk4_dfio.h 
+sub/dfio/clear_mk4corel.c : mk4_data.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_300.c : type_300.h mk4_dfio.h mk4_util.h 
+sub/dfio/copy_220.c : type_220.h mk4_dfio.h mk4_util.h 
+sub/dfio/copy_200.c : bytflp.h type_200.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_201.c : type_201.h mk4_dfio.h mk4_util.h 
+sub/dfio/addr_110.c : bytflp.h type_110.h mk4_dfio.h 
+sub/dfio/addr_200.c : bytflp.h type_200.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_202.c : type_202.h mk4_dfio.h 
+sub/dfio/copy_120.c : bytflp.h type_120.h mk4_util.h 
+sub/dfio/copy_201.c : bytflp.h type_201.h mk4_util.h 
+sub/dfio/init_000.c : type_000.h fstruct.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_120.c : type_120.h mk4_dfio.h 
+sub/dfio/clear_307.c : type_307.h mk4_dfio.h 
+sub/dfio/copy_305.c : bytflp.h type_305.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_205.c : type_205.h mk4_dfio.h mk4_util.h 
+sub/dfio/copy_210.c : bytflp.h type_210.h mk4_dfio.h mk4_util.h 
+sub/dfio/compress.c : mk4_typedefs.h mk4_dfio.h 
+sub/dfio/copy_207.c : bytflp.h type_207.h mk4_dfio.h mk4_util.h 
+sub/dfio/copy_206.c : bytflp.h type_206.h mk4_dfio.h mk4_util.h 
+sub/dfio/addr_101.c : bytflp.h type_101.h mk4_dfio.h mk4_util.h 
+sub/dfio/read_mk4fringe.c : mk4_data.h mk4_dfio.h mk4_util.h 
+sub/dfio/addr_212.c : bytflp.h type_212.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_204.c : type_204.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_mk4fringe.c : mk4_data.h mk4_dfio.h mk4_util.h 
+sub/dfio/open_datafile.c : mk4_data.h fstruct.h mk4_dfio.h mk4_util.h 
+sub/dfio/display_221.c : mk4_data.h mk4_dfio.h mk4_util.h 
+sub/dfio/addr_301.c : bytflp.h type_301.h mk4_dfio.h mk4_util.h 
+sub/dfio/addr_210.c : bytflp.h type_210.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_mk4root.c : mk4_data.h mk4_sizes.h mk4_dfio.h 
+sub/dfio/clear_mk4sdata.c : mk4_data.h mk4_sizes.h mk4_dfio.h 
+sub/dfio/clear_220.c : type_220.h mk4_dfio.h 
+sub/dfio/addr_307.c : bytflp.h type_307.h mk4_dfio.h mk4_util.h 
+sub/dfio/addr_205.c : bytflp.h type_205.h mk4_dfio.h mk4_util.h 
+sub/dfio/write_mk4corel.c : mk4_data.h fstruct.h mk4_dfio.h mk4_util.h 
+sub/dfio/copy_203.c : bytflp.h type_203.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_210.c : type_210.h mk4_dfio.h 
+sub/dfio/write_mk4sdata.c : mk4_data.h fstruct.h mk4_sizes.h mk4_dfio.h mk4_util.h 
+sub/dfio/addr_309.c : bytflp.h type_309.h mk4_dfio.h mk4_util.h 
+sub/dfio/addr_304.c : bytflp.h type_304.h mk4_dfio.h mk4_util.h 
+sub/dfio/write_record.c : mk4_records.h mk4_dfio.h mk4_util.h 
+sub/dfio/write_err.c : mk4_dfio.h mk4_util.h 
+sub/dfio/copy_204.c : bytflp.h type_204.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_309.c : type_309.h mk4_dfio.h 
+sub/dfio/test_compress.c : 
+sub/dfio/read_mk4file.c : mk4_dfio.h mk4_util.h 
+sub/dfio/clear_302.c : type_302.h mk4_dfio.h 
+sub/dfio/addr_202.c : bytflp.h type_202.h mk4_dfio.h mk4_util.h 
+sub/dfio/write_mk4root.c : fstruct.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_203.c : type_203.h mk4_dfio.h 
+sub/dfio/addr_208.c : bytflp.h type_208.h mk4_dfio.h mk4_util.h 
+sub/dfio/addr_306.c : bytflp.h type_306.h mk4_dfio.h mk4_util.h 
+sub/dfio/copy_221.c : bytflp.h type_221.h mk4_dfio.h mk4_util.h 
+sub/dfio/addr_207.c : bytflp.h type_207.h mk4_dfio.h mk4_util.h 
+sub/dfio/addr_302.c : bytflp.h type_302.h mk4_dfio.h mk4_util.h 
+sub/dfio/copy_307.c : bytflp.h type_307.h mk4_dfio.h mk4_util.h 
+sub/dfio/addr_300.c : bytflp.h type_300.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_200.c : type_200.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_208.c : type_208.h mk4_dfio.h 
+sub/dfio/addr_230.c : bytflp.h type_230.h mk4_dfio.h mk4_util.h 
+sub/dfio/copy_230.c : bytflp.h type_230.h mk4_dfio.h mk4_util.h 
+sub/dfio/addr_303.c : bytflp.h type_303.h mk4_dfio.h mk4_util.h 
+sub/dfio/copy_110.c : bytflp.h type_110.h mk4_dfio.h 
+sub/dfio/copy_208.c : bytflp.h type_208.h mk4_dfio.h mk4_util.h 
+sub/dfio/read_mk4corel.c : mk4_data.h mk4_dfio.h mk4_util.h 
+sub/dfio/copy_212.c : bytflp.h type_212.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_303.c : type_303.h mk4_dfio.h 
+sub/dfio/clear_230.c : type_230.h mk4_dfio.h 
+sub/dfio/clear_304.c : type_304.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_308.c : type_308.h mk4_dfio.h mk4_util.h 
+sub/dfio/copy_100.c : bytflp.h type_100.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_212.c : type_212.h mk4_dfio.h 
+sub/dfio/addr_305.c : bytflp.h type_305.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_110.c : type_110.h mk4_dfio.h 
+sub/dfio/corel_alloc.c : mk4_data.h mk4_dfio.h mk4_util.h 
+sub/dfio/copy_309.c : bytflp.h type_309.h mk4_dfio.h mk4_util.h 
+sub/dfio/attic/testprog.c : mk4_data.h 
+sub/dfio/copy_205.c : bytflp.h type_205.h mk4_dfio.h mk4_util.h 
+sub/dfio/read_mk4root.c : mk4_data.h mk4_sizes.h mk4_dfio.h 
+sub/dfio/clear_101.c : type_101.h mk4_dfio.h 
+sub/dfio/clear_coord.c : mk4_typedefs.h mk4_dfio.h 
+sub/dfio/copy_302.c : bytflp.h type_302.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_305.c : type_305.h mk4_dfio.h 
+sub/dfio/addr_206.c : bytflp.h type_206.h mk4_dfio.h mk4_util.h 
+sub/dfio/clear_301.c : type_301.h mk4_dfio.h 
+sub/dfio/test.c : mk4_data.h 
+sub/dfio/addr_100.c : bytflp.h type_100.h mk4_dfio.h mk4_util.h 
+sub/vex/get_def.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/get_statement.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/do_phase_cal_detect.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/fill_station_parms.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/parse_dec.c : mk4_typedefs.h mk4_vex.h mk4_util.h 
+sub/vex/write_vexfile.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/do_track.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/locate_blocks.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/ivex_info.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/decode_pval.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/get_su_chan_out.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/init_scan.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/strip_text.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/parse_vexfile.c : vex.h mk4_vex.h 
+sub/vex/get_pcm_config.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/parse_ref.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/parse_ra.c : mk4_typedefs.h mk4_vex.h mk4_util.h 
+sub/vex/do_roll.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/svex_info.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/lvex_info.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/get_vex.c : vex.h vex.h mk4_vex.h mk4_util.h 
+sub/vex/find_statements.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/evex_info.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/do_clock.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/get_block_mode.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/check_realrange.c : mk4_vex.h mk4_util.h 
+sub/vex/do_site.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/scan_info.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/get_section_mode.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/check_scan.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/get_pcm_tables.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/block_params.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/get_chip_mode.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/do_bbc.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/process_qstring.c : mk4_vex.h mk4_util.h 
+sub/vex/print_location.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/fill_deflists.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/do_exper.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/cvex_info.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/get_su_connect.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/do_eop.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/get_global_deflist.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/in_quote.c : vex.h mk4_vex.h 
+sub/vex/get_pbs_init.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/param_formats.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/do_pass_order.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/nextchar.c : mk4_vex.h 
+sub/vex/locate_cq.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/get_station_deflist.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/do_if.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/in_comment.c : vex.h mk4_vex.h 
+sub/vex/do_head_pos.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/do_source.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/check_strrange.c : mk4_vex.h mk4_util.h 
+sub/vex/do_antenna.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/read_file.c : mk4_vex.h mk4_util.h 
+sub/vex/get_version.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/get_corr_bd_parms.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/parse_date.c : mk4_typedefs.h mk4_vex.h mk4_util.h 
+sub/vex/get_val_list.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/get_corr_mode.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/do_freq.c : vex.h mk4_vex.h mk4_sizes.h mk4_util.h 
+sub/vex/get_trm_config.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/get_logscan.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/check_stloc.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/parse_units.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/get_drive_init.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/fill_scanlist.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/get_mode_deflist.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/check_intrange.c : mk4_vex.h mk4_util.h 
+sub/vex/test.c : vex.h mk4_vex.h 
+sub/vex/vex_init.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/parse_pval.c : vex.h mk4_vex.h mk4_util.h 
+sub/vex/do_das.c : vex.h mk4_vex.h mk4_util.h 
+sub/afio/parse_rsumm.c : adata.h mk4_afio.h mk4_util.h 
+sub/afio/clear_fsumm.c : adata.h mk4_afio.h 
+sub/afio/corelname.c : adata.h general.h mk4_afio.h mk4_util.h 
+sub/afio/rootname.c : adata.h general.h mk4_afio.h mk4_util.h 
+sub/afio/parse_csumm.c : adata.h mk4_afio.h mk4_util.h 
+sub/afio/afile_header.c : mk4_afio.h mk4_util.h 
+sub/afio/write_csumm.c : adata.h mk4_afio.h mk4_util.h 
+sub/afio/get_unique_name.c : mk4_afio.h mk4_util.h 
+sub/afio/write_fsumm.c : adata.h mk4_afio.h mk4_util.h 
+sub/afio/parse_tsumm.c : adata.h mk4_afio.h mk4_util.h 
+sub/afio/write_rsumm.c : adata.h mk4_afio.h mk4_util.h 
+sub/afio/write_tsumm.c : adata.h mk4_afio.h mk4_util.h 
+sub/afio/fringename.c : adata.h general.h mk4_afio.h mk4_util.h 
+sub/afio/clear_tsumm.c : adata.h mk4_afio.h 
+sub/afio/clear_csumm.c : adata.h mk4_afio.h 
+sub/afio/clear_rsumm.c : adata.h mk4_afio.h 
+sub/afio/parse_fsumm.c : adata.h mk4_afio.h mk4_util.h 
+sub/afio/aline_id.c : adata.h mk4_afio.h mk4_util.h 
+sub/util/sort_names.c : fstruct.h mk4_util.h 
+sub/util/swap.c : mk4_util.h 
+sub/util/report_times.c : account.h mk4_util.h 
+sub/util/minmax.c : 
+sub/util/hptoie4.c : mk4_util.h 
+sub/util/datec_to_datef.c : general.h mk4_util.h 
+sub/util/clear_fstruct.c : fstruct.h mk4_util.h 
+sub/util/syntax.c : mk4_util.h 
+sub/util/time_to_double.c : mk4_typedefs.h mk4_util.h 
+sub/util/msg.c : 
+sub/util/hptoie8.c : mk4_util.h 
+sub/util/extract_filenames.c : fstruct.h mk4_util.h 
+sub/util/day_of_datef.c : general.h mk4_util.h 
+sub/util/get_filelist.c : fstruct.h mk4_util.h 
+sub/util/swab.c : 
+sub/util/fileset.c : fileset.h mk4_util.h 
+sub/util/confirm.c : mk4_util.h 
+sub/util/time_to_int.c : 
+sub/util/get_abs_path.c : fstruct.h mk4_util.h 
+sub/util/root_id.c : mk4_util.h 
+sub/util/environment.c : mk4_util.h 
+sub/util/root_belong.c : mk4_util.h 
+sub/util/clear_date.c : mk4_typedefs.h 
+sub/util/datef_to_datec.c : general.h mk4_util.h 
+sub/util/hptoie.c : mk4_util.h 
+sub/util/check_name.c : fstruct.h mk4_util.h 
+sub/util/account.c : account.h mk4_util.h 
+sub/util/attic/msg.test.c : mess.h message_structs.h message_codes.h 
+sub/util/int_to_time.c : mk4_util.h 
+sub/util/test.c : mk4_util.h 
+sub/util/ismk4.c : mk4_util.h 
+misc/smto/smto_sdd_parse.c : smto_sdd.h 
+misc/smto/smto_sdx.c : 
+misc/smto/smto_sdd.c : 
+misc/smto/smto_sdt.c : smto_sdd.h 
+misc/smto/smto_sdd_ok.c : 
+misc/vlbi0/vlbi0.c : 
+misc/time/sc_time.c : hetetimecode.h 
+misc/time/htime.c : htime.h 
+misc/time/lifetime.c : htime.h isoclog.h 
+misc/time/ht_timeis.c : hops_time.h 
+misc/time/julian.c : julian.h 
+misc/time/lifetest.c : htime.h 
+misc/time/leapsec.c : htime.h 
+misc/time/ht_parser.c : hops_time.h 
+misc/time/hops_time.c : hops_time.h 
+misc/time/eph_time.c : htime.h 
+misc/time/rtype.c : htime.h 
+misc/vlbi2/four.c : 
+misc/vlbi2/m5b_tshift.c : 
+misc/vlbi2/wfmark5-09/vlbiv4_2.c : 
+misc/vlbi2/wfmark5-09/four.c : 
+misc/vlbi2/wfmark5-09/mainv_2.c : 
+misc/vlbi2/mainv.c : 
+misc/vlbi2/wfmark5-16/four.c : 
+misc/vlbi2/wfmark5-16/mainv.c : 
+misc/vlbi2/wfmark5-16/vlbiv.c : 
+misc/vlbi2/vlbiv.c : 
+misc/bits/vnoise.c : vnoise.h 
+misc/bits/bfind.c : 
+misc/bits/bstate.c : 
+misc/bits/b4thresh.c : 
+misc/bits/b4ensb.c : 
+misc/bits/vnoise_maker.c : hops_config.h vnoise.h 
+misc/bits/bpcal.c : 
+misc/bits/bwrite.c : 
+misc/bits/bnoise.c : 
+postproc/search/write_srchdata.c : search.h 
+postproc/search/plot_srchdata.c : cpgplot.h search.h 
+postproc/search/sort_data.c : search.h 
+postproc/search/parabola.c : 
+postproc/search/search.c : cpgplot.h search.h 
+postproc/search/fill_grids.c : search.h 
+postproc/search/parse_cmdline.c : cpgplot.h search.h 
+postproc/search/sorter.c : search.h 
+postproc/search/fit_peaks.c : search.h 
+postproc/search/read_data.c : search.h 
+postproc/search/grid_filler.c : search.h 
+postproc/search/clear_srchdata.c : search.h 
+postproc/aedit/get_param.c : aedata.h data.h aedit.h param_list.h 
+postproc/aedit/clear_fqex.c : summary.h 
+postproc/aedit/ps_baselabel.c : cpgplot.h psplot.h 
+postproc/aedit/qarray_index.c : aedata.h 
+postproc/aedit/clear_pstruct.c : pstruct.h 
+postproc/aedit/set_year.c : aedata.h 
+postproc/aedit/active_filter.c : aedit.h flags.h 
+postproc/aedit/display_psdata.c : cpgplot.h psplot.h 
+postproc/aedit/ps_selqual.c : cpgplot.h psplot.h 
+postproc/aedit/qfilter.c : aedata.h aedit.h flags.h 
+postproc/aedit/dup_flag.c : aedata.h flags.h summary.h 
+postproc/aedit/psfile4.c : aedata.h vex.h psplot.h summary.h 
+postproc/aedit/write_reproc.c : summary.h adata.h psplot.h 
+postproc/aedit/set_nfreq.c : aedit.h 
+postproc/aedit/pr_allsumm.c : summary.h 
+postproc/aedit/write_data.c : aedata.h aedit.h summary.h sort.h 
+postproc/aedit/datum_value.c : aedata.h aedit.h pstruct.h usearray.h 
+postproc/aedit/time_axis.c : aedit.h pstruct.h summary.h 
+postproc/aedit/tfilter.c : aedata.h aedit.h flags.h 
+postproc/aedit/trngl_present.c : 
+postproc/aedit/param_list.c : aedata.h usearray.h 
+postproc/aedit/read_cursor.c : cpgplot.h 
+postproc/aedit/summ_root.c : aedata.h summary.h 
+postproc/aedit/makekey.c : aedata.h summary.h sort.h 
+postproc/aedit/locate_pscurs.c : psplot.h 
+postproc/aedit/plot_quality.c : aedit.h aedata.h pstruct.h close_flags.h 
+postproc/aedit/pr_summary.c : aedata.h summary.h 
+postproc/aedit/init_inputs.c : aedit.h pstruct.h 
+postproc/aedit/parse_commands.c : aedit.h 
+postproc/aedit/get_axis.c : pstruct.h usearray.h 
+postproc/aedit/set_stations.c : aedit.h 
+postproc/aedit/edit.c : aedata.h aedit.h pstruct.h flags.h 
+postproc/aedit/aeclr_corel.c : aedata.h 
+postproc/aedit/setup_psplot.c : cpgplot.h psplot.h 
+postproc/aedit/set_qcodes.c : aedit.h 
+postproc/aedit/print_data.c : aedata.h 
+postproc/aedit/set_quads.c : aedit.h 
+postproc/aedit/get_plot_datum.c : aedata.h aedit.h pstruct.h summary.h 
+postproc/aedit/write_pshdr.c : psplot.h 
+postproc/aedit/aeclr_fringe.c : aedata.h 
+postproc/aedit/set_prange.c : aedit.h usearray.h 
+postproc/aedit/update_fqex.c : aedata.h summary.h 
+postproc/aedit/cleanup_psplot.c : cpgplot.h psplot.h 
+postproc/aedit/auto_hardcopy.c : cpgplot.h aedit.h 
+postproc/aedit/init_summ.c : summary.h 
+postproc/aedit/clear_source.c : summary.h 
+postproc/aedit/alloc_btq.c : summary.h 
+postproc/aedit/ps_inside.c : 
+postproc/aedit/cfilter.c : aedata.h aedit.h flags.h 
+postproc/aedit/setup_plot.c : cpgplot.h aedit.h pstruct.h summary.h 
+postproc/aedit/set_device.c : aedit.h 
+postproc/aedit/set_sources.c : aedit.h 
+postproc/aedit/parse_cmdline.c : aedit.h 
+postproc/aedit/allocate_parms.c : usearray.h 
+postproc/aedit/sorter.c : aedata.h sort.h 
+postproc/aedit/plot_points.c : cpgplot.h pstruct.h 
+postproc/aedit/plot.c : cpgplot.h aedata.h aedit.h pstruct.h summary.h 
+postproc/aedit/fill_parms.c : summary.h aedata.h data.h usearray.h 
+postproc/aedit/set_pols.c : aedit.h 
+postproc/aedit/set_triangles.c : aedit.h 
+postproc/aedit/clear_summ.c : summary.h 
+postproc/aedit/pr_fsumm.c : summary.h 
+postproc/aedit/plot_fqex.c : cpgplot.h aedata.h aedit.h summary.h pstruct.h 
+postproc/aedit/summ_triangle.c : aedata.h summary.h 
+postproc/aedit/set_timerange.c : aedit.h 
+postproc/aedit/fill_closure.c : aedata.h close_flags.h aedit.h 
+postproc/aedit/make_psarray4.c : psplot.h 
+postproc/aedit/pr_source.c : summary.h 
+postproc/aedit/ffilter.c : aedata.h aedit.h flags.h usearray.h 
+postproc/aedit/pr_csumm.c : summary.h 
+postproc/aedit/cross_link.c : aedata.h 
+postproc/aedit/get_plot_data.c : aedata.h aedit.h pstruct.h flags.h summary.h 
+postproc/aedit/extract_parms.c : data.h mk4_data.h aedata.h summary.h usearray.h 
+postproc/aedit/station_reduce.c : aedata.h flags.h 
+postproc/aedit/write_psfile.c : psplot.h 
+postproc/aedit/symbol_key.c : cpgplot.h summary.h pstruct.h 
+postproc/aedit/get_param_list.c : usearray.h 
+postproc/aedit/ps_free.c : psplot.h 
+postproc/aedit/run_pscursor.c : cpgplot.h aedata.h psplot.h 
+postproc/aedit/summ_corel.c : aedata.h summary.h 
+postproc/aedit/psplot.c : psplot.h aedata.h summary.h 
+postproc/aedit/write_families.c : aedit.h aedata.h sort.h 
+postproc/aedit/write_tdata.c : aedata.h aedit.h summary.h 
+postproc/aedit/fill4_parms.c : summary.h aedata.h mk4_data.h usearray.h 
+postproc/aedit/pstag_process.c : aedata.h flags.h psplot.h 
+postproc/aedit/tarray_index.c : aedata.h 
+postproc/aedit/aedit.c : aedit.h aedata.h usearray.h summary.h 
+postproc/aedit/aeclr_root.c : aedata.h 
+postproc/aedit/write_prmline.c : aedata.h usearray.h 
+postproc/aedit/command_id.c : 
+postproc/aedit/zoom.c : aedit.h aedata.h pstruct.h 
+postproc/aedit/clear.c : cpgplot.h aedit.h aedata.h pstruct.h 
+postproc/aedit/set_psparam.c : psplot.h 
+postproc/aedit/help.c : 
+postproc/aedit/aeclr_quad.c : aedata.h 
+postproc/aedit/pr_ssumm.c : summary.h 
+postproc/aedit/ps_scanlabel.c : cpgplot.h psplot.h 
+postproc/aedit/edit_close.c : aedata.h flags.h summary.h 
+postproc/aedit/summ_data.c : aedata.h summary.h 
+postproc/aedit/set_frequencies.c : aedit.h 
+postproc/aedit/pr_tsumm.c : summary.h 
+postproc/aedit/pr_inputs.c : aedit.h pstruct.h usearray.h 
+postproc/aedit/axis.c : aedit.h pstruct.h 
+postproc/aedit/unflag.c : aedata.h flags.h 
+postproc/aedit/erase_point.c : cpgplot.h 
+postproc/aedit/add_station.c : 
+postproc/aedit/aeclr_triangle.c : aedata.h 
+postproc/aedit/set_procrange.c : aedit.h 
+postproc/aedit/set_pscodes.c : psplot.h aedata.h 
+postproc/aedit/summ_fringe.c : aedata.h summary.h 
+postproc/aedit/plot_header.c : cpgplot.h summary.h 
+postproc/aedit/check_env.c : 
+postproc/aedit/set_type.c : aedit.h 
+postproc/aedit/set_mode.c : aedit.h 
+postproc/aedit/update_sinfo.c : summary.h 
+postproc/aedit/read_data.c : aedata.h aedit.h 
+postproc/aedit/edit_families.c : aedata.h flags.h 
+postproc/aedit/calc_close.c : aedata.h summary.h 
+postproc/aedit/save.c : aedata.h 
+postproc/aedit/set_baselines.c : aedit.h 
+postproc/aedit/cursor_select.c : aedata.h aedit.h pstruct.h flags.h 
+postproc/aedit/psplot4.c : psplot.h aedata.h vex.h summary.h 
+postproc/aedit/ps_proc_datum.c : cpgplot.h aedata.h flags.h psplot.h 
+postproc/aedit/tricheck.c : aedata.h 
+postproc/aedit/esdesp_check.c : 
+postproc/aedit/ps_fplot.c : data.h mk4_data.h aedata.h psplot.h 
+postproc/aedit/cleanup.c : cpgplot.h 
+postproc/aedit/mk3_qf.c : adata.h 
+postproc/aedit/fplot.c : aedit.h data.h mk4_data.h aedata.h pstruct.h 
+postproc/aedit/ps_selbase.c : cpgplot.h psplot.h 
+postproc/aedit/rfilter.c : aedata.h aedit.h flags.h 
+postproc/aedit/execute.c : aedata.h aedit.h pstruct.h summary.h 
+postproc/aedit/test1.c : aedata.h flags.h 
+postproc/aedit/write_param.c : aedata.h usearray.h 
+postproc/aedit/summ_quad.c : aedata.h summary.h 
+postproc/aedit/psplot_defaults4.c : psplot.h 
+postproc/aedit/run_com_file.c : aedata.h aedit.h 
+postproc/aedit/set_fraction.c : aedit.h 
+postproc/aedit/triangle_value.c : aedata.h pstruct.h 
+postproc/aedit/make_tri.c : summary.h 
+postproc/aedit/dup_check.c : aedata.h 
+postproc/aedit/fill_tdata.c : summary.h aedata.h 
+postproc/aedit/smatch.c : 
+postproc/aedit/axis_scale.c : pstruct.h 
+postproc/aedit/ps_selscan.c : cpgplot.h psplot.h 
+postproc/aedit/get_ps_indices4.c : psplot.h aedata.h summary.h 
+postproc/aedit/pr_rsumm.c : summary.h 
+postproc/bispec/bispec.c : adata.h mk4_util.h mk4_afio.h bispec.h 
+postproc/bispec/parse_cmdline.c : bispec.h mk4_util.h 
+postproc/bispec/make_bispec.c : adata.h bispec.h mk4_util.h mk4_afio.h 
+postproc/fold/fold_caltech.c : adata.h nr.h nrutil.h 
+postproc/fold/svdfit.c : nrutil.h 
+postproc/fold/safe.c : adata.h nr.h nrutil.h 
+postproc/fold/nnewfold.c : adata.h nr.h nrutil.h 
+postproc/fold/25septest.c : adata.h nr.h nrutil.h 
+postproc/fold/old.c : adata.h nr.h nrutil.h 
+postproc/fold/safe25mar.c : adata.h nr.h nrutil.h 
+postproc/fold/hstkpoly.c : nr.h nrutil.h 
+postproc/fold/svdvar.c : nrutil.h 
+postproc/fold/fold.c : adata.h nr.h nrutil.h 
+postproc/fold/svbksb.c : nrutil.h 
+postproc/fold/pythag.c : nrutil.h 
+postproc/fold/fold_22dec_1997.c : adata.h nr.h nrutil.h 
+postproc/fold/gaussj.c : nrutil.h 
+postproc/fold/svdcmp.c : nrutil.h 
+postproc/fold/polint.c : nrutil.h 
+postproc/fold/nrutil.c : 
+postproc/fold/fold_3dec98.c : adata.h nr.h nrutil.h 
+postproc/fold/write_vsumm.c : adata.h 
+postproc/fold/test.c : adata.h nr.h nrutil.h 
+postproc/average/average.c : average.h mk4_util.h 
+postproc/average/sort_data.c : average.h mk4_util.h 
+postproc/average/index_data.c : average.h 
+postproc/average/check_source.c : average.h mk4_util.h 
+postproc/average/check_tribase.c : average.h mk4_util.h 
+postproc/average/baseline_avg.c : average.h mk4_afio.h 
+postproc/average/triangle_avg.c : average.h mk4_util.h mk4_afio.h 
+postproc/average/assess_data.c : average.h 
+postproc/average/parse_cmdline.c : average.h mk4_util.h 
+postproc/average/sorter.c : average.h 
+postproc/average/get_int_time.c : average.h mk4_util.h 
+postproc/average/read_data.c : average.h mk4_util.h mk4_afio.h 
+postproc/average/check_times.c : average.h mk4_util.h 
+postproc/alist/summarize_fringe.c : data.h adata.h 
+postproc/alist/summarize_root.c : data.h adata.h 
+postproc/alist/alist.c : mk4_data.h fstruct.h adata.h 
+postproc/alist/parse_cmdline.c : fstruct.h 
+postproc/alist/summarize_corel.c : data.h adata.h 
+postproc/alist/open_output.c : 
+postproc/alist/summarize_mk4fringe.c : mk4_data.h adata.h 
+postproc/calamp/parse_cmdline.c : calamp.h mk4_util.h mk4_afio.h 
+postproc/calamp/read_calfile.c : calamp.h mk4_util.h 
+postproc/calamp/calfact.c : calamp.h mk4_util.h 
+postproc/calamp/calamp.c : calamp.h mk4_util.h mk4_afio.h 
+postproc/adump/parse_tfields.c : adump.h mk4_util.h 
+postproc/adump/parse_bfields.c : adump.h mk4_util.h 
+postproc/adump/strip_bline.c : adata.h adump.h mk4_util.h mk4_afio.h 
+postproc/adump/strip_tline.c : adata.h adump.h mk4_util.h mk4_afio.h 
+postproc/adump/parse_cmdline.c : adump.h mk4_util.h mk4_afio.h 
+postproc/adump/write_header.c : adump.h mk4_util.h mk4_afio.h 
+postproc/adump/adump.c : adump.h mk4_util.h mk4_afio.h 
+postproc/cofit/clear_codata.c : cofit.h 
+postproc/cofit/cofit.c : cpgplot.h cofit.h 
+postproc/cofit/sort_data.c : cofit.h 
+postproc/cofit/covsrt.c : 
+postproc/cofit/plot_codata.c : cpgplot.h cofit.h 
+postproc/cofit/svdcmpp.c : nrutil.h 
+postproc/cofit/fit_ampl.c : nr.h nrutil.h cofit.h 
+postproc/cofit/normalize_snr.c : cofit.h 
+postproc/cofit/parse_cmdline.c : cpgplot.h cofit.h 
+postproc/cofit/sorter.c : cofit.h 
+postproc/cofit/svbksb.c : nrutil.h 
+postproc/cofit/mrqfix.c : nrutil.h 
+postproc/cofit/ampf.c : 
+postproc/cofit/fit_codata.c : cofit.h mk4_afio.h 
+postproc/cofit/pythag.c : nrutil.h 
+postproc/cofit/gaussj.c : nrutil.h 
+postproc/cofit/svdcmp.c : nrutil.h 
+postproc/cofit/read_data.c : cofit.h 
+postproc/cofit/fit_snr.c : cofit.h 
+postproc/cofit/nrutil.c : 
+postproc/cofit/write_codata.c : cofit.h 
+postproc/cofit/mrqcof.c : nrutil.h 
+postproc/fplot/parse_cmdline.c : fstruct.h fplot.h 
+postproc/fplot/fplot.c : data.h mk4_data.h fstruct.h fplot.h 
+postproc/fourmer/print_cdata_cmp.c : fourmer.h 
+postproc/fourmer/test_new_chan_id.c : fourmer.h 
+postproc/fourmer/do_record_merge.c : fileset.h mk4_data.h mk4_sizes.h mk4_dfio.h mk4_util.h fourmer.h 
+postproc/fourmer/gen_new_chan_id.c : fourmer.h 
+postproc/fourmer/fourmer.c : fourmer.h 
+postproc/fourmer/scan_name_edit.c : fourmer.h 
+postproc/fourmer/append_sdata.c : fourmer.h 
+postproc/pratio/set_pol_field.c : adata.h 
+postproc/pratio/transfer_cotimes.c : adata.h 
+postproc/pratio/calc_vec_avg.c : adata.h 
+postproc/pratio/ratio.c : adata.h 
+postproc/pratio/parse_cmdline.c : 
+postproc/pratio/pratio.c : adata.h 
+postproc/pratio/open_outfiles.c : 
+postproc/pratio/compute_ratios.c : adata.h 
+postproc/pratio/write_ratios.c : adata.h 
+postproc/pratio/reset_pol_field.c : adata.h 
+postproc/pratio/close_outfiles.c : 
+postproc/coterp/sort_data.c : coterp.h 
+postproc/coterp/write_data.c : coterp.h 
+postproc/coterp/covsrt.c : 
+postproc/coterp/dpythag.c : nrutil.h 
+postproc/coterp/fit_times.c : nrutil.h coterp.h 
+postproc/coterp/interp.c : coterp.h 
+postproc/coterp/parse_cmdline.c : cpgplot.h coterp.h 
+postproc/coterp/sorter.c : coterp.h 
+postproc/coterp/svbksb.c : nrutil.h 
+postproc/coterp/mrqfix.c : nrutil.h 
+postproc/coterp/plot_sttimes.c : coterp.h 
+postproc/coterp/elfactor.c : 
+postproc/coterp/dsvdcmpp.c : nrutil.h 
+postproc/coterp/check_lists.c : coterp.h 
+postproc/coterp/read_data.c : coterp.h 
+postproc/coterp/fit_cotime.c : coterp.h 
+postproc/coterp/nrutil.c : 
+postproc/coterp/stationize.c : coterp.h 
+postproc/coterp/mrqcof.c : nrutil.h 
+postproc/coterp/coterp.c : coterp.h 
+postproc/fringex/set_loops.c : fringex.h 
+postproc/fringex/clear_loops.c : fringex.h 
+postproc/fringex/model.c : fringex.h 
+postproc/fringex/parse_dflag.c : fringex.h 
+postproc/fringex/parse_cmdline.c : fstruct.h fringex.h 
+postproc/fringex/parse_iflag.c : fringex.h 
+postproc/fringex/fill_aline.c : mk4_data.h adata.h vex.h fringex.h 
+postproc/fringex/fringex.c : fringex.h fstruct.h 
+postproc/fringex/calc_seg.c : fringex.h 
+postproc/fringex/read_binaries.c : general.h fringex.h fstruct.h vex.h 
+postproc/fringex/filelist.c : mk4_afio.h fringex.h fstruct.h 
+postproc/fringex/attic/dms_to_deg.c : 
+postproc/fringex/set_reffreq.c : fringex.h 
+postproc/fringex/accum_segs.c : fringex.h 
+postproc/fringex/clear_fxp.c : fringex.h 
+postproc/attic/x_fplot/open_x_fplot.c : print_page.h icon_bitmap.h 
+postproc/attic/x_fplot/print_x_fplot.c : print_page.h 
+postproc/attic/x_fplot/hcopy_x_fplot.c : 
+postproc/attic/x_fplot/show_x_fplot.c : print_page.h 
+postproc/attic/x_fplot/getfont_fplot.c : print_page.h 
+postproc/attic/x_fplot/close_x_fplot.c : 
+postproc/attic/x_fplot/pgbreak_fplot.c : 
+postproc/attic/x_fplot/get_gc.c : 
+postproc/attic/x_fplot/too_small.c : 
+postproc/attic/x_fplot/test.c : data.h 
+postproc/attic/linkdata/make_clinks.c : adata.h 
+postproc/attic/linkdata/linkdata.c : adata.h 
+postproc/attic/linkdata/type_3.c : 
+postproc/attic/linkdata/parse_cmdline.c : 
+postproc/attic/linkdata/make_flinks.c : adata.h 
+postproc/attic/linkdata/read_afiles.c : adata.h 
+postproc/attic/linkdata/file_list.c : 
+postproc/attic/linkdata/make_rlinks.c : adata.h 
+postproc/attic/linkdata/alloc_lists.c : 
+postproc/attic/linkdata/parent_root.c : 
+postproc/attic/linkdata/dir_list.c : 
+postproc/attic/linkdata/make_link.c : 
+postproc/attic/linkdata/cleanup.c : 
+postproc/fourfit/fill_201.c : vex.h mk4_data.h 
+postproc/fourfit/tpstat_interp.c : mk4_data.h param_struct.h pass_struct.h ovex.h mk4_sizes.h 
+postproc/fourfit/init_tokens.c : parser.h control.h 
+postproc/fourfit/bcd_to_2int.c : 
+postproc/fourfit/gate_off.c : mk4_data.h param_struct.h pass_struct.h 
+postproc/fourfit/make_plotdata.c : mk4_data.h param_struct.h pass_struct.h 
+postproc/fourfit/refringe_list.c : adata.h refringe.h fstruct.h 
+postproc/fourfit/fill_210.c : mk4_data.h vex.h pass_struct.h param_struct.h 
+postproc/fourfit/fourfit.c : vex.h mk4_data.h control.h param_struct.h pass_struct.h fstruct.h refringe.h fileset.h 
+postproc/fourfit/plot_complex.c : type_comp.h 
+postproc/fourfit/sprint_date.c : general.h 
+postproc/fourfit/nullify_cblock.c : control.h mk4_sizes.h 
+postproc/fourfit/postcorrect.c : mk4_data.h pass_struct.h 
+postproc/fourfit/vrot.c : mk4_data.h param_struct.h pass_struct.h 
+postproc/fourfit/pwrt_left.c : 
+postproc/fourfit/default_cblock.c : control.h mk4_data.h mk4_sizes.h 
+postproc/fourfit/search_windows.c : mk4_data.h param_struct.h pass_struct.h 
+postproc/fourfit/calc_normalization.c : mk4_data.h param_struct.h pass_struct.h 
+postproc/fourfit/print_at.c : print_page.h 
+postproc/fourfit/precorrect.c : mk4_data.h ovex.h pass_struct.h param_struct.h control.h 
+postproc/fourfit/skip_index.c : control.h mk4_sizes.h 
+postproc/fourfit/lex.c : parser.h general.h mk4_data.h mk4_sizes.h pass_struct.h 
+postproc/fourfit/apply_filter.c : mk4_data.h param_struct.h pass_struct.h control.h filter.h statistics.h 
+postproc/fourfit/grid.c : 
+postproc/fourfit/parabola.c : type_comp.h 
+postproc/fourfit/comp_func.c : type_comp.h 
+postproc/fourfit/fringe_search.c : mk4_data.h vex.h pass_struct.h param_struct.h 
+postproc/fourfit/linterp.c : 
+postproc/fourfit/organize_data.c : mk4_data.h vex.h pass_struct.h param_struct.h 
+postproc/fourfit/apply_passband.c : mk4_data.h param_struct.h pass_struct.h 
+postproc/fourfit/make_flist.c : mk4_data.h vex.h freqlist.h mk4_sizes.h 
+postproc/fourfit/delay_rate.c : mk4_data.h type_comp.h param_struct.h pass_struct.h 
+postproc/fourfit/interp.c : mk4_data.h param_struct.h pass_struct.h 
+postproc/fourfit/clear_plotdata.c : mk4_data.h plot_struct.h mk4_sizes.h 
+postproc/fourfit/search.c : mk4_data.h param_struct.h pass_struct.h control.h 
+postproc/fourfit/fill_param.c : mk4_data.h vex.h param_struct.h 
+postproc/fourfit/get_bfstring.c : 
+postproc/fourfit/plot_graph.c : 
+postproc/fourfit/clear_freq_corel.c : mk4_data.h pass_struct.h 
+postproc/fourfit/fill_fringe_info.c : vex.h mk4_data.h param_struct.h pass_struct.h 
+postproc/fourfit/make_postplot.c : mk4_data.h param_struct.h filter.h statistics.h pass_struct.h ovex.h type_comp.h cpgplot.h 
+postproc/fourfit/time_range.c : mk4_data.h vex.h param_struct.h 
+postproc/fourfit/sprint_char_arr.c : 
+postproc/fourfit/interp555.c : 
+postproc/fourfit/output.c : mk4_data.h print_page.h pass_struct.h vex.h 
+postproc/fourfit/fill_207.c : mk4_data.h vex.h pass_struct.h param_struct.h 
+postproc/fourfit/fill_202.c : vex.h mk4_data.h param_struct.h 
+postproc/fourfit/pcalibrate.c : mk4_data.h param_struct.h pass_struct.h control.h 
+postproc/fourfit/parse_cmdline.c : mk4_data.h fstruct.h control.h refringe.h param_struct.h pass_struct.h 
+postproc/fourfit/check_rflist.c : mk4_data.h refringe.h 
+postproc/fourfit/compute_qf.c : mk4_data.h pass_struct.h param_struct.h control.h statistics.h filter.h 
+postproc/fourfit/copy_cblock_parts.c : control.h mk4_sizes.h 
+postproc/fourfit/print_left.c : print_page.h 
+postproc/fourfit/bcd_qmsec.c : 
+postproc/fourfit/pwrt_right.c : 
+postproc/fourfit/compute_xpower.c : mk4_data.h param_struct.h 
+postproc/fourfit/calc_rms.c : mk4_data.h param_struct.h pass_struct.h 
+postproc/fourfit/fill_212.c : mk4_data.h param_struct.h pass_struct.h 
+postproc/fourfit/set_pointers.c : mk4_data.h vex.h pass_struct.h param_struct.h freqlist.h mk4_sizes.h 
+postproc/fourfit/put_char_at.c : print_page.h 
+postproc/fourfit/norm.c : mk4_data.h param_struct.h pass_struct.h 
+postproc/fourfit/generate_cblock.c : ovex.h control.h pass_struct.h param_struct.h 
+postproc/fourfit/stcount_interp.c : mk4_data.h param_struct.h pass_struct.h math.h mk4_sizes.h 
+postproc/fourfit/freq_spacing.c : mk4_data.h param_struct.h pass_struct.h 
+postproc/fourfit/fill_204.c : mk4_data.h 
+postproc/fourfit/criteria_match.c : mk4_data.h control.h 
+postproc/fourfit/parse_control_file.c : control.h parser.h mk4_data.h pass_struct.h 
+postproc/fourfit/create_fsm.c : parser.h 
+postproc/fourfit/fill_230.c : mk4_data.h param_struct.h pass_struct.h 
+postproc/fourfit/rotate_pcal.c : mk4_data.h param_struct.h pass_struct.h 
+postproc/fourfit/read_control_file.c : 
+postproc/fourfit/clear_pass.c : mk4_data.h control.h param_struct.h pass_struct.h 
+postproc/fourfit/display_fplot.c : mk4_data.h 
+postproc/fourfit/fill_206.c : mk4_data.h param_struct.h pass_struct.h vex.h filter.h 
+postproc/fourfit/max555.c : 
+postproc/fourfit/fill_200.c : vex.h mk4_data.h param_struct.h 
+postproc/fourfit/get_corel_data.c : mk4_data.h vex.h control.h fstruct.h 
+postproc/fourfit/fill_203.c : vex.h mk4_data.h param_struct.h mk4_sizes.h 
+postproc/fourfit/fill_208.c : pass_struct.h mk4_data.h param_struct.h 
+postproc/fourfit/fill_205.c : mk4_data.h param_struct.h pass_struct.h vex.h 
+postproc/fourfit/make_passes.c : mk4_data.h vex.h param_struct.h pass_struct.h control.h 
+postproc/fourfit/parser.c : parser.h control.h mk4_sizes.h 
+postproc/fourfit/pcal_interp.c : mk4_data.h param_struct.h pass_struct.h mk4_sizes.h 
+postproc/fourfit/skip_data.c : control.h 
+postproc/fourfit/create_fname.c : vex.h mk4_data.h param_struct.h pass_struct.h 
+postproc/fourfit/dms_to_deg.c : 
+postproc/fourfit/read_sdata.c : mk4_data.h fileset.h mk4_dfio.h 
+postproc/fourfit/compute_model.c : mk4_data.h param_struct.h 
+postproc/fourfit/print_parities.c : data.h param_struct.h pass_struct.h statistics.h 
+postproc/fourfit/fft1.c : mk4_data.h type_comp.h 
+postproc/fourfit/ap_mean.c : mk4_data.h 
+postproc/fourfit/report_actions.c : 
+postproc/fourfit/set_defaults.c : control.h 
+postproc/fourfit/update.c : mk4_data.h param_struct.h pass_struct.h 
+difx/dumpvis.c : difx2mark4.h 
+difx/dumpswin.c : difxio.h 
+help/aedit/man/formatter.c : 
+help/aedit/man/fixquotes.c : 
+correlator/CorAsc2/CorAsc2.c : type_000.h type_100.h type_101.h type_120.h T1.h type_200.h type_201.h type_202.h type_203.h type_204.h type_205.h type_206.h type_207.h type_208.h type_210.h type_212.h type_220.h type_221.h type_230.h type_300.h type_301.h type_302.h type_304.h type_306.h type_307.h type_308.h type_309.h tapeDB.h 
+correlator/prog/doc/help/aedit/formatter.c : 
+correlator/prog/doc/help/aedit/fixquotes.c : 

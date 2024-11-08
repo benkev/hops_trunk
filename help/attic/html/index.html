@@ -1,0 +1,229 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.06 [en] (X11; I; HP-UX B.10.20 9000/785) [Netscape]">
+   <TITLE> Help for the Mark 4 Correlator </TITLE>
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFCC99" LINK="#0000EE" VLINK="#551A8B" ALINK="#FE0000">
+
+<H1>
+Mark 4 Correlator Help</H1>
+Help is available for the Mark 4 correlator as a set of linked html pages.
+Click on the section in which you think your desired information may reside.
+<BR>&nbsp;
+<H3>
+Realtime Programs</H3>
+
+<LI>
+<B>bos </B>- controls the hardware correlator boards. One copy of this
+program runs on each of the crate computers.</LI>
+
+<LI>
+<B><A HREF="/correlator/prog/doc/mk4_development/conductor.html">conductor
+</A></B>is
+the central sequencing software that controls overall operation of the
+correlator. At its core is a finite state machine, implemented within
+<B><A HREF="/correlator/prog/src/correlator/conductor/create_fsm.c">create_fsm.c</A></B></LI>
+
+<LI>
+<B>corrman</B>, running on ccc, supports <B>bos</B>es in crates. 
+<B>corrman</B> creates the tables that are used to configure the 
+correlator boards and writes output data from <B>bos</B>es to disk. 
+<B>corrman</B> communicates with <B>bos</B>es through messages and 
+through sockets named <I>m4crate</I> in /etc/services. </LI>
+
+<LI>
+<B><A HREF="OperaHelp.html">opera</A></B> provides all aspects of the
+operator interface.  Additional help on the yellow "Mount Tape Request" 
+frame is <A HREF = "MountTapeHelp.html">here</A>. </LI>
+
+<LI>
+<B>count</B> schedules <B>counts</B> to display system timing 
+information in a small xterm.  <B>counts</B> 
+checks to see that the delays between local systicks in the various
+modules are within allowable bounds specified in ivex.  <B>counts</B> 
+works through the Lantronix Terminal Server, RAG's switch, and the 
+HP counter.  These are discussed <A HREF = "NOTETS.pdf">here</A>.  
+If you're having trouble with <B>count</B> or <B>counts</B>, see 
+especially pages 3 and 4.  Configuration of the Terminal Server is 
+discussed <A HREF = "NOTLAN2.pdf">here</A>.  Copies of two documents 
+from Lantronix for their ETS16PR terminal servers are also available:  
+<A HREF = "ets.pdf">Installation Guide</A> and 
+<A HREF = "ets_ref.pdf">Reference Manual</A>. </LI> 
+
+<LI>
+<B>genaroot </B>- creates the Mark 4 root file, for the stations and scan
+name specified in the task stream file.</LI>
+
+<LI>
+<B>mcb</B></LI>
+
+<LI>
+<B>rotman</B></LI>
+
+<LI>
+<B>suman</B> The tape-head-offset database kept by suman is described 
+<A HREF = "nottdb.html">here</A>. </LI>
+
+<LI>
+<B>sutrx</B></LI>
+
+
+<H3>
+VEX</H3>
+
+<UL>
+<LI>
+<B><A HREF="../vex/cvex10.pdf">cvex parameter tables</A></B></LI>
+
+<LI>
+<B><A HREF="../vex/cvex.txt">cvex example file</A></B></LI>
+
+<LI>
+<B><A HREF="../vex/evex10.pdf">evex parameter tables</A></B></LI>
+
+<LI>
+<B><A HREF="../vex/evex.txt">evex example file</A></B></LI>
+
+<LI>
+<B><A HREF="../vex/ivex10.pdf">ivex parameter tables</A></B></LI>
+
+<LI>
+<B><A HREF="../vex/ivex.txt">ivex example file</A></B></LI>
+
+<LI>
+<B><A HREF="../vex/lvex10.pdf">lvex parameter tables</A></B></LI>
+
+<LI>
+<B><A HREF="../vex/lvex.txt">lvex example file</A></B></LI>
+
+<LI>
+<B><A HREF="../vex/ovex15a.pdf">ovex parameters tables</A></B></LI>
+
+<LI>
+<B><A HREF="../vex/ovex.txt">ovex example file</A></B></LI>
+</UL>
+
+<H3>
+SU's &amp; Tape Drives</H3>
+
+<LI>
+<B><A HREF="protocol.txt">tape drive protocol </A></B>is a list of the
+low-level protocol used to communicate with the Mark 4 drives.</LI>
+
+<LI>
+<B><A HREF="/correlator/prog/doc/station_unit/mess_su_v224.ps">EVN/MkIV 42.3</A></B> lists
+all commands supported by the station units.</LI> 
+
+<LI> 
+The tape-head-offset database and <B>tapit</B> and <B>edtap</B> 
+used to manipulate this database are described 
+<A HREF = "nottdb.html">here</A>. </LI>
+
+<H3>
+File Contents</H3>
+
+<LI>
+Mark 4 file format definitions can be examined in detail.</LI>
+
+<H3>
+Scripts &amp; Auxilliary Programs</H3>
+
+<LI>
+<B>clkm </B>resynchronizes the clkm master timing module. This normally
+needs to be done only once, after initial power-up.</LI>
+
+<LI>
+<B>clnmess</B></LI>
+
+<LI> 
+<B><A HREF = "composer.pdf">composer</A></B> is a shell script 
+that calls either <B>tgen</B>, which reads vex files, or <B>a2t</B>, 
+which reads reprocess lists in afile format, and writes task-stream 
+(tsf) files for opera to send to conductor.  Notes on <B>tgen</B> 
+and <B>a2t</B> are also <A HREF = "composer.pdf">here</A>. 
+Additional notes on <B>tgen</B>'s checks and warning messages are 
+<A HREF = "Tgen.txt">here</A>. </LI> 
+
+<LI> 
+<B><A HREF = "CorAsc2.html">CorAsc2</A></B> is a test program that 
+can read correlator data files and debug print almost 
+everything therein.  CorAsc2 is also used to read the 
+tape-head-offset database as described 
+<A HREF = "nottdb.html">here</A>. </LI> 
+
+<LI> 
+<B><A HREF = "Sara2lvex.html">Sara2lvex</A></B> reads VLBA log files 
+in the format produced by the NRAO program <B>sara</B> and writes 
+Mark-4-compatible lvex files. </LI> 
+
+<LI>
+<B>endall</B></LI>
+
+<LI>
+<B>largo</B> alias <B>llog</B> is a script to call <B>Log</B> 
+to activate message logging for debuggery.  These are described 
+<A HREF = "LogHelp.html">here</A>. </LI> 
+
+<LI>
+<B>lmess </B>- will list the state of each program's unread message queue.&nbsp;
+VMAL should always be present, and can be used as an indication that the
+external mailer is up and running.&nbsp; A large number of messages in
+any program's queue signifies that something is amiss--quite likely
+the program has died, and the run-time software will need to be shutdown
+(endall) and restarted (runall).</LI>
+
+<LI>
+<B>lproc </B>- lists the run-time processes that are currently active.&nbsp;
+It is useful&nbsp; as an (remote) indicator of whether or not the correlator
+software is running, and also to check if some key program, such as suman,
+has died.</LI>
+
+<LI>
+<B>polyhead</B></LI>
+
+<LI>
+<B>mimic</B></LI>
+
+<LI>
+<B><A HREF="mk4fit.txt">mk4fit</A></B></LI>
+
+<LI>
+<B>runall</B></LI>
+
+<LI>
+<B>sendfile</B></LI>
+
+<LI>
+<B>sendnote</B></LI>
+
+<LI>
+<B>stcodes</B></LI>
+
+<LI>
+<B>tspm </B>- resynchronizes the TSPM timing module, in order to align
+its systick with the output of the CLKM module.&nbsp; This normally needs
+to be done only once, following the execution of clkm.&nbsp; If the timing
+monitor (HP counter or the program <I>count</I>) indicates that the TSPM
+delay is in error, it may be necessary to run tspm again.</LI>
+
+<LI> 
+<B>tuba</B>:  The <B><A HREF = "M4TapeLib.txt">Mark-4 Tape Library</A></B> 
+contains information about all tapes in slots of the library and also all 
+tapes that have been in the library.  Principal access to this library is 
+through <B>tuba</B>, which is used to enter and remove tapes from the 
+library and print tape labels, and is intended to be self-explanatory. 
+Programs <B>suman</B>, <B>opera</B>, and <B>tgen</B> consult this library 
+using <B>m4tl()</B>. </LI> 
+
+<LI>
+<B><A HREF = "NOTETS.pdf">vts0</A></B> and <B>vts1</B> are scripts 
+used to connect through the Lantronix Terminal Servers to the station 
+units and the crate controllers.  More notes about the Lantronix 
+boxes are under <B>count</B> and <B>counts</B> above. </LI>
+
+<BR>&nbsp;
+</BODY>
+</HTML>
+

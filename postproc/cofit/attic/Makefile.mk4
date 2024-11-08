@@ -1,0 +1,44 @@
+## $MK4_DIST_D/src/postproc/cofit/Makefile
+SHELL := /bin/ksh
+
+##-----------------------------------------------------------------------------
+ifeq "$(MK4_MK_ENV)" ""
+  include $(shell echo $${PWD%/src/*})/cfg/env.mk
+  default $(MAKECMDGOALS) :
+	@mkdir -p $(MK4_MK_BLD_D)
+	@$(MAKE) -f $(MK4_MK_SRC_D)/Makefile -C $(MK4_MK_BLD_D) $(MAKECMDGOALS) 
+
+##-----------------------------------------------------------------------------
+else # ifeq "$(MK4_MK_ENV)" ""
+  include $(MK4_MK_CFG_D)/common.mk
+  include $(MK4_MK_CFG_D)/$(MK4_MK_ARCH).mk 
+
+  ##---------------------------------------------------------------------------
+  language := fortran
+ 
+  png_lib := $(subst .so,,\
+              $(subst lib,,\
+               $(notdir $(wildcard $(MK4_SYS_LIB_PATH)/*png12.so))))
+
+  ##---------------------------------------------------------------------------
+  ## prg
+  prg := cofit
+  prg_srcs  := $(strip \
+   clear_codata.c   fit_codata.c     parse_cmdline.c  sort_data.c \
+   cofit.c          plot_codata.c    read_data.c      sorter.c \
+   write_codata.c   fit_ampl.c       ampf.c           nrutil.c \
+   covsrt.c         mrqcof.c         mrqfix.c \
+   svbksb.c         svdcmpp.c        pythag.c         normalize_snr.c \
+   fit_snr.c \
+  )
+  prg_libs :=  cpgplot pgplot $(png_lib) afio mk4util X11 m
+  prg_lpath :=  $(MK4_MK_LIB_D) $(PGPLOT_DIR) $(X11_DIR) $(MK4_SYS_LIB_PATH)
+
+  ##
+  ipath := $(MK4_MK_INC_D) $(PGPLOT_DIR) 
+
+  ##
+  include $(MK4_MK_CFG_D)/rules.mk 
+
+##-----------------------------------------------------------------------------
+endif # ifeq "$(MK4_MK_ENV)" ""

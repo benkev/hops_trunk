@@ -1,0 +1,10 @@
+#!/bin/ksh
+# $MK4_DIST_D/src/scripts/share/tspm
+# setup the tspm module          rjc 99.5.13
+# tspm  -  configure tspm module (remotely)
+
+#-------------------------------------------------------------------------------
+. $MK4_CONF_D/mk4.conf
+
+#-------------------------------------------------------------------------------
+$mk4_cr1_rsh config_tspm

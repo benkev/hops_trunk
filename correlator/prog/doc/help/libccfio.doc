@@ -1,0 +1,40 @@
+Documentation for the CCFIO (Correlator control file IO) library
+----------------------------------------------------------------
+
+Documentor:  CJL March 29 1995
+
+This library consists mainly of support routines that should never
+get called from application code.  The interface to the correlator
+control files is handled through only two IO routines and an
+initialization routine, described below.  You must include the
+header file to use these routines, and you will have to refer
+to the contents of the header file to make any sense of what the
+routines do.  The header file is thoroughly documented (ahem -
+real soon now!).
+
+#include "ccfile.h"			Needed for all ccf operations
+
+ccontrol_file *			File: $CCFIO/read_ccfile.c
+read_ccfile (filename, 			Reads the specified sections
+	which_sections, errflag)	of the ccf "filename" into a
+char *filename;				dynamically allocated ccf
+long which_sections;			memory structure, and returns
+long *errflag;				a pointer to the structure.
+					The sections are specified via
+					bits in the "which_sections"
+					mask.  Success or failure is
+					indicated by corresponding bits
+					in the errflag mask.  Structure
+					and mask definitions are in
+					$INC/ccfile.h
+
+int				File: $CCFIO/write_ccfile.c
+write_ccfile (filename, ccf)		Writes the contents of the "ccf"
+char *filename;				memory structure to the disk
+ccontrol_file *ccf;			file "filename" as a standard
+					ccf file.
+					Return: 0=good, else bad
+
+void				File: $CCFIO/init_ccfile.c
+init_ccfile (ccf)			Initializes the contents of
+ccontrol_file *ccf;			the "ccf" memory structure.

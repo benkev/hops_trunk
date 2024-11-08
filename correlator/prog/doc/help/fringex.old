@@ -1,0 +1,54 @@
+Documentation for the program "fringex", aeer 18 Jan 94
+----------------------------------------------------
+
+COMMAND NAME:  fringex
+
+SYNOPSIS:  segments output of fourfit
+
+SYNTAX: fringex [-abcmfeoxiq] data file list
+         [nsecs mode freq rate delay ra dec]
+        -a phase is residual to corel+frnge model 
+        -b phase is residual to corel use for closure phases 
+        -c phase is total phase - geodetic definition
+        -m phase is total earth centered for closure phases
+           default=total earth centered phase 
+        -f filter mode makes rate,delay,ra,dec offsets relative
+           to corel - rather than relative to the fourfit peak 
+        -e new (ver=2) format for aedit 
+        -o shift segment by half segment duration
+        -x to list default format
+        -i output incoherent average (one noise corrected amp per scan)
+        -q nsecs is in millisecs (special mode - times are ficticious)
+        nsecs=coh.int sec=9999=default for full scan with corel epoch 
+        a value of nsecs=integral number of APs is recommended
+        mode=0  is non zero for special modes i.e. 402 for Lestrade
+        mode=1 for old frngx format for caltech package
+        freq (MHz) redefines the frequency 
+        freq=-1 for reference frequency equal to channel nearest mean
+        freq=-2 for reference frequency equal to mean 
+        ra dec are position offsets in all modes
+        in filter mode:
+        rate=rate ps/s and delay=delay ns forces output to these
+        values of rate and multiband delay plus any ra and dec offset
+        
+OPTION FLAGS: 
+
+
+
+
+
+ARGUMENTS:	arga
+			Description of regular arguments
+		argb
+			There may be more than one
+
+ENVIRONMENT:	ENV1 ENV2 (list of all environment varibles which affect the
+		functioning of the program)
+
+
+DESCRIPTION:
+
+Arbitrarily detailed description of any and all aspects of the program/script.
+The more the better.
+
+The section headings above are examined by software.  DO NOT CHANGE THEM.

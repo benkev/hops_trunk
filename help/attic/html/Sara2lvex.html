@@ -1,0 +1,61 @@
+<HTML>
+<HEAD>
+<META NAME="Generator" CONTENT="Corel WordPerfect 8">
+<TITLE></TITLE>
+</HEAD>
+<BODY TEXT="#000000" LINK="#0000FF" VLINK="#551A8B" ALINK="#FF0000" BGCOLOR="#C0C0C0">
+<FONT SIZE="+1"></FONT>
+<BR WP="BR1"><BR WP="BR2"><FONT FACE="" SIZE="-1">
+<P><CENTER><STRONG>Sara2lvex</STRONG></CENTER>
+</FONT></P>
+
+<BR WP="BR1"><BR WP="BR2">
+<P><FONT FACE="" SIZE="-1"><STRONG>Sara2lvex</STRONG> is a new program now available for beta testing. 
+<STRONG>Sara2lvex</STRONG> reads VLBA log files in the format produced by the NRAO
+program <STRONG>sara</STRONG> and writes Mark-4-compatible lvex files.  <STRONG>Sara2lvex</STRONG>
+needs to read also the ovex file for the same experiment.</FONT></P>
+
+<P><FONT FACE="" SIZE="-1">Usage:</FONT></P>
+
+<P><FONT FACE="" SIZE="-1">      sara2lvex  <EM>sarafilename</EM>  <EM>ovexfilename</EM>  &gt;  <EM>outfilename</EM></FONT></P>
+
+<P><FONT FACE="" SIZE="-1">The quality of the lvex output is dependent on the quality of
+both the input files: You need to have a good ovex file before
+running <STRONG>sara2lvex</STRONG>.</FONT></P>
+
+<BR WP="BR1"><BR WP="BR2">
+<P><FONT FACE="" SIZE="-1"><STRONG>Sara</STRONG> is available on various NRAO machines such as
+aspen.aoc.nrao.edu. On such machines, <STRONG>sara</STRONG> is available in /opt/local/vlbsoft/bin/sara with source code in /home/magnolia2/vlbsoft/obsprgms/solaris/sara.c (etc.) and documentation in
+/home/magnolia2/vlbsoft/doc/sara.txt.  <STRONG>Sara</STRONG> reads VLBA binary
+logs and writes an ASCII equivalent, which, depending on the
+commands to <STRONG>sara</STRONG>, can contain all the information in the binary
+logs.  <STRONG>Sara2lvex</STRONG> works well with the <STRONG>sara</STRONG> defaults, or, to save a
+little disk space, ask for typecodes C1, COM, FLG, and TAP only.</FONT></P>
+
+<BR WP="BR1"><BR WP="BR2">
+<P><FONT FACE="" SIZE="-1"><STRONG>Sara2lvex</STRONG> has some known problems especially with respect to the
+notorious broken scans:  VLBA stations usually ignore the pass
+numbers and tape directions in the schedule and put scans on the
+tape wherever they fit.  This results in some scans being broken
+into two pieces when the tape drive hits either of the low-tape
+sensors.  <STRONG>Sara2lvex</STRONG> makes such broken scans into two partial
+scans (with the same scan name) and adds a comment "Continuation
+of previous scan" to the second part.  Search for these comments
+with an editor.  Deleting or commenting out the less-desirable of
+the partial scans is probably the best that can be done with the
+Mark-4 correlator:  <STRONG>Genaroot</STRONG> will use the last of the two if it
+is not deleted or commented.</FONT></P>
+
+<BR WP="BR1"><BR WP="BR2">
+<P><FONT FACE="" SIZE="-1"><STRONG>Sara2lvex</STRONG> is based on a Perl script, <STRONG>vlvex.pl</STRONG>, written by Dave
+Graham of MPIfR, Bonn, Germany and on a C program, <STRONG>vlogx</STRONG>, written
+by Nancy Vandenburg of NVI, Inc. and NASA GSFC.  <STRONG>Vlogx</STRONG> is in
+ftp://gemini.gsfc.nasa.gov/pub/sked/vlogx/source/... with
+documentation in .../pub/sked/vlogx/vlogx.txt.</FONT></P>
+
+<BR WP="BR1"><BR WP="BR2">
+<P><FONT FACE="" SIZE="-1">	Revised:  2001 July 11, JAB</FONT></P>
+
+<BR WP="BR1"><BR WP="BR2">
+</BODY>
+</HTML>

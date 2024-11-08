@@ -1,0 +1,68 @@
+Documentation for the BFIO (Binary File IO) library
+---------------------------------------------------
+
+Documentor:  CJL 23 October 1992
+	     Revised March 29 1995
+
+This library contains all the routines needed for reading and writing
+binary correlator data files (types root, corel and fringe, also
+known as type 50, 51 and 52, or type 0, 1 and 2 files respectively).  
+
+The input to these routines is typically a filename from which to read
+or write, and a pointer to a structure defined in $INC/data.h (type
+data_root, data_corel or data_fringe) which contains or will receive
+a representation of the data file in memory.
+
+Unlike some other HOPS libraries, the BFIO library contains routines
+which should never be needed by the application programmer.  These
+routines are internal support routines, and are not documented here.
+
+Below is a K&R-style calling sequence and description of each routine
+of programmer interest in the library (in logical, not alphabetic order).
+As always, the most detailed documentation can be found in the source files:
+
+
+#include "data.h"				Do this for all routines
+
+void					File: $BFIO/clear_fringe.c
+clear_fringe (fringe)				Initialize the fringe
+struct data_fringe *fringe;			structure.
+
+int					File: $BFIO/read_corel.c
+read_corel (filename, databuf, ncorel_rec)	Reads the type-1 "filename"
+char *filename;					into memory as one large
+struct type_corel *databuf[];			array of type_corel structs.
+int *ncorel_rec;				Concatenates data with that
+						already in memory.  The number
+						of records present after the
+						call is placed in ncorel_rec
+						Return: 0=good, -1=bad,
+							-2=really bad
+
+int					File: $BFIO/read_fringe.c
+read_fringe (filename, fringe)			Reads the type 2 "filename"
+char *filename;					into the fringe data structure
+struct data_fringe *fringe;			Return: 0=good, else bad
+
+int					File: $BFIO/read_fringe_quick.c
+read_fringe_quick (filename, fringe)		Reads just the type 4xxx
+char *filename;					records into fringe structure
+struct data_fringe *fringe;			This is often all that's needed,
+						and it's much faster than
+						read_fringe()
+						Return: 0=good, else bad
+
+int					File: $BFIO/read_root.c
+read_root (filename, root)			Reads the type-0 "filename"
+char *filename;					into the root data structure
+struct data_root *root;				Return: 0=good, else bad
+
+int					File: $BFIO/write_root.c
+write_root (root, filename)			Writes the contents of the
+struct data_root *root;				root structure to "filename"
+char *filename;					Return: 0=good, else bad
+
+int					File: $BFIO/write_fringe.c
+write_fringe (fringe, filename)			Writes the contents of the
+struct data_fringe *fringe;			fringe structure to "filename"
+char *filename;					Return: 0=good, else bad

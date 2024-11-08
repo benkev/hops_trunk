@@ -1,0 +1,1636 @@
+#!/usr/bin/env mywish
+# Opera revised:  2002 March 27, JAB 
+# (Startup procedure is at the end)
+# 
+proc makke { s n t } { ;# Make a traffic light 
+  global fontn m col 
+  canvas .$s.$n -width 30 -height 119 -bg white 
+  .$s.$n create text 16 10 -text $t -font $fontn 
+  .$s.$n create oval  5 19 25 39 -fill gray40 -tags r 
+  .$s.$n create oval  8 43 22 57 -fill gray40 -tags y 
+  .$s.$n create oval  8 62 22 76 -fill gray40 -tags g 
+  .$s.$n create text 16 71 -font $fontn -tags t 
+  bind .$s.$n <Button>          " actt $s $n Y " 
+  bind .$s.$n <ButtonRelease>   " actt $s $n N " 
+  bind .$s.$n <Double-Button-1> " actt $s $n P " 
+  if { $s == "s" } { 
+    set m($n) 0 
+    .$s.$n create rectangle 0 80 31 120 -outline "" -fill gray85 -tags src 
+  } else { 
+    .$s.$n create rectangle 0 80 31 120 -outline "" -fill $col($n) } 
+  .$s.$n create text 16  89 -text "-" -font $fontn -tags sr 
+  .$s.$n create text 16 108 -text "-" -font $fontn -tags sa 
+} ;# End of makke 
+# 
+proc actt { s x y } { ;# Activate from a click on a traffic light 
+  global m 
+  if { $y == "Y" } { 
+    .$s.$x configure -bg gray85 
+  } elseif { $y == "N" } { 
+    .$s.$x configure -bg white 
+    if { $s == "s" } { 
+      set m($x) 1 
+      showw $x 1 
+      wm deiconify .t$x 
+      raise .t$x 
+    } elseif { $s == "a" && $x == "0" } { 
+      tasks 
+    } elseif { $s == "a" } { files $x } 
+  } elseif { $y == "P" && $s == "a" } { sendd $x Prom } 
+} ;# End of actt 
+# 
+proc revv { s n t tt } { ;# Change state of a traffic light 
+  global col 
+  foreach x { r y g } { 
+    if { $t != $x } { .$s.$n itemconfigure $x -fill gray40 } } 
+  switch -- "$t" { 
+    "r" { 
+      # bell 
+      .$s.$n itemconfigure r -fill $col(r) ;# Or Coral or Tomato 
+      .$s.$n itemconfigure t -text "" } 
+    "y" { 
+      .$s.$n itemconfigure y -fill $col(y) ;# Or Yellow 
+      .$s.$n itemconfigure t -text "" } 
+    "g" { 
+      .$s.$n itemconfigure g -fill $col(g) ;# Or Lawn Green 
+      .$s.$n itemconfigure t -text $tt ;# That is <, |, or > 
+      } 
+    default { .$s.$n itemconfigure t -text "" } } 
+} ;# End of revv 
+# 
+proc showw { x y } { ;# Auxiliary display (of SU data) 
+  # x is a tape-drive number, 0 to 15 
+  global tmo msglev col 
+  global fontn fontb m count counter countp speed comnd 
+  global head headc ohead hpos txtx bcode pass resp 
+  global sspeed reelu reell headx gngto 
+  set txt "" 
+  if { $msglev < 1 } { puts "opera showw DEBUG txtx = $txtx " } 
+  if { "$txtx" != "" && [ find2 $x 73 $txtx ] != "" } { 
+    set txl [ split $txtx "\n" ] 
+    set iend [ llength $txl ] 
+    for { set i 0 } { $i < $iend } { incr i } { 
+      set txli [ lindex $txl $i ] 
+      set t0 [ lindex $txli 0 ] 
+      set t1 [ lindex $txli 1 ] 
+      if { $t0 == $x && $t1 == 74 } { 
+        append txt "\n" 
+        append txt $txli } } } 
+  if { ( "$txt" == "" && $y == 1 ) || $tmo($x) > 10 } { 
+    set txt " I have no messages for tape drive $x.  Sorry. " } 
+  if { [ winfo exists .t$x ] } { ;# Old message still there? 
+    .t$x.m configure -text $txt ;# Yes 
+    if { "$txt" != "" } { 
+      .t$x.m configure -bg $col(r) 
+    } else { 
+      .t$x.m configure -bg gray85 } 
+    if { "$head($x)" == "" || "$headx($x)" == "" } { 
+      return ;# Try again later 
+    } elseif { "$headc($x)" == "" || "$hpos($x)" == "" } { ;# Last command? 
+      set headc($x) $headx($x) ;# Nope, set it 
+      set hpos($x) $headx($x) 
+      .t$x.sc set 0 
+      return ;# And try again next time 
+    } else { ;# Check:  Should we move the heads? 
+      set headcx [ expr { $hpos($x) + [ .t$x.sc get ] } ] 
+      if { $headcx != $headc($x) } { ;# Move wanted? 
+        sendd $x "Heads = $headcx " ;# Yes 
+        set headc($x) $headcx 
+        set ohead($x) 0 
+      } elseif { [ expr { abs ( $headx($x) - $headc($x) ) } ] > 1.0 } { 
+          ;# Somebody else moved it? 
+        if { $ohead($x) < 3 } { ;# Yes 
+          incr ohead($x) ;# Count it 
+        } else { ;# Reset
+          set hpos($x) $headx($x) 
+          .t$x.sc set 0 
+          set headc($x) $headx($x) ;# Last command 
+          set ohead($x) 0 } } } 
+    return 
+  } else { ;# No old message.  Create new toplevel, etc. 
+    toplevel .t$x -bg gray85 
+    wm title .t$x "Station Unit $x" 
+    set yo [ expr { 260 + 30 * $x } ] 
+    wm geometry .t$x +10+$yo  
+    # 
+    message .t$x.m -font $fontn -width 640 -text $txt -bg gray85 -fg black 
+    if { "$txt" != "" } { .t$x.m configure -bg $col(r) } 
+    # 
+    frame .t$x.t -bg gray85 
+    label .t$x.t.la1 -font $fontn -bg gray85 -fg black -text "VSN:" 
+    label .t$x.t.bc -width 11 -font $fontn -relief ridge \
+        -textvariable bcode($x) -bg gray85 -fg black 
+    label .t$x.t.lax -font $fontn -bg gray85 -fg black -text "Pass:" 
+    label .t$x.t.pa -width 4 -font $fontn -relief ridge \
+        -textvariable pass($x) -bg gray85 -fg black 
+    label .t$x.t.la2 -font $fontn -bg gray85 -fg black -text "UpperReel:" 
+    label .t$x.t.ur -width 7 -font $fontn -relief ridge \
+        -textvariable reelu($x) -bg gray85 -fg black 
+    label .t$x.t.la3 -font $fontn -bg gray85 -fg black -text "LowerReel:" 
+    label .t$x.t.lr -width 7 -font $fontn -relief ridge \
+        -textvariable reell($x) -bg gray85 -fg black 
+    pack .t$x.t.la1 .t$x.t.bc .t$x.t.lax .t$x.t.pa .t$x.t.la2 .t$x.t.ur \
+        .t$x.t.la3 .t$x.t.lr -padx 1 -side left -fill x 
+    # 
+    frame .t$x.c -bg gray85 
+    label .t$x.c.la3 -font $fontn -bg gray85 -fg black -text "Footage:" 
+    label .t$x.c.co -width 7 -font $fontn -relief ridge \
+        -textvariable counter($x) -bg gray85 -fg black 
+    label .t$x.c.la4 -font $fontn -bg gray85 -fg black -text "Go to:" 
+    entry .t$x.c.en -width 7 -font $fontn -bg white \
+        -textvariable countp($x) -fg black 
+    bind .t$x.c.en <Return> " sendd $x \"Go to \$countp($x) \" " 
+    button .t$x.c.b -font $fontb -bg white -fg black -text "Refind" \
+        -command " repos $x " 
+    label .t$x.c.la5 -font $fontn -bg gray85 -fg black -text "Going to:" 
+    label .t$x.c.cg -width 7 -font $fontn -relief ridge \
+        -textvariable gngto($x) -bg gray85 -fg black 
+    pack .t$x.c.la3 .t$x.c.co .t$x.c.la4 .t$x.c.en .t$x.c.b \
+         .t$x.c.la5 .t$x.c.cg -padx 1 -side left -fill x 
+    # 
+    frame .t$x.b -bg gray85 
+    button .t$x.b.u -font $fontb -bg white -fg black -text Unload \
+        -command " sendd $x Unload " 
+    button .t$x.b.fr -font $fontb -bg white -fg black -text "<< FR" \
+        -command " sendd $x FR " 
+    button .t$x.b.rp -font $fontb -bg white -fg black -text "< Play" \
+        -command " sendd $x PlayR " 
+    button .t$x.b.s -font $fontb -bg white -fg black -text Stop \
+        -command " sendd $x Stop " 
+    button .t$x.b.rl -font $fontb -bg white -fg black -text Release \
+        -command " sendd $x Release " 
+    button .t$x.b.l -font $fontb -bg white -fg black -text Load \
+        -command " sendd $x Load " 
+    button .t$x.b.fp -font $fontb -bg white -fg black -text "Play >" \
+        -command " sendd $x PlayF " 
+    button .t$x.b.ff -font $fontb -bg white -fg black -text "FF >>" \
+        -command " sendd $x FF " 
+    pack .t$x.b.u  .t$x.b.fr .t$x.b.rp .t$x.b.s .t$x.b.rl .t$x.b.l \
+         .t$x.b.fp .t$x.b.ff -side left -fill x 
+    # 
+    frame .t$x.h -bg gray85 
+    label .t$x.h.la1 -font $fontn -bg gray85 -fg black -text "Speed:" 
+    label .t$x.h.sp -width 7 -font $fontn -relief ridge \
+        -textvariable speed($x) -bg gray85 -fg black 
+    label .t$x.h.lax -font $fontn -bg gray85 -fg black -text "SetSpeed:" 
+    entry .t$x.h.ss -width 7 -font $fontn -bg white \
+        -textvariable sspeed($x) -fg black 
+    bind .t$x.h.ss <Return> " sendd $x \"SetSpeed \$sspeed($x) \" " 
+    label .t$x.h.la2 -font $fontn -bg gray85 -fg black -text "HeadPosition:" 
+    label .t$x.h.po -width 5 -font $fontn -relief ridge \
+        -textvariable head($x) -bg gray85 -fg black 
+    set hpos($x) $headx($x) 
+    set headc($x) $headx($x) 
+    set ohead($x) 0 
+    # label .t$x.h.la3 -font $fontn -bg gray85 -fg black -text "\265" 
+    button .t$x.h.b2 -font $fontb -bg white -fg black -text "Peak" \
+        -command " sendd $x \"Command = w c9 100 \" " 
+    label .t$x.h.la4 -font $fontn -bg gray85 -fg black -text "Offset:" 
+    pack .t$x.h.la1 .t$x.h.sp .t$x.h.lax .t$x.h.ss .t$x.h.la2 .t$x.h.po \
+         .t$x.h.b2 .t$x.h.la4 -padx 1 -side left -fill x 
+    #    .t$x.h.la3 .t$x.h.b2 .t$x.h.la4 -padx 1 -side left -fill x 
+    # 
+    scale .t$x.sc -from -100 -to 100 -tickinterval 20 \
+        -font $fontn -orient horizontal -length 640 -bg white -fg black 
+    bind .t$x.sc <Double-Button-1> " .t$x.sc set 0 ; \
+        set headc($x) \"\" ; set hpos($x) \"\" " 
+    # 
+    frame .t$x.com -bg gray85 
+    button .t$x.com.bd -font $fontb -bg white -fg black -text "Dismount" \
+        -command " sendd $x \"Dismount \" " 
+    button .t$x.com.br -font $fontb -bg white -fg black -text "Remove" \
+        -command " sendd $x \"Remove [ .s.$x itemcget sa -text ] \" " 
+    label .t$x.com.la -font $fontn -bg gray85 -fg black -text " Command:" 
+    entry .t$x.com.c -width 5 -font $fontn -bg white -fg black \
+        -textvariable comnd($x) 
+    bind .t$x.com.c <Return> " sendd $x \"Command = \$comnd($x) \" ; \
+         .t$x.com.c selection range @0 end ; set resp($x) \"\" ; retrn $x " 
+    label .t$x.com.lr -font $fontn -bg gray85 -fg black -text " Response:" 
+    label .t$x.com.r -width 17 -font $fontn -relief ridge \
+        -textvariable resp($x) -bg gray85 -fg black 
+    pack .t$x.com.br .t$x.com.bd .t$x.com.la .t$x.com.c \
+        .t$x.com.lr .t$x.com.r -side left -fill x 
+    # 
+    pack .t$x.m .t$x.t .t$x.c .t$x.b .t$x.h .t$x.sc .t$x.com -side top 
+    bind .t$x <Button-3> " destroy .t$x ; set m($x) 0 ; set hpos($x) \"\" " 
+  } ;# End of else create new toplevel 
+} ;# End of showw 
+# 
+proc repos { x } { ;# From Repos button 
+  global rep msglev 
+  if { $msglev < 1 } { puts "opera repos DEBUG x = $x  rep = $rep " } 
+  if { $x >= 0 && $rep < 0 } { ;# Initial push? 
+    set rep $x ;# Yes 
+    after 1000 " repos -1 " ;# Come back in a second 
+  } elseif { $x >= 0 && $x == $rep } { ;# Second push? 
+    sendd $x "Repos 2 " ;# Yes 
+    set rep -1 
+  } elseif { $x < 0 && $rep >= 0 } { ;# No second push? 
+    sendd $rep "Repos 1 " ;# Yes 
+    set rep -1 } 
+  # Else ($rep < 0 && $x < 0), ignore 
+} ;# End of repos 
+# 
+proc find2 { x1 x2 tx } { ;# Find x1 x2 in tx, return next token after 
+  set iend [ llength $tx ] 
+  set i 0 
+  set z "" 
+  while { $i < $iend } { 
+    if { [ lindex $tx $i ] == $x1 && \
+         [ lindex $tx [ expr { $i+1 } ] ] == $x2 } { 
+      set z [ lindex $tx [ expr { $i+2 } ] ] 
+      break } 
+    incr i } 
+  return $z 
+} ;# End of find2 
+# 
+proc find3 { x1 x2 x3 tx } { ;# Find x1 x2 x3 in tx, return next token after 
+  set iend [ llength $tx ] 
+  set i 0 
+  set z "" 
+  while { $i < $iend } { 
+    if { [ lindex $tx $i ] == $x1 && \
+         [ lindex $tx [ expr { $i+1 } ] ] == $x2 && \
+         [ lindex $tx [ expr { $i+2 } ] ] == $x3 } { 
+      set z [ lindex $tx [ expr { $i+3 } ] ] 
+      break } 
+    incr i } 
+  return $z 
+} ;# End of find3 
+# 
+proc sendd { x y } { ;# Send to opmes, process return  
+  global NSU tmo msglev col 
+  global txtx counter speed head headx pass bcode 
+  global reelu reell gngto lineno tfile 
+  if { $msglev < 1 && $y != " " } { 
+    puts "opera sendd DEBUG sending $x \"$y\" " } 
+  set txtx [ opmes $x "$y" ] ;# From opmes.c ### 
+  if { $msglev < 1 } { puts "opera sendd DEBUG txtx = $txtx " } 
+  if { "$txtx" == "" } { return } 
+  set txl [ split $txtx "\n" ] 
+  set iend [ llength $txl ] 
+  for { set i 0 } { $i < $iend } { incr i } { 
+    set txli  [ lindex $txl $i ] 
+    set txli0 [ lindex $txli 0 ] 
+    set txli1 [ lindex $txli 1 ] 
+    set txli2 [ lindex $txli 2 ] 
+    switch -- "$txli0" { 
+      "CS" { ucorst $txli1 $txli2 $txli } 
+      "SC" { scorst $txli1 $txli2 $txli } 
+      "ERROR" { errbx $txli } 
+      "MOUNT" { mntbx $txli } 
+      "TAPBX" { tapbx $txli 0 } 
+      "TERMINATE" { 
+        # profile off tpro ;# ?? 
+        # profrep tpro cpu ;# ??
+        terbx $txli } 
+      "S" { 
+        set txli3 [ lindex $txli 3 ] 
+        set txli4 [ lindex $txli 4 ] 
+        cstats $txli1 $txli2 $txli3 $txli4 } 
+      "S2" { 
+        set lineno($txli1) $txli2 
+        set tfile($txli1) [ lindex $txli 3 ] 
+        mfile $txli1 } 
+      "LS" { links $txli } 
+      "COTROT" { cotrot $txli } 
+      "R" { 
+        set su [ expr $txli1 ] 
+        if { "$txli2" == "73" } { gsw $su [ lindex $txli 3 ] } 
+        retrn $su } 
+      "StrOrd" { strord $txli } 
+      default { 
+        if { "$txli0" == "00" || ( $txli0 >= 0 && $txli0 < 16 ) } { 
+          set j [ expr $txli0 ] 
+          switch -- "$txli1" { 
+            "Chan" { chan $j $txli2 $txli } 
+            "30" { set counter($j) $txli2 } 
+            "31" { set reelu($j) $txli2 } 
+            "32" { set reell($j) $txli2 } 
+            "41" { set headx($j) $txli2 } 
+            "42" { set head($j) $txli2 } 
+            "b5" { set speed($j) $txli2 } 
+            "b7" { set gngto($j) $txli2 } 
+            "c0" { 
+              set pass($j) $txli2 
+              for { set s 0 } { $s < 8 } { incr s } { 
+                if { [ winfo exists .o$s.c ] } { 
+                  .o$s.c itemconfigure pas$j -text $txli2 } } } 
+            "35" { set bcode($j) $txli2 } 
+            "36" - 
+            "37" - 
+            "38" { append bcode($j) $txli2 } 
+            "Stream" { stream $txli } 
+            "Station" { station $txli } 
+            "DIR" { dir $txli } 
+            "ROT" { rot $txli } 
+            "TOT" { tot $txli } 
+            "SRROT" { srrot $txli } 
+            "EDROT" { edrot $txli } 
+            "Status" { sstatus $txli } } } } } }  
+} ;# End of sendd 
+# 
+proc cotrot { tx } { ;# Received COTROT 
+  global NSU 
+  for { set s 0 } { $s < 8 } { incr s } { 
+    if { [ winfo exists .o$s.c ] } { 
+      for { set su 0 } { $su < $NSU } { incr su } { 
+        set sr [ .s.$su itemcget sr -text ] 
+        if { $sr != "-" } { 
+          .o$s.c itemconfigure rot$su \
+              -text [ lindex $tx [ expr { $sr + 2 } ] ] } } 
+      .o$s.c itemconfigure cot -text [ lindex $tx 1 ] } } 
+} ;# End of cotrot 
+# 
+proc links { tx } { ;# Link Status 
+  global NSU col 
+  set su [ lindex $tx 1 ] 
+  if { $su >= $NSU } { return } 
+  for { set s 0 } { $s < 8 } { incr s } { 
+    if { ! [ winfo exists .o$s.c ] } { continue } 
+    if { [ .o$s.c find withtag sa$su ] == "" } { continue } 
+    for { set i 0 } { $i < 4 } { incr i } { 
+      for { set j 0 } { $j < 4 } { incr j } { 
+        .o$s.c itemconfigure cgs$su.$i.$j -text "" } 
+      set ls [ lindex $tx [ expr { $i + 2 } ] ] 
+      if { [ expr { $ls & 16 } ] == 0 } { 
+        .o$s.c itemconfigure chg$su.$i -fill $col(d) 
+        return } 
+      .o$s.c itemconfigure chg$su.$i -fill $col(g) 
+      if { [ expr { $ls & 1 } ] == 0 } { 
+        .o$s.c itemconfigure cgs$su.$i.0 -text d 
+        .o$s.c itemconfigure chg$su.$i -fill $col(r) } 
+      if { [ expr { $ls & 2 } ] != 0 } { 
+        .o$s.c itemconfigure cgs$su.$i.1 -text e 
+        .o$s.c itemconfigure chg$su.$i -fill $col(r) } 
+      if { [ expr { $ls & 4 } ] == 0 } { 
+        .o$s.c itemconfigure cgs$su.$i.2 -text r 
+        .o$s.c itemconfigure chg$su.$i -fill $col(r) } 
+      if { [ expr { $ls & 8 } ] == 0 } { 
+        .o$s.c itemconfigure cgs$su.$i.3 -text s 
+        .o$s.c itemconfigure chg$su.$i -fill $col(r) } } } 
+} ;# End of links 
+# 
+proc stream { tx } { ;# Stream number 
+  global col srsu NSU 
+  set sr [ lindex $tx 2 ] 
+  if { $sr < 0 || $sr > 3 } { set sr "-" } 
+  set su [ expr [ lindex $tx 0 ] ] 
+  if { $su >= $NSU } { return } 
+  set srsu($su) $sr 
+  .s.$su itemconfigure sr -text $sr 
+  .s.$su itemconfigure src -fill $col($sr) 
+  for { set s 0 } { $s < 8 } { incr s } { 
+    if { [ winfo exists .o$s.c ] } { 
+      .o$s.c itemconfigure sr$su -text $sr 
+      .o$s.c itemconfigure src$su -fill $col($sr) } } 
+  if { [ winfo exists .o$sr.c ] && [ .o$sr.c find withtag sr$su ] == "" } { 
+    destroy .o$sr 
+    matl $sr } 
+} ;# End of stream 
+# 
+proc strord { tx } { ;# Stream priority order 
+  for { set i 1 } { $i < 5 } { incr i } { 
+    set j [ lindex $tx $i ] 
+    .a.$j itemconfigure sa -text $i } 
+} ;# End of strord 
+# 
+proc station { tx } { ;# Station letter code 
+  set su [ expr [ lindex $tx 0 ] ] 
+  set sa [ lindex $tx 2 ] 
+  .s.$su itemconfigure sa -text $sa 
+  for { set s 0 } { $s < 8 } { incr s } { 
+    if { [ winfo exists .o$s.c ] } { 
+      .o$s.c itemconfigure sa$su -text $sa } } 
+} ;# End of station 
+# 
+proc dir { tx } { ;# Station DIRection of tape pass  
+  for { set s 0 } { $s < 8 } { incr s } { 
+    if { [ winfo exists .o$s.c ] } { 
+      set su [ expr [ lindex $tx 0 ] ] 
+      .o$s.c itemconfigure dir$su -text [ lindex $tx 2 ] } } 
+} ;# End of dir 
+# 
+proc rot { tx } { ;# Station ROT 
+  for { set s 0 } { $s < 8 } { incr s } { 
+    if { [ winfo exists .o$s.c ] } { 
+      set su [ expr [ lindex $tx 0 ] ] 
+      .o$s.c itemconfigure srot$su -text [ lindex $tx 2 ] } } 
+} ;# End of rot 
+# 
+proc tot { tx } { ;# Station TOT 
+  global col 
+  for { set s 0 } { $s < 8 } { incr s } { 
+    if { [ winfo exists .o$s.c ] } { 
+      set su [ expr [ lindex $tx 0 ] ] 
+      .o$s.c itemconfigure tot$su -text [ lindex $tx 2 ] 
+      switch -- [ lindex $tx 3 ] { 
+        "R" { .o$s.c itemconfigure totb$su -fill $col(r) } 
+        "G" { .o$s.c itemconfigure totb$su -fill $col(g) } 
+        "Y" { .o$s.c itemconfigure totb$su -fill $col(y) } 
+        default { .o$s.c itemconfigure totb$su -fill "" } } } } 
+} ;# End of tot 
+# 
+proc srrot { tx } { ;# Start ROT 
+  for { set s 0 } { $s < 8 } { incr s } { 
+    if { [ winfo exists .o$s.c ] } { 
+      set su [ expr [ lindex $tx 0 ] ] 
+      .o$s.c itemconfigure strt$su -text [ lindex $tx 2 ] } } 
+} ;# End of srrot 
+# 
+proc edrot { tx } { ;# End ROT 
+  for { set s 0 } { $s < 8 } { incr s } { 
+    if { [ winfo exists .o$s.c ] } { 
+      set su [ expr [ lindex $tx 0 ] ] 
+      .o$s.c itemconfigure end$su -text [ lindex $tx 2 ] } } 
+} ;# End of edrot 
+# 
+proc sstatus { tx } { ;# SU status 
+  global col 
+  for { set s 0 } { $s < 8 } { incr s } { 
+    if { [ winfo exists .o$s.c ] } { 
+      set su [ expr [ lindex $tx 0 ] ] 
+      switch -- [ expr [ lindex $tx 2 ] ] { 
+         0 - 
+         1 { .o$s.c itemconfigure sucb$su -fill "" } 
+         9 { .o$s.c itemconfigure sucb$su -fill $col(r) } 
+        11 { .o$s.c itemconfigure sucb$su -fill $col(g) } 
+        default { .o$s.c itemconfigure sucb$su -fill $col(y) } } 
+      .o$s.c itemconfigure suc$su -text [ lindex $tx 3 ] } } 
+} ;# End of sstatus 
+# 
+proc chan { su in tx } { ;# SU channel status 
+  global col 
+  switch -- [ lindex $tx 5 ] { 
+    0 { set cj $col(d) } 
+    1 { set cj $col(y) } 
+    2 { set cj $col(g) } 
+    3 { set cj $col(r) } 
+    4 { set cj $col(b) } 
+    default { set cj $col(r) } } 
+  set pcal [ lindex $tx 6 ] 
+  if { $pcal < -1 } { 
+    set cp $col(b) 
+  } elseif { $pcal < 0 } { 
+    set cp $col(d) 
+  } elseif { $pcal < 5 } { 
+    set cp $col(r) 
+  } elseif { $pcal < 20 } { 
+    set cp $col(y) 
+  } elseif { $pcal < 127 } {  
+    set cp $col(g) 
+  } else { ;# 127 is error from 0s or overflow 
+    set cp $col(r) } 
+  set txt [ lindex $tx 3 ] 
+  for { set s 0 } { $s < 8 } { incr s } { 
+    if { [ winfo exists .o$s.c ] } { 
+      .o$s.c itemconfigure cn$su.$in -text $txt 
+      .o$s.c itemconfigure va$su.$in -fill $cj 
+      .o$s.c itemconfigure pc$su.$in -fill $cp } } 
+} ;# End of chan 
+# 
+proc scorst { su in tx } { ;# Summary correlator statistics from SC 
+  global col 
+  for { set i 0 } { $i < 6 } { incr i } { 
+    switch -- [ lindex $tx [ expr { 3 + $i } ] ] { 
+      -3 { continue } 
+      -2 { set cl $col(d) } 
+      -1 { continue } 
+       0 { set cl $col(g) } 
+       1 { set cl $col(y) } 
+       2 { set cl $col(r) } 
+       3 { set cl $col(b) } 
+      default { set cl $col(r) } } 
+    for { set s 0 } { $s < 8 } { incr s } { 
+      if { [ winfo exists .o$s.c ] } { 
+        .o$s.c itemconfigure u$i.$su.$in -fill $cl } } } 
+} ;# End of scorst 
+# 
+proc ucorst { su0 su1 tx } { ;# Correlator statistics from CS 
+  global dtba msglev kw col 
+  if { [ winfo exists .k.c ] } { 
+    if { $su0 < $su1 } { ;# Order baseline 
+      set sua $su0 
+      set sub $su1 
+    } else { 
+      set sua $su1 
+      set sub $su0 } 
+    if { $msglev < 0 } { puts "opera ucorst DEBUG tx = $tx " } 
+    if { [ set kw($sua-$sub) ] == "" } { 
+      .k.c create window 0 [ expr { 14 + 144 * $dtba } ] -anchor nw \
+          -window .k.w$sua-$sub 
+      if { $msglev < 1 } { puts "opera ucorst DEBUG window = .k.w$sua-$sub " } 
+      set kw($sua-$sub) $dtba 
+      incr dtba } 
+    set ch  [ lindex $tx 3 ] 
+    set b   [ lindex $tx 4 ] 
+    if { $b == 0 } { set iend 6 } else { set iend 11 } 
+    for { set i 0 } { $i < $iend } { incr i } { 
+      if { $i < 6 } { 
+        set ce [ lindex $tx [ expr { 5 + $i } ] ] 
+        if { $su0 < $su1 } { set bb $b } else { set bb [ expr { 1 - $b } ] } 
+      } elseif { $i == 6 } { 
+        continue 
+      } else { ;# $i > 6 
+        set ce [ lindex $tx [ expr { 4 + $i } ] ] 
+        set bb 1 } 
+      switch -- $ce { 
+        -3 - 
+        -2 - 
+        -1 { set cl $col(d) } 
+         0 { set cl $col(g) } 
+         1 { set cl $col(y) } 
+         2 { set cl $col(r) } 
+         3 { set cl $col(b) } 
+        default { set cl $col(r) } } 
+      .k.w$sua-$sub itemconfigure t$ch.$bb.$i -fill $cl } } 
+} ;# End of ucorst 
+# 
+proc reads { } { ;# Read opmes messages periodically just for anyhow 
+  global NSU tmo m 
+  sendd 0 R 
+  for { set i 0 } { $i < $NSU } { incr i } { 
+    incr tmo($i)  
+    if { $tmo($i) > 10 && [ expr { $tmo($i) % 4 } ] == 0 } { 
+        revv s $i x "" 
+        if { $m($i) > 0 } { showw $i 2 } } } 
+  after 500 reads 
+} ;# End of reads 
+# 
+proc retrn { x } { ;# Extract answer from Command, if any 
+  global comnd resp txtx 
+  set tx $comnd($x) 
+  if { [ lindex $tx 0 ] == "r" } { 
+    set ref [ lindex $tx 1 ] 
+    set txl [ split $txtx "\n" ] 
+    set iend [ llength $txl ] 
+    for { set i 0 } { $i < $iend } { incr i } { 
+      set txli [ lindex $txl $i ] 
+      if { [ set t0 [ lindex $txli 0 ] ] == "R" && \
+           [ set t1 [ lindex $txli 1 ] ] == $x  && \
+           [ set t2 [ lindex $txli 2 ] ] == $ref } { 
+        set resp($x) "$t1  $t2  [ lindex $txli 3 ]  [ lindex $txli 4 ]" } } } 
+} ;# End of retrn 
+# 
+proc errbx { tx } { ;# Post error messages 
+  global fontn fontb fontc fontd col 
+  if { [ winfo exists .e ] } { 
+    wm deiconify .e 
+    .e.t.m configure -state normal 
+    raise .e 
+  } else { 
+    toplevel .e -bg $col(r) 
+    wm geometry .e +90+290 
+    wm title .e "ERRORS!" 
+    frame .e.t 
+    text .e.t.m -cursor top_left_arrow -font $fontd -bg $col(r) -fg black \
+        -height 5 -width 90 -yscrollcommand " .e.t.s set " 
+    scrollbar .e.t.s -command " .e.t.m yview " -bg white  
+    pack .e.t.s -side right -fill y 
+    pack .e.t.m -side left -expand 1 -fill both 
+    button .e.b -font $fontc -bg white -fg black -text "Bummer!" \
+        -command { wm iconify .e } 
+    pack .e.b -side bottom 
+    pack .e.t -side top -fill both -expand 1 
+    bind .e <Button-3> { wm iconify .e } } 
+  set tagg [ lindex $tx 1 ] 
+  .e.t.m insert end $tx $tagg 
+  .e.t.m insert end "\n" 
+  .e.t.m tag configure $tagg -background white 
+  .e.t.m tag bind $tagg <Button-1> \
+      " .e.t.m tag configure $tagg -background gray85 " 
+  .e.t.m tag bind $tagg <ButtonRelease-1> \
+      " .e.t.m tag configure $tagg -background white ; \
+      puts \"opera errbx DEBUG error message $tagg \" ; netscp $tagg " 
+  .e.t.m see end 
+  .e.t.m configure -state disabled 
+  bell 
+} ;# End of errbx 
+# 
+proc netscp { tagg } { ;# Call netscape 
+  global env netnum msglev 
+  if { $tagg == -1 } { 
+    set filtag "Help.html" 
+  } elseif { $tagg == -2 } { 
+    set filtag "MountTapeHelp.html" 
+  } else { set filtag "Errors.html#$tagg" } 
+  # if { [ string first netscape [ exec ps ] ] > 0 } ? 
+  if { "$netnum" != "" && [ lsearch [ exec ps -e ] "$netnum" ] > -1 } { 
+    exec /opt/ns-communicator/netscape -remote openURL(file:$env(HELP)/$filtag) 
+  } else { 
+    set netnum [ exec /opt/ns-communicator/netscape file:$env(HELP)/$filtag & ] 
+    if { $msglev < 1 } { 
+        puts "opera netscp DEBUG:  Spawned netscape PID = $netnum " } }  
+} ;# End of netscp 
+# 
+proc helpbx { n } { ;# Help messages 
+  global fontn env 
+  if { [ winfo exists .h$n ] } { 
+    wm deiconify .h$n 
+    raise .h$n 
+  } else { 
+    toplevel .h$n -bg gray85 
+    if { $n == 1 } { 
+      wm geometry .h$n +210+260 
+    } else { wm geometry .h$n +360+260 } 
+    wm title .h$n "Opera Help $n" 
+    text .h$n.m -font $fontn -bg gray85 -fg black -cursor crosshair \
+        -height 25 -width 57 -yscrollcommand " .h$n.s set " 
+    scrollbar .h$n.s -command " .h$n.m yview " -bg white  
+    pack .h$n.s -side right -fill y 
+    pack .h$n.m -side left -expand 1 -fill both 
+    bind .h$n <Button-3> " destroy .h$n " 
+    if { $n == 1 } { 
+      set f [ open $env(HELP)/OperaHelp.txt ] 
+    } else { set f [ open $env(HELP)/MountTapeHelp.txt ] } 
+    while { ! [ eof $f ] } { 
+      .h$n.m insert end [ read $f 1000 ] } 
+    close $f 
+    .h$n.m see 1.0 
+    .h$n.m configure -state disabled 
+  } ;# End of else not exist .h$n 
+} ;# End of helpbx 
+# 
+proc tapbx { tx fl } { ;# Crude tape-status box  
+  global fontn fontt NSU 
+  if { ! $fl && ! [ winfo exists .ts ] } { 
+    return 
+  } elseif { $fl && [ winfo exists .ts ] } { 
+    wm deiconify .ts 
+    raise .ts 
+    return 
+  } elseif { $fl && ! [ winfo exists .ts ] } { 
+    set nsu [ expr { ( $NSU > 6 ) ? $NSU : 6 } ] 
+    toplevel .ts -bg gray85  
+    wm geometry .ts +50+220 
+    wm title .ts "Mounted Tapes" 
+    label .ts.l -font $fontn -bg gray85 -fg black \
+        -text " Str  SU  Stn        VSN            Slot " 
+    listbox .ts.t -font $fontt -bg gray85 -fg black -height 7 -width 26 \
+        -yscrollcommand " .ts.s set " 
+    scrollbar .ts.s -command " .ts.t yview " -bg white 
+    for { set i 0 } { $i < $nsu } { incr i } { .ts.t insert $i "  " } 
+    pack .ts.l -side top -anchor w 
+    pack .ts.s -side right -fill y 
+    pack .ts.t -side left -fill both 
+    bind .ts <Button-3> { destroy .ts } 
+    return 
+  } elseif { ! $fl && [ winfo exists .ts ] } { 
+    set lin [ lindex $tx 2 ] ;# SU number = line number 
+    if { "$lin" == "" } { return } 
+    .ts.t delete $lin 
+    .ts.t insert $lin [ string range $tx 5 end ] } 
+} ;# End of tapbx 
+# 
+proc mntbx { tx } { ;# Mount tape request
+  global fontn fontt mcolor msglev 
+  if { $msglev < 1 } { puts "opera mntbx DEBUG tx = $tx " } 
+  if { [ lindex $tx 1 ] == "end" } { 
+    if { [ winfo exists .m ] } { destroy .m } 
+    return } 
+  if { [ winfo exists .m ] } { 
+    wm deiconify .m 
+    raise .m 
+  } else { 
+    toplevel .m -bg $mcolor 
+    wm geometry .m +30+220 
+    wm title .m "Mount Tape Request" 
+    label .m.l -font $fontn -bg $mcolor -fg black \
+        -text " Str  SU  Stn        VSN            Slot " 
+    text .m.t -font $fontt -bg $mcolor -fg black -height 10 -width 26 \
+        -yscrollcommand " .m.s set " 
+    scrollbar .m.s -command " .m.t yview " -bg white 
+    bind .m.t <Return> { 
+      if { [ .m.t cget -state ] != "normal" } { return } 
+      set txt [ .m.t get q.first q.last ] 
+      .m.t configure -state normal 
+      .m.t delete 1.0 end 
+      .m.t configure -state disabled 
+      .m.t tag bind q <Leave> { .m.t configure -state disabled } 
+      sendd 0 "RMR $txt " } 
+    bind .m.t <KeyPress> { 
+      if { $msglev < 1 } { 
+          puts "opera mntbx DEBUG A = %A  K = %K  N = %N  k = %k " } 
+      if { [ .m.t cget -state ] == "normal" && %N > 31 && %N < 127 } { 
+          .m.t mark set insert insert+1chars 
+          .m.t delete insert-1chars } } 
+    button .m.b -font $fontn -bg white -fg black -text "Help" \
+        -command { netscp -2 } 
+        # -command { helpbx 2 } 
+    pack .m.l -side top -anchor w 
+    pack .m.b -side bottom 
+    pack .m.s -side right -fill y 
+    pack .m.t -side left -fill both 
+    bind .m <Button-3> { 
+      if { $msglev < 1 } { 
+          puts "opera mntbx DEBUG:  [ .m.t get 1.0 end-1chars ] " } 
+      if { [ string length [ .m.t get 1.0 end ] ] < 2 } { 
+        destroy .m } else { wm iconify .m } } 
+    .m.t tag configure q -background white 
+    .m.t tag bind q <Enter> { .m.t configure -state normal } 
+    .m.t tag bind q <Leave> { .m.t configure -state disabled } 
+    .m.t tag bind q <ButtonRelease-1> { 
+      .m.t tag remove q 1.0 end 
+      .m.t tag add q "insert linestart" "insert lineend" 
+      .m.t tag bind q <Leave> { } } 
+  } ;# End of else not exist .m 
+  .m.t configure -state normal 
+  if { [ lindex $tx 1 ] == "clear" } { 
+    .m.t delete 1.0 end 
+    .m.t configure -state disabled 
+    return } 
+  .m.t insert end [ string range $tx 5 end ] 
+  .m.t insert end "\n" 
+  .m.t see 1.0 
+  foreach patn { "????????" "?" } { 
+    set indx 1.0 
+    set len [ string length $patn ] 
+    while { "$indx" != "" } { 
+      set indx [ .m.t search $patn $indx end ] 
+      if { $msglev < 1 } { 
+          puts "opera mntbx DEBUG patn = $patn  indx = $indx " } 
+      if { "$indx" != "" } { 
+        .m.t tag add q $indx "$indx + $len chars" 
+        set indx [ expr { int ( $indx ) + 1.0 } ] } } } 
+  if { $msglev < 1 } { puts "opera mntbx DEBUG:  [ .m.t tag configure q ] " } 
+  .m.t configure -state disabled 
+} ;# End of mntbx 
+# 
+proc cstats { n sts st ss } { ;# Status message from conductor 
+  global env msglev 
+  if { $msglev < 1 } { 
+      puts "opera cstats DEBUG S n = $n  sts = $sts  st = $st " } 
+  switch -- $sts { 
+    1 { set t g } 
+    2 { set t y } 
+    3 { set t r } 
+    default { set t x } } 
+  # Set stream traffic light $n to color $t (r, y, g, or x = all gray): 
+  revv a $n $t "" 
+  # Set upper text label of stream $n to $st (state number): 
+  .a.$n itemconfigure sr -text $st 
+  # Process $st to get and show state name: 
+  if { $n == 0 && [ winfo exists .p ] } { 
+    set wndo ".p" 
+  } else { 
+    set wndo ".l$n" } 
+  if { [ winfo exists $wndo ] } { 
+    $wndo.l.2 configure -text $ss 
+    set f [ open $env(CORR)/conductor/con_symbols.h ] 
+    while { [ gets $f line ] >= 0 } { 
+      if { [ lindex $line 0 ] == "enum" && \
+           [ lindex $line 1 ] == "fsm_states" } { break } } 
+    set i -1 
+    while { [ gets $f line ] >= 0 } { 
+      if { $i == $st } { break } 
+      incr i } 
+    set fsname [ string trim [ lindex $line 0 ] "," ] 
+    if { $msglev < 1 } { puts "opera cstats DEBUG n = $n  fsname = $fsname " } 
+    $wndo.l.1 configure -text "$st  $fsname" 
+    close $f } 
+  if { $n == 0 && [ winfo exists .p ] && $st == 1 } { 
+    if { [ winfo ismapped .p.b.ss ] } { return } 
+    .p.tt.m configure -state normal -bg white 
+    pack forget .p.b.de .p.b.ho 
+    pack .p.b.sa .p.b.ss .p.b.ho -side left 
+    bind .p.tt.m <ButtonRelease-1> { 
+        set linesno(0) [ expr { int ( [ .p.tt.m index insert ] ) } ] } } 
+} ;# End of cstats 
+# 
+proc terbx { tx } { ;# Terminate (die) request (apoptosis) 
+  global fontn fontb netnum col 
+  if { [ winfo exists .d ] } { 
+    wm deiconify .d 
+    .d.t configure -state normal 
+    raise .d 
+  } else { 
+    toplevel .d -bg gray85 
+    wm geometry .d +400+90 
+    wm title .d "Terminate Request!" 
+    text .d.t -font $fontn -bg $col(r) -fg black -height 5 -width 40 
+    frame .d.b 
+    button .d.b.d -font $fontb -bg #ff3f3f -fg black -text "Die!" \
+        -command { exit 0 } 
+    button .d.b.l -font $fontb -bg white -fg black -text "No!  Don't die!" \
+        -command { wm iconify .d } 
+    pack .d.b.d .d.b.l -side left 
+    pack .d.b -side bottom 
+    pack .d.t -side top -fill both -expand 1 
+    .d.t insert end " Somebody wants me to kill myself!  OK? \n" 
+    bind .d <Button-3> { wm iconify .d } } 
+  .d.t insert end $tx 
+  .d.t insert end "\n" 
+  .d.t see end 
+  .d.t configure -state disabled 
+  bell 
+  if { "$netnum" != "" && [ lsearch [ exec ps -e ] "$netnum" ] > -1 } { 
+    exec kill -9 $netnum } 
+  after 1000 { exit 1 } ;# !! 
+} ;# End of terbx 
+# 
+proc gsw { s state } { ;# General status word from SU
+  global msglev tmo head headx m col 
+  if { $msglev < 1 } { puts "opera gsw DEBUG s $s  state $state " } 
+  set tmo($s) 0 
+  if { $state & 0x01 } { 
+    revv s $s r "" 
+  } elseif { ! ( $state & 0x040 ) || "$head($s)" == "" || \
+      "$headx($s)" == "" || abs ( $head($s) - $headx($s) ) > 1.0 } { 
+    revv s $s y "" 
+  } else { 
+    if { ! ( $state & 0x02 ) } { 
+      set t "|" 
+    } elseif { $state & 0x0800 } { 
+      set t ">" 
+    } else { 
+      set t "<" } 
+    revv s $s g $t } 
+  if { $m($s) } { showw $s 2 } 
+  if { [ winfo exists .t$s ] } { ;# Messages there? 
+    set hx $head($s) 
+    if { $state & 0x010 } { 
+      .t$s.h.po configure -bg $col(y) 
+    } elseif { "$headx($s)" != "" && "$hx" != "" } { 
+      if { [ expr { abs ( $hx - $headx($s) ) } ] > 1.0 } { 
+        .t$s.h.po configure -bg $col(r) 
+      } else { 
+        .t$s.h.po configure -bg gray85 } } 
+    if { $state & 0x08 || $state & 0x02000 } { 
+      .t$s.h.sp configure -bg $col(y) 
+    } else { .t$s.h.sp configure -bg gray85 } 
+    if { $state & 0x020 } { 
+      .t$s.c.co configure -bg $col(y) 
+    } else { .t$s.c.co configure -bg gray85 } } 
+} ;# End of gsw 
+# 
+proc lites { } { ;# Set station-unit traffic-light colors 
+  global txtx NSU tmo head headx m 
+  for { set s 0 } { $s < $NSU } { incr s } { 
+    set hx $head($s) 
+    if { "$txtx" == "" || $tmo($s) > 10 } { 
+      revv s $s x "" 
+    } elseif { [ find3 $s 73 00 $txtx ] != "" } { 
+      revv s $s r "" 
+    } elseif { ( [ find2 $s 73 $txtx ] != "" && \
+        [ find3 $s 73 06 $txtx ] == "" ) || \
+        "$hx" == "" || "$headx($s)" == "" || abs ( $hx - $headx($s) ) > 1.0 } { 
+      revv s $s y "" 
+      # Other checks needed here ??  
+    } else { 
+      if { [ find3 $s 73 01 $txtx ] == "" } { 
+        set t "|" 
+      } elseif { [ find3 $s 73 11 $txtx ] != "" } { 
+        set t ">" 
+      } else { 
+        set t "<" } 
+      revv s $s g $t } 
+    if { $m($s) } { showw $s 2 } } 
+} ;# End of lites 
+# 
+proc files { s } { ;# List task files and commands 
+  global fontn fontb fontd env col tsfile linesno 
+  set linesno($s) 0 
+  if { [ winfo exists .l$s ] } { 
+    wm deiconify .l$s 
+    raise .l$s 
+    return } 
+  toplevel .l$s -bg $col($s) 
+  set xo [ expr { 50 + 40 * $s } ] 
+  wm geometry .l$s +$xo+220  
+  wm title .l$s "Stream $s" 
+  entry .l$s.c -font $fontd -bg white -fg black -textvariable tsfile($s) 
+  pack .l$s.c -side top -fill x 
+  frame .l$s.b 
+  button .l$s.b.op -font $fontd -bg white -fg black -text Open \
+      -command " pack forget .l$s.x ; pack forget .l$s.b.op ; mfile $s " 
+  button .l$s.b.st -font $fontd -bg white -fg black -text Start \
+      -command " startc $s " 
+  button .l$s.b.de -font $fontd -bg white -fg black -text Details \
+      -command " matl $s " 
+  bind .l$s.b.de <Double-Button-1> { corst } 
+  button .l$s.b.ho  -font $fontd -bg white -fg black -text Hold \
+      -command " sendd $s \"Task Hold \" " 
+  button .l$s.b.br  -font $fontd -bg white -fg black -text Break \
+      -command " sendd $s \"Task Break \" " 
+  pack .l$s.b.op .l$s.b.st -side left 
+  frame .l$s.b2 
+  button .l$s.b2.res -font $fontd -bg white -fg black -text Resume \
+      -command " resumc $s " 
+  button .l$s.b2.en  -font $fontd -bg white -fg black -text End \
+      -command " sendd $s \"Task End \" " 
+  pack .l$s.b .l$s.b2 -side top 
+  frame .l$s.l -bg $col($s) 
+  label .l$s.l.1 -font $fontd -bg $col($s) -fg black -relief ridge -text " " 
+  label .l$s.l.2 -font $fontd -bg $col($s) -fg black -relief ridge -text " " 
+  pack .l$s.l.1 .l$s.l.2 -padx 2 -side left 
+  pack .l$s.l -side bottom 
+  frame .l$s.x 
+  listbox .l$s.x.l -font $fontd -bg gray85 -fg black -height 6 \
+      -yscrollcommand " .l$s.x.s set " 
+  scrollbar .l$s.x.s -bg white -command " .l$s.x.l yview "  
+  pack .l$s.x.s -side right -fill y 
+  pack .l$s.x.l -side left -fill both -expand 1 
+  pack .l$s.x -side bottom -fill both -expand 1 
+  set was [ pwd ] 
+  cd $env(TASK) 
+  set txt [ lsort [ glob *.tsf ] ] 
+  cd $was 
+  set iend [ llength $txt ] 
+  for { set i 0 } { $i < $iend } { incr i } { 
+    .l$s.x.l insert end [ lindex $txt $i ] } 
+  .l$s.x.l see 0 
+  bind .l$s.x.l <ButtonRelease-1> \
+      " set tsfile($s) $env(TASK)/\[ selection get \] " 
+  bind .l$s <Button-3> " destroy .l$s " 
+  # set tsfile($s) "" 
+  if { [ .a.$s itemcget sr -text ] > 1 } { 
+    pack forget .l$s.x 
+    pack forget .l$s.b.op 
+    pack forget .l$s.b.st 
+    pack .l$s.b.de .l$s.b.ho .l$s.b.br -side left 
+    pack .l$s.b2.res .l$s.b2.en -side left } 
+} ;# End of files 
+# 
+proc startc { s } { ;# Start button command 
+  global linesno tsfile 
+  sendd $s "Task Start $linesno($s) $tsfile($s) " 
+  set linesno($s) 0 
+  if { [ winfo exists .l$s.p.m ] } { .l$s.p.m tag remove sel 1.0 end } 
+  pack forget .l$s.x 
+  pack forget .l$s.b.op 
+  pack forget .l$s.b.st 
+  pack .l$s.b.de .l$s.b.ho .l$s.b.br -side left 
+  pack .l$s.b2.res .l$s.b2.en -side left 
+} ;# End of startc 
+# 
+proc resumc { s } { ;# Resume button command 
+  global linesno 
+  sendd $s "Task Resume $linesno($s) " 
+  set linesno($s) 0 
+  if { [ winfo exists .l$s.p.m ] } { .l$s.p.m tag remove sel 1.0 end } 
+} ;# End of resumc 
+# 
+proc mfile { s } { 
+  global fontn fontb fontd env col 
+  global tfile tfilt tfileo tsfile lineno linesno 
+  global mcolor msglev 
+  if { $s == 0 && [ winfo exists .p.tt.de ] && \
+     ( "$tfile(0)" == "" || "$tfile(0)" == "$env(TASK)/opera.tsf" ) } { 
+    .p.tt.m configure -state normal 
+    .p.tt.m tag remove emph 1.0 end 
+    set ts [ expr { 0.0 + $lineno(0) } ] 
+    .p.tt.m tag add emph $ts [ expr { 1.0 + $lineno(0) } ]-1chars 
+    if { $lineno(0) > 1 && \
+        [ .a.0 itemcget sr -text ] >  1 && \
+        [ .a.0 itemcget sr -text ] < 12 } { .p.tt.m see $ts } 
+    .p.tt.m configure -state disabled 
+    return } 
+  if { $s == 0 && [ winfo exists .p ] && ! [ winfo exists .l0 ] && \
+      "$tfile(0)" != "" && "$tfile(0)" != "$env(TASK)/opera.tsf" && \
+       [ .a.0 itemcget sr -text ] > 1 } { 
+    files 0 
+    destroy .p } 
+  if { ! [ winfo exists .l$s ] } { return } 
+  if { [ winfo ismapped .l$s.x ] && "$tfile($s)" != "" && \
+       [ .a.$s itemcget sr -text ] > 1 } { 
+    pack forget .l$s.x 
+    pack forget .l$s.b.op 
+    pack forget .l$s.b.st 
+    pack .l$s.b.de .l$s.b.ho .l$s.b.br -side left 
+    pack .l$s.b2.res .l$s.b2.en -side left 
+    if { "$tsfile($s)" != "$tfile($s)" } { set tsfile($s) "" } } 
+  if { [ winfo ismapped .l$s.x ] } { 
+    pack forget .l$s.p 
+    return } 
+  if { ! [ winfo exists .l$s.p ] } { 
+    frame .l$s.p -bg gray85 
+    text .l$s.p.m -font $fontd -bg gray85 -fg black \
+        -yscrollcommand " .l$s.p.s set " -height 15 -width 35 
+    scrollbar .l$s.p.s -command " .l$s.p.m yview " -bg white 
+    pack .l$s.p.s -side right -fill y 
+    pack .l$s.p.m -side left -fill both -expand 1 
+    pack .l$s.p -side bottom -fill both -expand 1 
+    bind .l$s.p.m <ButtonRelease-1> \
+        " set linesno($s) \[ expr int ( \[ .l$s.p.m index insert \] ) \] ; \
+        .l$s.p.m tag add sel \"insert linestart\" \"insert lineend\" " 
+  } ;# End of if not .l$s.p 
+  if { $msglev < 1 } { 
+     puts "opera mfile DEBUG index end = [ .l$s.p.m index end ] " } 
+  if { ( "$tfile($s)" != "$tfileo($s)" && "$tsfile($s)" != "$tfileo($s)" ) || \
+       ( "$tfile($s)" != "" && "$tfile($s)" == "$tfileo($s)" && \
+         [ exec filetime $tfile($s) ] != $tfilt($s) ) } { 
+    .l$s.p.m configure -state normal 
+    .l$s.p.m delete 1.0 end } 
+  if { [ .l$s.p.m index end ] <= 2.0 } { 
+    if { $msglev < 1 } { puts \
+        "opera mfile DEBUG tfile($s) = $tfile($s) tsfile($s) = $tsfile($s) " } 
+    if { [ .a.$s itemcget sr -text ] > 1 && "tfile($s)" != "" } { 
+      if { ! [ file readable "$tfile($s)" ] } { 
+        errbx "ERROR 1002 from opera:  Can't open or read file $tfile($s) " 
+        return }  
+      set f [ open $tfile($s) ] 
+      set tfileo($s) "$tfile($s)" 
+      set tfilt($s) [ exec filetime $tfileo($s) ] 
+    } elseif { "$tsfile($s)" != "" } { 
+      if { ! [ file readable "$tsfile($s)" ] } { 
+        errbx "ERROR 1002 from opera:  Can't open or read file $tsfile($s) "
+        return }  
+      set f [ open $tsfile($s) ] 
+      set tfileo($s) "$tsfile($s)" 
+      set tfilt($s) [ exec filetime $tfileo($s) ] 
+    } else { return } 
+    .l$s.p.m configure -state normal 
+    .l$s.p.m delete 1.0 end 
+    while { ! [ eof $f ] } { .l$s.p.m insert end [ read $f 1000 ] } 
+    close $f 
+    .l$s.p.m tag configure emph -background $mcolor 
+    .l$s.p.m see 1.0 
+  } elseif { $lineno($s) > 1 && \
+      [ .a.$s itemcget sr -text ] >  1 && \
+      [ .a.$s itemcget sr -text ] < 12 } { 
+    .l$s.p.m see [ expr { 0.0 + $lineno($s) } ] } 
+  .l$s.p.m configure -state normal 
+  .l$s.p.m tag remove emph 1.0 end 
+  if { [ .a.$s itemcget sr -text ] > 1 } { 
+    set ts [ expr { 0.0 + $lineno($s) } ] 
+    if { $msglev < 1 } { puts "opera mfile DEBUG ts = $ts " } 
+    .l$s.p.m tag add emph $ts [ expr { 1.0 + $lineno($s) } ]-1chars } 
+  .l$s.p.m configure -state disabled 
+} ;# End of mfile 
+# 
+proc tasks { } { ;# Operator to type or control stream 0 
+  global fontn fontb fontd env tsfile linesno 
+  global mcolor col 
+  if { [ winfo exists .p ] } {
+    wm deiconify .p     
+    raise .p 
+    return } 
+  set linesno(0) 0 
+  set tsfile(0) $env(TASK)/opera.tsf 
+  toplevel .p -bg $col(0) 
+  wm geometry .p +515+1 
+  wm title .p "Operator Stream" 
+  frame .p.tt -bg gray85 
+  text .p.tt.m -font $fontd -bg white -fg black \
+      -yscrollcommand " .p.tt.s set " -height 15 -width 35 
+  scrollbar .p.tt.s -command " .p.tt.m yview " -bg white 
+  .p.tt.m tag configure emph -background $mcolor 
+  pack .p.tt.s -side right -fill y 
+  pack .p.tt.m -side left -fill both -expand 1 
+  frame .p.b 
+  button .p.b.de -font $fontd -bg white -fg black -text Details \
+      -command { matl 0 } 
+  bind .p.b.de <Double-Button-1> { corst } 
+  button .p.b.sa -font $fontd -bg white -fg black -text Save \
+      -command { 
+        if { ! [ file writable "$tsfile(0)" ] } { errbx \
+            "ERROR 1004 from opera:  Can't open or write to file $tsfile(0) "
+          return }  
+        set f [ open $tsfile(0) w ] 
+        puts $f [ .p.tt.m get 0.0 end ] 
+        close $f } 
+  button .p.b.ss -font $fontd -bg white -fg black -text "Save & Start" \
+      -command { 
+        if { ! [ file writable "$tsfile(0)" ] } { errbx \
+            "ERROR 1004 from opera:  Can't open or write to file $tsfile(0) "
+          return }  
+        set f [ open $tsfile(0) w ] 
+        puts $f [ .p.tt.m get 0.0 end-2chars ] 
+        close $f 
+        .p.tt.m configure -state disabled -bg gray85 
+        sendd 0 "Task Start 0 $tsfile(0)" 
+        set linesno(0) 0 
+        .p.tt.m tag remove sel 1.0 end 
+        after 1000 
+        pack forget .p.b.sa 
+        pack forget .p.b.ss 
+        pack .p.b.de 
+        bind .p.tt.m <ButtonRelease-1> { 
+          set linesno(0) [ expr { int ( [ .p.tt.m index insert ] ) } ] 
+          .p.tt.m tag add sel "insert linestart" "insert lineend" } } 
+  button .p.b.ho -font $fontd -bg white -fg black -text Hold \
+      -command { sendd 0 "Task Hold " } 
+  pack .p.b.sa .p.b.ss .p.b.ho -side left 
+  frame .p.b2 
+  button .p.b2.br  -font $fontd -bg white -fg black -text Break \
+      -command { sendd 0 "Task Break " } 
+  button .p.b2.res -font $fontd -bg white -fg black -text Resume \
+      -command { 
+          sendd 0 "Task Resume $linesno(0) " 
+          set linesno(0) 0 
+          .p.tt.m tag remove sel 1.0 end } 
+  button .p.b2.en  -font $fontd -bg white -fg black -text End \
+      -command { sendd 0 "Task End " } 
+  pack .p.b2.br .p.b2.res .p.b2.en -side left 
+  frame .p.l -bg $col(0) 
+  label .p.l.1 -font $fontd -bg $col(0) -fg black -relief ridge -text " " 
+  label .p.l.2 -font $fontd -bg $col(0) -fg black -relief ridge -text " " 
+  pack .p.l.1 .p.l.2 -padx 2 -side left 
+  pack .p.l .p.b2 .p.b -side bottom 
+  pack .p.tt -side top -fill both -expand 1 
+  bind .p.tt.m <ButtonRelease-1> { 
+      set linesno(0) [ expr { int ( [ .p.tt.m index insert ] ) } ] } 
+  bind .p <Button-3> { wm iconify .p } 
+  if { ! [ file readable "$tsfile(0)" ] } { 
+    errbx "ERROR 1002 from opera:  Can't open or read file $tsfile(0) "
+    return }  
+  set f [ open $tsfile(0) ] 
+  while { ! [ eof $f ] } { 
+    .p.tt.m insert end [ read $f 1000 ] } 
+  close $f 
+  .p.tt.m see 1.0 
+} ;# End of tasks 
+# 
+proc tado { } { ;# Ta Do 
+  global fontn fontb fontd env 
+  toplevel .j -bg gray85  
+  wm geometry .j +90+220 
+  wm title .j "Ta Do" 
+  frame .j.tt -bg gray85 
+  text .j.tt.m -font $fontd -bg gray85 -fg black \
+      -yscrollcommand " .j.tt.s set " -height 15 -width 35 
+  scrollbar .j.tt.s -command " .j.tt.m yview " -bg white 
+  pack .j.tt.s -side right -fill y 
+  pack .j.tt.m -side left -fill both -expand 1 
+  frame .j.b 
+  button .j.b.gw -font $fontd -bg white -fg black -text "Go Away" \
+      -command { wm iconify .j } 
+  button .j.b.rf -font $fontd -bg white -fg black -text Refresh \
+      -command { 
+          .j.tt.m configure -state normal 
+          .j.tt.m delete 1.0 end 
+          set f [ open $env(TEXT)/TaDo.txt ] 
+          while { ! [ eof $f ] } { 
+            .j.tt.m insert end [ read $f 1000 ] } 
+          close $f 
+          .j.tt.m see 1.0 
+          .j.tt.m configure -state disabled } 
+  pack .j.b.gw .j.b.rf -side left -padx 2 
+  pack .j.b -side bottom 
+  pack .j.tt -side top -fill both -expand 1 
+  bind .j <Button-3> { wm iconify .j } 
+  set f [ open $env(TEXT)/TaDo.txt ] 
+  while { ! [ eof $f ] } { 
+    .j.tt.m insert end [ read $f 1000 ] } 
+  close $f 
+  .j.tt.m see 1.0 
+  .j.tt.m configure -state disabled 
+} ;# End of tado 
+# 
+proc matl { s } { ;# Matrix list = details 
+  global fontc fontd fonte fontf col NSU srsu 
+  if { [ winfo exists .o$s ] } { 
+    wm deiconify .o$s     
+    raise .o$s 
+    if { $s >= 4 && $s < 8 } { matl [ expr { 1 + $s } ] } ;# Recurse 
+    return } 
+  set sus " " 
+  if { $s < 4 } { 
+    for { set i 0 } { $i < $NSU } { incr i } { 
+      if { $srsu($i) == "$s" } { append sus "$i " } } 
+    set nsu [ llength $sus ] 
+    if { $nsu < 1 } { 
+      after 3000 " matl $s " ;# Wait for info from SUM 
+      return } 
+    set nsd [ expr { ( $nsu > 4 ) ? 4 : $nsu } ] 
+    set mt 0.0 
+  } else { ;# $s >= 4 
+    set nsu $NSU 
+    set nsd [ expr { $nsu - 4 * ( $s - 4 ) } ] 
+    if { $nsd < 1 } { return } 
+    if { $nsd > 4 } { set nsd 4 } 
+    for { set i 0 } { $i < $nsu } { incr i } { append sus "$i " } 
+    set mt [ expr { 3.975 * ( $s - 4 ) / $nsu } ] 
+    if { $mt > 1.0 } { set mt 1.0 } 
+  } ;# End of else $s >= 4 
+  set xs 16 
+  set ys 12 
+  toplevel .o$s -bg gray90 
+  wm title .o$s "Details $s" 
+  # set xo [ expr { 540 + 40 * $s } ] 
+  set xo [ expr { 2150 - 290 * $s } ] 
+  wm geometry .o$s +$xo+1 
+  set ht [ expr { 204 * $nsd } ] 
+  if { $nsu <= 4 } { 
+    incr ht 41 
+  } elseif { $s <= 4 } { 
+    incr ht 14 
+  } elseif { $s == [ expr { 4 + ( $nsu - 1 ) / 4 } ] } { 
+    incr ht 27 } 
+  canvas .o$s.c -bg gray90 -width 280 -height $ht \
+      -yscrollcommand " .o$s.s set " \
+      -scrollregion " 0 0 330 [ expr { ( 3.4 + $nsu * 17 ) * $ys } ] " 
+  scrollbar .o$s.s -bg white -command " .o$s.c yview " 
+  pack .o$s.s -side right -fill y 
+  pack .o$s.c -side left -fill both -expand 1 
+  bind .o$s <Button-3> " destroy .o$s " 
+  foreach yo \
+      " [ expr { $ys - 2 } ] [ expr { 2 + ( 1 + $nsu * 17 ) * $ys } ] " { 
+    .o$s.c create text $xs                   $yo -font $fontd -text "SU" 
+    .o$s.c create text [ expr {  3 * $xs } ] $yo -font $fontd -text "Stn" 
+    .o$s.c create text [ expr {  5 * $xs } ] $yo -font $fontd -text "Str" 
+    .o$s.c create text [ expr {  7 * $xs } ] $yo -font $fontd -text "Ch#" 
+    .o$s.c create text [ expr { 10 * $xs } ] $yo -font $fontd -text "Ch" 
+    .o$s.c create text [ expr { 15 * $xs } ] $yo -font $fontd -text \
+        "lspucnkls" } 
+  set xsu -1 
+  foreach su $sus { 
+    incr xsu 
+    set ysu [ expr { $ys * ( 1 + 17 * $xsu ) } ] 
+    set yo  [ expr { $ysu +        $ys } ] 
+    set yr1 [ expr { $ysu +  0.5 * $ys } ] 
+    set yr2 [ expr { $ysu + 16.5 * $ys } ]  
+    set xr1 [ expr {     $xs - 6 } ] 
+    set xr2 [ expr { 5 * $xs - 7 } ] 
+    .o$s.c create rectangle $xr1 $yr1 $xr2 $yr2 -outline "" -fill gray80  
+    .o$s.c create text $xs $yo -font $fontd -text $su 
+    .o$s.c create text [ expr { 3 * $xs } ] $yo -font $fontd \
+        -text "-" -tags sa$su 
+    set xr1 [ expr { 5 * $xs - 6 } ] 
+    set xr2 [ expr { $xr1 + 13 } ] 
+    .o$s.c create rectangle $xr1 $yr1 $xr2 $yr2 -outline "" \
+        -fill gray80 -tags src$su 
+    .o$s.c create text [ expr { 5 * $xs } ] $yo -font $fontd \
+        -text "-" -tags sr$su 
+    set yr1 [ expr { $ysu + 1.5 * $ys } ] 
+    set yr2 [ expr { $ysu + 2.5 * $ys } ]  
+    set xr1 [ expr {     $xs - 6 } ] 
+    set xr2 [ expr { 5 * $xs + 7 } ] 
+    .o$s.c create rectangle $xr1 $yr1 $xr2 $yr2 -outline "" -tags sucb$su 
+    set yo1 [ expr { $ysu + 2 * $ys } ] 
+    set xo1 [ expr { 3 * $xs } ] 
+    .o$s.c create text $xo1 $yo1 -font $fontf -text "---------" -tags suc$su 
+    set yo [ expr { $ysu + 3 * $ys } ] 
+    set xu [ expr { 1.6 * $xs } ] 
+    .o$s.c create text $xu $yo -font $fonte -text "Pass:" 
+    set xu [ expr { 4 * $xs } ] 
+    .o$s.c create text $xu $yo -font $fonte -text "----" -tags pas$su 
+    set yo [ expr { $ysu + 4 * $ys } ] 
+    set xu [ expr { 3 * $xs } ] 
+    .o$s.c create text $xu $yo -font $fonte -text "----" -tags dir$su 
+    set yo  [ expr { $ysu + 5.5 * $ys } ] 
+    set xu  [ expr { 3 * $xs } ] 
+    .o$s.c create text $xu $yo -font $fonte -text "Start:" 
+    set xt [ expr { 3 * $xs } ] 
+    set y1 [ expr { $ysu + 6.5 * $ys } ] 
+    .o$s.c create text $xt $y1 -font $fonte -text "------:--:--" -tags strt$su 
+    set yo  [ expr { $ysu + 7.5 * $ys } ] 
+    set xu  [ expr { 3 * $xs } ] 
+    .o$s.c create text $xu $yo -font $fonte -text "End:" 
+    set xt [ expr { 3 * $xs } ] 
+    set y1 [ expr { $ysu + 8.5 * $ys } ] 
+    .o$s.c create text $xt $y1 -font $fonte -text "------:--:--" -tags end$su 
+    set yo  [ expr { $ysu + 10 * $ys } ] 
+    set xu  [ expr { 3 * $xs } ] 
+    .o$s.c create text $xu $yo -font $fonte -text "TOT:" 
+    set yr1 [ expr { $ysu + 10.5 * $ys } ] 
+    set yr2 [ expr { $ysu + 11.5 * $ys } ]  
+    set xr1 [ expr {     $xs - 6 } ] 
+    set xr2 [ expr { 5 * $xs + 7 } ] 
+    .o$s.c create rectangle $xr1 $yr1 $xr2 $yr2 -outline "" -tags totb$su 
+    set xt [ expr { 3 * $xs } ] 
+    set y1 [ expr { $ysu + 11 * $ys } ] 
+    .o$s.c create text $xt $y1 -font $fonte -text "------:--:--" -tags tot$su 
+    set yo [ expr { $ysu + 12 * $ys } ] 
+    .o$s.c create text $xu $yo -font $fonte -text "ROT:" 
+    set y2 [ expr { $ysu + 13 * $ys } ] 
+    .o$s.c create text $xt $y2 -font $fonte -text "------:--:--" -tags srot$su 
+    set yo [ expr { $ysu + 14.5 * $ys } ] 
+    .o$s.c create text $xu $yo -font $fonte -text "Str's ROT:" 
+    set y2 [ expr { $ysu + 15.5 * $ys } ] 
+    .o$s.c create text $xt $y2 -font $fonte -text "------:--:--" -tags rot$su 
+    set xo1 [ expr { 13.5 * $xs - 5 } ] 
+    set xo2 [ expr { 14   * $xs - 5 } ] 
+    for { set i 0 } { $i < 6 } { incr i } { 
+      set xi($i) [ expr { ( 14.5 + 0.5 * $i ) * $xs - 5 } ] } 
+    for { set in 0 } { $in < 16 } { incr in } { ;# Each index 
+      set yo [ expr { $ysu + $ys * ( 1 + $in ) } ] 
+      .o$s.c create text [ expr {  7 * $xs } ] $yo -font $fontd -text $in 
+      .o$s.c create text [ expr { 10 * $xs } ] $yo -font $fontd \
+          -text "-" -tags cn$su.$in 
+      set yo1 [ expr { $yo - 5 } ] 
+      .o$s.c create rectangle $xo1 $yo1 \
+          [ expr { $xo1 + 5 } ] [ expr { $yo1 + 10 } ] \
+          -fill gray40 -tags va$su.$in 
+      .o$s.c create rectangle $xo2 $yo1 \
+          [ expr { $xo2 + 5 } ] [ expr { $yo1 + 10 } ] \
+          -fill gray40 -tags pc$su.$in 
+      for { set i 0 } { $i < 6 } { incr i } { 
+        .o$s.c create rectangle $xi($i) $yo1 \
+            [ expr { $xi($i) + 5 } ] [ expr { $yo1 + 10 } ] \
+            -fill gray40 -tags u$i.$su.$in } } 
+    set xo1 [ expr { 13 * $xs - 6 } ] 
+    set xo2 [ expr { 13 * $xs - 2 } ] 
+    for { set chg 0 } { $chg < 4 } { incr chg } { ;# Each channel group 
+      set yo [ expr { $ysu + $ys * ( 1 + 4 * $chg ) } ] 
+      set yo1 [ expr { $yo - 5 } ] 
+      .o$s.c create rectangle $xo1 $yo1 \
+          [ expr { $xo1 + 6 } ] [ expr { $yo1 + 4 * $ys - 2 } ] \
+              -fill gray40 -tags chg$su.$chg 
+      for { set cgs 0 } { $cgs < 4 } { incr cgs } { ;# Each chg status 
+        set yo2 [ expr { $yo + $ys * $cgs } ] 
+        .o$s.c create text $xo2 $yo2 -font $fonte -text "" \
+            -tags cgs$su.$chg.$cgs } } 
+  } ;# End of foreach su 
+  set yo [ expr { ( 2.3 + $nsu * 17 ) * $ys } ] 
+  set xu [ expr { 1.5 * $xs } ] 
+  set xt [ expr { 5.5 * $xs } ] 
+  .o$s.c create text $xu $yo -font $fonte -text "COT:" 
+  .o$s.c create text $xt $yo -font $fonte -text "------:--:--" -tags cot 
+  .o$s.c yview moveto $mt 
+} ;# End of matl 
+# 
+proc corst { } { ;# Status from corrman  
+  global fontd fonte fontf NSU dtba msglev kw 
+  if { [ winfo exists .k ] } { 
+    wm deiconify .k     
+    raise .k 
+    return } 
+  set dtba 0 
+  set nba [ expr { $NSU * ( $NSU + 1 ) / 2 } ] 
+  set xs 8  
+  set ys 9 
+  toplevel .k -bg gray90 
+  wm title .k "Status at Correlator" 
+  # wm geometry .k -1+1 
+  wm geometry .k +460+1 
+  canvas .k.c -bg gray90 -width 215 -height 1000 \
+      -yscrollcommand " .k.s set " \
+      -scrollregion " 0 0 215 [ expr { ( 2 + 16 * $nba ) * $ys } ] " 
+  scrollbar .k.s -command " .k.c yview " -bg white 
+  pack .k.s -side right -fill y 
+  pack .k.c -side left -fill both -expand 1 
+  bind .k <Button-3> " destroy .k " 
+  set xo 3 
+  set yo 1 
+  set txt "CH  SU    UCNKLS   SU  UCNKLS    T3T3 "
+  .k.c create text $xo $yo -anchor nw -font $fontf -text $txt 
+  for { set sua 0 } { $sua < $NSU } { incr sua } { 
+    for { set sub $sua } { $sub < $NSU } { incr sub } { 
+      canvas .k.w$sua-$sub -bg gray90 -width 215 -height [ expr { 16 * $ys } ] 
+      set kw($sua-$sub) "" 
+      for { set ch 0 } { $ch < 16 } { incr ch } { 
+        set xo 15  
+        set yo [ expr { ( 5.0 / 9.0 + $ch ) * $ys } ] 
+        .k.w$sua-$sub create text $xo $yo -font $fontf -text "$ch" 
+        for { set b 0 } { $b < 2 } { incr b } { 
+          if { $b == 0 } { 
+            set su $sua 
+            set iend 6 
+          } else { 
+            set su $sub 
+            set iend 11 } 
+          set xo [ expr { 2 * $b + ( 4 + 10 * $b ) * $xs } ] 
+          .k.w$sua-$sub create text $xo $yo -font $fontf -text "$su" 
+          for { set i 0 } { $i < $iend } { incr i } { 
+            if { $i == 6 } { continue } 
+            set x1 [ expr { 1 + 2 * $b + ( 9 * $b + $i + 7 ) * $xs } ] 
+            set yr1 [ expr {  $yo - 4 } ] 
+            set yr2 [ expr { $yr1 + 7 } ]  
+            set xr1 [ expr {  $x1 - 4 } ] 
+            set xr2 [ expr { $xr1 + 5 } ] 
+            .k.w$sua-$sub create rectangle $xr1 $yr1 $xr2 $yr2 \
+                -outline black -fill gray40 -tags t$ch.$b.$i } } } } } 
+} ;# End of corst 
+# 
+proc inith {  } { ;# List ivex keys, send one to conductor 
+  global NSU fontn fontb ikey keys cc cf msglev col 
+  if { [ winfo exists .i ] } { 
+    wm deiconify .i 
+    raise .i 
+    return } 
+  set nsu [ expr { ( $NSU < 8 ) ? 8 : $NSU } ] 
+  toplevel .i -bg gray85 
+  wm geometry .i +260+220 
+  wm title .i "Initialize Ivex" 
+  frame .i.cb 
+  checkbutton .i.cb.c -bg white -fg black -font $fontb -selectcolor gray40 \
+      -text C -variable cc 
+  pack .i.cb.c -side top 
+  for { set i 0 } { $i < $nsu } { incr i } { 
+    checkbutton .i.cb.$i -bg white -fg black -font $fontb -selectcolor gray40 \
+        -text $i -variable cf($i) 
+    pack .i.cb.$i -side top 
+    bind .i.cb.$i <Button-3> " 
+      .i.cb.$i configure -selectcolor $col(r) ; 
+      .i.cb.$i select " } 
+  pack .i.cb -side left 
+  entry .i.c -font $fontn -bg white -fg black -textvariable ikey 
+  pack .i.c -side top -fill x 
+  frame .i.x 
+  listbox .i.x.l -font $fontn -bg gray85 -fg black \
+      -yscrollcommand " .i.x.s set " 
+  scrollbar .i.x.s -bg white -command " .i.x.l yview " 
+  pack .i.x.s -side right -fill y 
+  pack .i.x.l -side left -fill both -expand 1 
+  pack .i.x -side bottom -fill both -expand 1 
+  set l 0 
+  while { [ array get keys $l ] != "" } { 
+    .i.x.l insert end $keys($l) 
+    incr l } 
+  .i.x.l see 0 
+  bind .i.x.l <ButtonRelease-1> { set ikey [ selection get ] } 
+  bind .i.x.l <Double-Button-1> { 
+    set ikey [ selection get ] 
+    set line "I $ikey $cc " 
+    for { set i 0 } { $i < $NSU } { incr i } { 
+      if { ( $cf($i) == 1 ) && \
+          ( [ .i.cb.$i cget -selectcolor ] == "$col(r)" ) } {
+        append line "2 " } else { append line "$cf($i) " } } 
+    if { $msglev < 1 } { puts "opera inith DEBUG line = $line " } 
+    sendd 0 $line } 
+  bind .i.x.l <Button-3> { destroy .i } 
+  bind .i.x.s <Button-3> { destroy .i } 
+    # Because bind .i.x <Button-3> { destroy .i } doesn't work 
+  bind .i.c <Return> {
+    set line "I $ikey $cc " 
+    for { set i 0 } { $i < $NSU } { incr i } { 
+      if { ( $cf($i) == 1 ) && \
+          ( [ .i.cb.$i cget -selectcolor ] == "$col(r)" ) } {
+        append line "2 " } else { append line "$cf($i) " } } 
+    if { $msglev < 1 } { puts "opera inith DEBUG line = $line " } 
+    sendd 0 $line } 
+  bind .i.c <Button-3> { destroy .i } 
+} ;# End of inith 
+#
+proc initivex { } { ;# Read some stuff from ivex for inith 
+  global NSU env keys cc cf msglev 
+  if { $msglev < 1 } { puts "opera initivex DEBUG reading global.ivex " } 
+  set f [ open $env(SYSVEX)/global.ivex ] 
+  while { [ gets $f line ] >= 0 } { 
+    if { [ string trim [ lindex $line 0 ] "\$;" ] == "CORR_INIT" } { break } } 
+  set cc 1 
+  set k 0 
+  set kk 0 
+  set l 0 
+  while { [ gets $f line ] >= 0 } { 
+    if { [ lindex $line 0 ] == "def" } { 
+      set keys($l) [ string trim [ lindex $line 1 ] ";" ] ;# INIT... 
+      incr l 
+    } elseif { [ lindex $line 0 ] == "ref" } { 
+      set j [ expr 0x[ string index [ lindex $line 3 ] 4 ] ] ;# PBS number 
+      if { $j > $kk } { set kk $j } 
+      set cf($j) 1 ;# This PBS exists 
+      incr k ;# Count PBSs 
+    } elseif { [ string index $line 0 ] == "\$" } { break } } ;# End 
+  # Need error check?? 
+  # Here $j is last numbered PBS, $k is the number of PBSs, 
+  # kk is the highest numbered PBS   
+  # set NSU [ expr { ( $k < ( $kk + 1 ) ) ? ( $kk + 1 ) : $k } ] 
+  set NSU [ expr { $kk + 1 } ] 
+  #set NSU 16
+  close $f 
+} ;# End of initivex 
+# 
+proc labl { } { ;# Label over traffic lights and Help 
+  global fontn fontb 
+  frame .la -bg gray85 
+  label .la.l -font $fontn -bg gray85 -fg black \
+      -text "    Station Units" 
+  button .la.b2 -font $fontb -bg white -fg black -text "Tapes" \
+      -command { tapbx "" 1 } 
+  button .la.b -font $fontb -bg white -fg black -text "Help" \
+      -command { netscp -1 } 
+      # -command { helpbx 1 } 
+  label .la.r -font $fontn -bg gray85 -fg black \
+      -text "          Streams       " 
+  pack .la.l .la.b2 -side left -padx 10 
+  pack .la.r .la.b -side right 
+} ;# End of labl 
+# 
+proc mksu { } { ;# Make traffic lights for SUs 
+  # .s = station units = tape drives traffic lights 
+  global NSU 
+  if { $NSU < 8 } { 
+    set nsu 8 
+  } else { 
+    set nsu $NSU }
+  frame .s -bg gray85 
+  set txt "" 
+  for { set i 0 } { $i < $nsu } { incr i } { 
+    makke s $i $i 
+    append txt ".s.$i " } 
+  eval pack $txt -side left 
+} ;# End of mksu 
+# 
+proc helpb { } { ;# Other buttons, etc. (misnamed)  
+  global fontb fontn fonte 
+  frame .hb -bg gray85 
+  button .hb.b2 -font $fontb -bg white -fg black -text "Initialize" \
+      -command { inith } 
+  button .hb.b3 -font $fontb -bg white -fg black -text "Details" \
+      -command { matl 4 } 
+  bind .hb.b3 <Double-Button-1> { corst } 
+  canvas .hb.s -width 80 -height 45 -bg gray85 
+  .hb.s create text 40 14 -font $fonte -text "<-Str  Stat->" 
+  .hb.s create text 40 34 -font $fonte -text "<-Stn   Pri->" 
+  pack .hb.b2 .hb.b3 -side top 
+  pack .hb.s -side bottom 
+} ;# End of helpb 
+# 
+proc mkts { } { ;# Make task-stream's traffic lights 
+  # .a = Task-Streams traffic lights 
+  frame .a -bg gray85 
+  makke a 0 O ;# Stream 0, Operator task 
+  for { set i 1 } { $i < 4 } { incr i } { makke a $i $i } 
+  pack .a.0 .a.1 .a.2 .a.3 -side left 
+} ;# End of mkts 
+# 
+proc startup { } { 
+  # ##### Global initialization: 
+  global fontn fontb fontc fontd fonte fontf fontt 
+  global msglev env NSU 
+  global txtx ikey rep netnum dtba 
+  global comnd head headx headc ohead hpos m lineno linesno 
+  global srsu tfile tsfile tfileo tfilt tmo col mcolor 
+  global argc argv 
+  set fontn "-*-*schoolbook-medium-r-normal--18-*-*-*-*-*-*-*" 
+  set fontb $fontn 
+  set fontc "-*-*schoolbook-medium-r-normal--17-*-*-*-*-*-*-*" 
+  set fontd "-*-*schoolbook-bold-r-normal--14-*-*-*-*-*-*-*" 
+  set fonte "-*-*schoolbook-bold-r-normal--12-*-*-*-*-*-*-*" 
+  set fontf "-*-*schoolbook-bold-r-normal--10-*-*-*-*-*-*-*" 
+  set fontt "-*-courier-bold-r-normal--18-0-*-*-*-*-*-*" 
+  set msglev 1; ;# For debuggery (reset below) 
+  # Initialize environment variables if need be: 
+  if { [ array get env HELP ] == "" } { 
+    set env(HELP) /correlator/prog/doc/help 
+    puts "opera WARNING env(HELP) set to $env(HELP) " } 
+  if { [ array get env TASK ] == "" } { 
+    set env(TASK) /correlator/task 
+    puts "opera WARNING env(TASK) set to $env(TASK) " } 
+  if { [ array get env SYSVEX ] == "" } { 
+    set env(SYSVEX) /correlator/sysvex 
+    puts "opera WARNING env(SYSVEX) set to $env(SYSVEX) " } 
+  if { [ array get env CORR ] == "" } { 
+    set env(CORR) /correlator/prog/src/correlator 
+    puts "opera WARNING env(CORR) set to $env(CORR) " } 
+  if { [ array get env TEXT ] == "" } { 
+    set env(TEXT) /correlator/prog/text 
+    puts "opera WARNING env(TEXT) set to $env(TEXT) " } 
+  if { [ array get env BIN ] == "" } { 
+    set env(BIN) /correlator/bin
+    puts "opera WARNING env(BIN) set to $env(BIN) " } 
+  set NSU 1 ;# Number of SUs to check for (reset by initivex below) 
+  set txtx "" 
+  set ikey "" 
+  set rep -1 
+  set netnum "" 
+  set dtba 0 
+  sendd 0 X ;# To make NSU from the following stick 
+  initivex ;# Read and set some stuff from ivex file 
+  # Initialize head parameters, etc.  
+  for { set i 0 } { $i < $NSU } { incr i } { 
+    set comnd($i) "" 
+    set head($i) "" 
+    set headx($i) "" 
+    set headc($i) "" 
+    set ohead($i) 0 
+    set hpos($i) "" 
+    set m($i) 0 
+    set lineno($i) 0 
+    set linesno($i) 0 
+    set srsu($i) "-" 
+    set tfile($i) "" 
+    set tsfile($i) "" 
+    set tfileo($i) "" 
+    set tfilt($i) 0 
+    set tmo($i) 0 } 
+  set col(0) #efefff ;# Almost white 
+  set col(1) #7fffff ;# Pastel cyan 
+  set col(2) #bfbfff ;# Pastel blue 
+  set col(3) #ff7fff ;# Pastel magenta 
+  set col(-) gray85  ;# Background gray 
+  set col(d) gray40  ;# Dark 
+  set col(r) #ff7f7f ;# Red or Colal or Tomato 
+  set col(y) #ffff7f ;# Yellow 
+  set col(g) #7fff7f ;# Green or Lawn Green 
+  set col(b) #7f7fff ;# Blue 
+  set mcolor #ffff7f ;# Yellow 
+  # ##### Start up everything 
+  wm geometry . +1+1 ;# Near top left corner 
+  wm title . "Opera:  Mark-IV Correlator, Operator Interface" 
+  . configure -bg gray85 
+  labl  ;# Label over traffic lights 
+  mksu  ;# SU traffic lights, .s 
+  helpb ;# Help button, .hb 
+  mkts  ;# Task-streams traffic lights, .a 
+  pack .la -side top -fill x 
+  pack .s -side left 
+  pack .hb -side left -fill y 
+  pack .a 
+  strord " x 0 1 2 3 " ;# Default stream priority order 
+  # Start up the checking loops: 
+  # lites ;# Read from opmes 
+  reads ;# Main working loop  
+  # Message level for debuggery; changeable in opmes 
+  if { $argc > 0 && [ lindex $argv 0 ] != "" } { 
+    set msglev [ lindex $argv 0 ] 
+  } else { set msglev 1 } ;# Default 
+  tado ;# Ta Do 
+} ;# End of startup 
+# package require Tclx ;# ?? 
+# profile on ;# ?? 
+startup 
+# End of opera 
+

@@ -1,0 +1,99 @@
+From tfolkers@as.arizona.edu  Tue Mar 29 18:24:10 2011
+Return-Path: <tfolkers@as.arizona.edu>
+X-Spam-Checker-Version: SpamAssassin 3.2.5 (2008-06-10) on
+	franklin.haystack.mit.edu
+X-Spam-Level: 
+X-Spam-Status: No, score=0.0 required=5.5 tests=none autolearn=ham
+	version=3.2.5
+Received: from hyperion.haystack.edu (hyperion.haystack.edu [192.52.65.1])
+	by franklin.haystack.mit.edu (8.13.8/8.13.8) with ESMTP id p2TMO9gH003279
+	(version=TLSv1/SSLv3 cipher=EDH-RSA-DES-CBC3-SHA bits=168 verify=NO)
+	for <gbc@franklin.haystack.edu>; Tue, 29 Mar 2011 18:24:09 -0400
+Received: from smtoxdpy1.smt.as.arizona.edu (aspen.as.arizona.edu [128.196.248.97])
+	by hyperion.haystack.edu (8.13.8+Sun/8.13.8) with ESMTP id p2TMOEuq020766
+	for <gbc@haystack.mit.edu>; Tue, 29 Mar 2011 18:24:14 -0400 (EDT)
+Received: from smtoxdpy1.smt.as.arizona.edu (localhost [127.0.0.1])
+	by smtoxdpy1.smt.as.arizona.edu (8.14.4/8.14.3) with ESMTP id p2TLbSmn009317;
+	Tue, 29 Mar 2011 14:37:28 -0700
+Received: (from tfolkers@localhost)
+	by smtoxdpy1.smt.as.arizona.edu (8.14.4/8.14.4/Submit) id p2TLbSE5009315;
+	Tue, 29 Mar 2011 14:37:28 -0700
+From: Thomas Folkers <tfolkers@as.arizona.edu>
+Message-Id: <201103292137.p2TLbSE5009315@smtoxdpy1.smt.as.arizona.edu>
+Date: Tue, 29 Mar 2011 14:37:27 -0700
+To: gbc@haystack.mit.edu, tfolkers@email.arizona.edu
+Subject: TotalPower.dat File
+User-Agent: Heirloom mailx 12.5 7/5/10
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Greylist: Delayed for 00:46:40 by milter-greylist-3.0 (hyperion.haystack.edu [192.52.65.1]); Tue, 29 Mar 2011 18:24:14 -0400 (EDT)
+X-DSPAM-Result: Innocent
+X-DSPAM-Processed: Tue Mar 29 18:24:10 2011
+X-DSPAM-Confidence: 0.9899
+X-DSPAM-Probability: 0.0000
+X-DSPAM-Signature: 4d925c0a32811473221349
+X-DSPAM-Factors: 27,
+	Received*for+<gbc, 0.01000,
+	Received*for+<gbc, 0.01000,
+	Observing, 0.01000,
+	Received*(localhost+[127.0.0.1]), 0.01000,
+	X-Greylist*00, 0.01000,
+	X-Greylist*[192.52.65.1]), 0.01000,
+	X-Greylist*3.0+(hyperion.haystack.edu, 0.01000,
+	Received*franklin.haystack.mit.edu+(8.13.8/8.13.8), 0.01000,
+	Received*(version=TLSv1/SSLv3+cipher=EDH, 0.01000,
+	Like, 0.01000,
+	Received*Tue, 0.01000,
+	Received*Tue, 0.01000,
+	1+4, 0.01000,
+	1+4, 0.01000,
+	Date*0700, 0.01000,
+	Modified+Julian, 0.01000,
+	of, 0.01000,
+	this+helps, 0.01000,
+	Received*ESMTP, 0.01000,
+	Received*ESMTP, 0.01000,
+	Date, 0.01000,
+	Received*by+hyperion.haystack.edu, 0.01000,
+	), 0.01000,
+	X-Greylist*Delayed, 0.01000,
+	X-Greylist*0400, 0.01000,
+	/+n, 0.01000,
+	much, 0.01000
+Status: RO
+Content-Length: 957
+Lines: 31
+
+
+Geoff,
+
+  I'm not sure the totalpower.dat file will be of much use to you. The
+file goes like this:
+
+  MJD       Mode Scan   TP-1      SP-1      TP-2     SP-2
+55649.89359 Idle 1708  2.984224 -0.00025  8.195541  0.00571  \
+                                                             \
+                        TP-3      SP-3      TP-4     SP-4
+                       2.412512 -0.00033  8.084447  0.00032
+
+
+  MJD = Modified Julian Date
+  Mode = Observing mode.
+  Scan = Scan number
+  TP-1,4 = 2-Second average Total    Power for channels 1-4 (in volts)
+  SP-1,4 = 2-Second average Switched Power for channels 1-4 (in volts)
+
+
+  Because I average the totalpower over 2 seconds there is not much info
+in there because all phases a summed together then / n. The switched power
+on the other-hand keeps the phases separate then normalizes. Like this:
+
+  SP[i] = (sum_sig[i] / n[i] ) - (sum_ref[i] / n[i]);
+
+  Hope this helps.
+
+Tom
+
+!DSPAM:4d925c0a32811473221349!
+

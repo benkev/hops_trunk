@@ -1,0 +1,43 @@
+#!/bin/ksh
+# $MK4_DIST_D/src/scripts/share/runall
+# runall script
+
+#-------------------------------------------------------------------------------
+data_d=${1:-/data1}
+. $MK4_CONF_D/mk4.conf
+
+#-------------------------------------------------------------------------------
+cd $TMP
+export DISPLAY=lcc:0.0
+
+#-------------------------------------------------------------------------------
+rdoa all mq correlator
+
+#-------------------------------------------------------------------------------
+$mk4_cr0_rsh  rotman 2 $ROTMAN_SUBMASK &
+$mk4_cr0_rsh  bos &
+$mk4_cr1_rsh  bos &
+
+$mk4_pu7_rsh domino 0 7  &
+$mk4_pu8_rsh domino 0 8  &
+$mk4_pu9_rsh domino 0 9  &
+$mk4_pua_rsh domino 0 10 &
+$mk4_pub_rsh domino 0 11 &
+
+$mk4_cc1_rsh "mcb 2" &
+
+$mk4_cc1_rsh "setenv DATADIR $data_d; setenv CORDATA $data_d; genaroot -m 2" &
+
+$mk4_cc0_rsh conductor 1 &
+$mk4_cc0_rsh opera &
+$mk4_cc1_rsh "start-corrman" &
+$mk4_cc1_rsh "sutrx 0 2" &
+$mk4_cc1_rsh "sutrx 1 2" &
+$mk4_cc1_rsh "sutrx 2 2" &
+$mk4_cc1_rsh "sutrx 3 2" &
+$mk4_cc1_rsh "sutrx 4 2" &
+$mk4_cc1_rsh "sutrx 5 2" &
+$mk4_cc1_rsh "sutrx 6 2" &
+#
+$mk4_cc1_rsh "suman 2" &
+$mk4_cc0_rsh "count" &

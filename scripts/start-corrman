@@ -1,0 +1,3 @@
+#!/bin/bash
+ulimit -n 256
+corrman 1 cr2 w141 w142 w143

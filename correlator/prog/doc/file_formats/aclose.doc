@@ -1,0 +1,82 @@
+The contents of the type 3 lines are as follows:
+
+Field #	Contents		Example		Comments
+-------	--------		-------		--------
+1	Format version #	2		To allow evolution of format
+2	Experiment #            2945		Must be same on all baselines
+3	File type 		3		Indicates closure triangle data
+4	Year of scan		95		Must be same on all baselines
+5	Scan time ddd-hhmmss	237-160130	Must be same on all baselines
+6	Source name		3C345		Must be same on all baselines
+7	Freq/mode		XA		Must be same on all baselines
+8	Triangle		GJY		Also specifies order of telescopes,
+						baselines in other fields.  Baselines
+						come in order GJ, JY, GY
+9	Root id codes		jnhuig,,joqdfe	Three entries, separated by commas,
+						blank means same as last one
+10	Extent #s		3,7,12		Comma separated
+11	Lengths			645,632,659	Comma separated scan lengths
+			     or 10		Means all baselines the same
+12	Quality code		8		Some synthesis of reliability info.
+13	ESDESP			010212		Max diff between baselines for
+						each digit of ESDESPs
+14	Bispectrum amplitude    0.36823		Units of 10^-12 ccoeff^3
+15	Bispectrum SNR		17.239		
+16	Bispectrum phase	231.5		degrees (=closure phase)
+17	Closure SBD		1.342		microsec
+18	Closure MBD		0.05923		microsec
+19	MBD ambiguity		0.125		microsec, 0.0 if not same on all
+						baselines
+20	Closure rate		0.0378		psec/sec
+21	Elevation		23.3,16.9,82.4	Comma separated
+22	Azimuth			49,234,179	Comma separated
+23	Reference epoch		0349		Must be same on all baselines
+24	Reference frequency	8415.99		Must be same on all baselines
+
+The quality code is determined by a variety of tests:
+
+a) A letter code from a constituent baseline propagates directly into the
+   quality field for a closure triangle.  The precedence of the baselines
+   when multiple letter codes are present is undefined.
+b) When no letter codes are present, the lowest numerical quality code present
+   on the three baselines is used as a starting point.  If the data are
+   segmented and the baseline quality codes are zero, the closure quality
+   code is started at 9 instead.  This number is reduced by one under each of 
+   the following circumstances.
+    i) Minimum and maximum scan lengths differ by more than 1%
+    ii) Minimum and maximum scan lengths differ by more than 20%
+    iii) Minimum and maximum number of freqs processed differ by more than 5%
+    iv) Baselines were processed under different roots.
+
+The contents of the type 4 lines are as follows:
+
+Field #	Contents		Example		Comments
+-------	--------		-------		--------
+1	Format version #	2		To allow evolution of format
+2	Experiment #            2945		Must be same on all baselines
+3	File type 		4		Indicates closure quad data
+4	Year of scan		95		Must be same on all baselines
+5	Scan time ddd-hhmmss	237-160130	Must be same on all baselines
+6	Source name		3C345		Must be same on all baselines
+7	Freq/mode		XA		Must be same on all baselines
+8	Quad			GJYM		Also specifies order of telescopes,
+						baselines in other fields.  Baselines
+						come in order GJ,GY,GM,JY,JM,YM
+9	Root id codes		jnhuig,,,,,	Six entries, separated by commas,
+						blank means same as last one
+10	Extent #s		3,7,12,2,23,24	Comma separated
+11	Lengths			645,632,659,632,617,655
+						Comma separated scan lengths
+			     or 10		Means all baselines the same
+12	Quality code		8		Some synthesis of reliability info.
+13	ESDESP			010212		Max diff between baselines for
+						each digit of ESDESPs
+14	Closure amplitude	0.8935		Dimensionless
+15	Elevation		23.3,16.9,8.4,54.5
+						Comma separated
+16	Azimuth			49,234,179,334	Comma separated
+17	Reference epoch		0349		Must be same on all baselines
+18	Reference frequency	8415.99		Must be same on all baselines
+
+Wherever the comment says "Must be same on all baselines", the data line would never
+be formed in the first place unless it were true.  This will be enforced by aedit.

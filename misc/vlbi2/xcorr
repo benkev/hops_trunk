@@ -1,0 +1,15 @@
+#!/bin/tcsh
+# xcorr script for 2-bit data
+# Revised: 2009 March 31, DLS
+if ("$2" == "") then
+  echo "Usage: xcorr <file1> <file2> (without .m5b)"
+  echo "1-bit correlation of 2-bit data"
+else if (-e $1.m5b) then
+     if (-e $2.m5b) then
+       vlbi2 $1.m5b $2.m5b -2bit 1 > /dev/null
+       mv -f dd1.pos $1x$2.ps
+       gs $1x$2.ps
+     endif
+else
+     echo "File $1.m5b not found."
+endif

@@ -1,0 +1,34 @@
+
+   Hi Geoff,
+   Here are the rough steps I used to get HOPS working on my laptop. Let me
+   know if you need any more information.
+   Chris
+   ---
+   System info:
+   MacBook Pro Retina (Mid 2012)
+   2.6 GHz Intel Core i7
+   OS X 10.8.2
+   $ gcc --version
+   i686-apple-darwin11-llvm-gcc-4.2 (GCC) 4.2.1 (Based on Apple Inc. build
+   5658) (LLVM build 2336.11.00)
+   0. Already had ghostscript and pgplot installed via MacPorts. GS version:
+   9.06 and pgplot 5.2.2.
+   1. Downloaded the hops-3.8 build 756 tarball
+   from\240[1]ftp://gemini.haystack.mit.edu/pub/hops.
+   2. Modified the file hops-3.8/configure to replace every mention of
+   libpng12 to libpng.
+   3. Linked gs into /usr/bin as described in hops-3.8/MacPorts.txt
+   4. Linked pgplot into /opt/local/pgplot as described in
+   hops-3.8/MacPorts.txt
+   5. Ran configure as: ../hops-3.8/configure LDFLAGS=-L/opt/X11/lib
+   X_INSANE='-lobjc -framework Foundation -L/opt/local/lib -lpng
+   -F/opt/local/Library/Frameworks/ -framework AquaTerm'
+   NB: AquaTerm was installed via MacPorts as well, and didn't provide the
+   libaquaterm library anymore. Apparently Frameworks is a different way of
+   doing this?
+   6. make; sudo make install; make check\240
+   --
+   Christopher Greer
+   Steward Observatory
+   773-888-1342
+

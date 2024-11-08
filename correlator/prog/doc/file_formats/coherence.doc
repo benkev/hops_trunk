@@ -1,0 +1,53 @@
+Coherence analysis results format
+---------------------------------
+
+To automate the reduction of mm-VLBI data it is necessary to write out
+the results of a coherence analysis operation in a machine-readable format.
+This document describes the issues involved, and describes two key 
+proposed formats.
+
+The coherence properties of a dataset are determined by station-related
+phenomena -- the atmosphere over a station, and the stability of the
+station frequency standard.  A complete description of the coherence properties
+of a dataset should therefore be possible using a station-based format.
+
+However, the data with which the coherence properties must be analyzed
+are baseline-based.  Assuming the baseline coherence properties have been
+determined, some algorithm must be employed to attribute properties to
+stations.  This algorithm will rely on some form of closure.  The manner
+in which station properties combine to produce baseline properties
+must be determined on theoretical grounds (e.g. if the coherence time
+of station A is m seconds and of station B is n seconds, what is the
+coherence time of baseline AB?  Is it (1/m^2 + 1/n^2)^(-1/2), or something
+else?  What does one do when triangles are incomplete?  You can only
+determine coherence times when the source is detected, so any algorithm
+for figuring out what coherence times to use for all scans will
+involve interpolation between calibrator scans.
+
+Assuming these problems can be satisfactorily solved, a useful format
+for the coherence times should mimic the correlator control file
+schedule section.  For example:
+
+ 95 274 04 08 00  0420-014 A(15,10):B(20,10):C(6,4)
+ 95 274 04 13 10  0411+054 A(15,10):B(20,10)
+ 95 274 04 37 40  0411+054 A(15,10):B(60,20):C(10,6)
+
+For each station, the first number in parentheses would be the fringe
+search coherence time (for maximum SNR), while the second number would
+be the maximum coherent integration time which ensures negligible
+coherence loss, for visibility generation.
+
+Feedback on coherence data must refer back to the baseline data.  The
+obvious form for this is one plot per baseline/scan, with markers for
+both the machine-determined baseline coherence times, and the coherence
+times resulting from the station-based decomposition.  The former should
+be user-modifiable via cursor operation.
+
+The station-based decomposition should be a separate program to allow for
+user customization of the baseline coherence times.  The format of the
+baseline-based coherence data must therefore be specified.  An
+augmented A-file format (version 4) seems appropriate, since we need to
+modify it anyway to allow independent amplitude and phase SNRs.  One
+could implement smoothing and other manipulation of the coherence data
+in an upgraded aedit (or a standalone program) as an upgrade to the
+initial mm-VLBI package implementation.

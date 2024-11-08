@@ -1,0 +1,108 @@
+Documentation for the program "rename", CJL 24 November 1993
+------------------------------------------------------------
+
+COMMAND NAME:   rename
+
+SYNOPSIS:  Moves files from CI names to Unix names and directories
+
+SYNTAX:  rename [-d rootname] [-m nnn] [-o destdir] [-r] [sourcedir]
+		Where the flags are optional, and sourcedir is the
+		location of the CI files to be moved.
+
+OPTION FLAGS:   -d rootname
+			This switches on "dribble mode" operation
+			of rename.  In this mode it operates on
+			only one root file family at a time.  This
+			mode is invoked automatically by the
+			"dribble" script, and is the principal
+			mode quasi real-time data transfer from
+			the HP1000 correlator computers.  This
+			mode is incompatible with the -o mode. In
+			dribble mode, the sourcedir is overridden
+			by the directory containing the specified
+			root file.
+
+		-m nnn
+			Verbosity control.  The integer nnn can
+			be anywhere from -3 to 3, higher numbers
+			being less verbose.  The default is 1.
+
+		-o destdir
+			By default, rename places the files in one
+			of the main correlator data areas pointed
+			to by the environment variables CORDATA,
+			DATA1, ..., DATAn.  This flag overrides the
+			default destination, forcing the files into
+			the specified destination directory.  The
+			directory tree will be created there as needed,
+			and no symbolic links will be created.  This
+			mode is incompatible with the -d mode.
+
+		-r
+			Rename constructs a shell script to move
+			the files, to avoid the complexities of
+			different treatments for intra and inter
+			filesystem renames.  If the -r flag is
+			specified, this shell script will not be
+			deleted after rename finishes, and a message
+			will be printed on the terminal telling the
+			user what the filename of the script is.
+			This option is intended for debug purposes.
+
+ARGUMENTS:	sourcedir
+			This mandatory argument (except in dribble mode,
+			see description of -d option) tells "rename" where
+			to find the input data files in the CI file
+			naming convention.  It is not possible to
+			specify individual files to rename, except
+			when using the -d option (dribble mode).  Instead,
+			one should arrange for the desired subset of
+			correlator files to occupy their own directory,
+			and feed the name of that directory to rename.
+			Specifying a directory which contains corel
+			or fringe files without an associated root is
+			an error.
+
+ENVIRONMENT:	CORDATA, DATA1 ... DATAn
+
+DESCRIPTION:
+
+The purpose of the rename program is to convert the CI-style filenames of
+correlator data files newly FTP'ed from the HP-1000 system into the standard
+UNIX filename conventions.  Since the directory structure of experiment
+number and scantime subdirectories is integral to the UNIX filename convention,
+rename creates these directory trees as needed before renaming the actual
+files.
+
+The program has three modes.  The first two are automatic, and are intended for 
+routine, unattended transfer of production correlation data to the main data
+areas on the UNIX systems.  It looks at the environment variables CORDATA,
+DATA1, DATA2, ... , DATAn, figures out which has the most space, and sends
+all the data to that directory.  It also inserts symbolic links into $CORDATA
+to create the illusion of a single monolithic data area, even though the
+data are actually spread out more or less evenly across several physical
+disks.
+
+The third mode is a manual mode, intended for deliberate invocation by a user,
+for the purpose of transferring specific pieces of data to a private area
+on the UNIX system.  It is accessed via the -o flag, which is accompanied by
+the name of the desired destination directory.  Rename will create an experiment
+directory and scan subdirectories in the destination directory, and move the
+data files into the resulting directory tree, ready for manipulation by other
+programs.  Note that this directory tree is integral to the UNIX filenaming
+convention, and much of the software will not work on data that is not properly
+located in such a tree.  The subdirectory location represents additional
+information to that available on the HP-1000 filesystem, which is extensively
+used by the new software.
+
+Restrictions are similarly imposed on the renaming of files without associated
+roots.  The tight binding of corel and fringe files to their roots is fundamental
+to the entire software system.  Programs within the system treat root, corel
+and fringe files as inseparable groups, thus mimicking the HP-1000 practise of
+bundling them all up into one physical file.
+
+Except in dribble (-d) mode, which is not intended for manual use, rename 
+always moves ALL files in the source directory .. there is no way to ask
+it to do a desired subset of the files there.  If you need to move just a subset
+of them, create a new directory and move just the subset into that directory.
+Then invoke 'rename' on the new directory to achieve the desired effect.

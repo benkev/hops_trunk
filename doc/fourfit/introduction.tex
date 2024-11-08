@@ -1,0 +1,45 @@
+This manual is intended to be useful for a varied audience, which will
+include both users and developers. Hopefully it is organized enough
+so that any specific user can find the information they need, although
+of course the ultimate arbiter is the source code, which should be
+consulted for further detail.
+
+\subsection{Why fringe-fit?}
+One might reasonably ask why fringe-fitting is even necessary, given that
+the data have already been "correlated". The reason is that correlation
+is done with a very specific model, which incorporates information about
+source coordinates, station coordinates, epoch, frequency sequence, polar
+motion, earth rotation, clock-settings, etc. Many of these parameters
+contain significant errors, which will manifest themselves as non-zero
+residual delay and phase, varying in time. It is the task of fringe-fitting
+to remove as much of this residual signal as possible by estimating corrections
+to the intermediate quantities of group delay and delay rate.
+
+Once corrections to delay and rate are estimated, they can then be recombined
+with the delay and rate predicted by the model, in order to yield a "total"
+observable. This total is relatively insensitive to errors in the original
+model. For example, if we define $O$ as the observed (true) value and $C$ 
+as the computed model value, then the residual data value is $O-C$, and we 
+have the relation $O = C + (O-C)$. Small changes to $C$ are canceled out by
+compensating changes in $O-C$, at least over the region where changes
+remain linear.
+
+\subsection{Correlator windows}
+Not only is it desirable to keep the model as close to reality as possible,
+in order to stay within the linear region, but there are also some natural
+limitations inherent in the correlation process, which cause a finite range
+of possible residual values around the model. For example, a lag correlator
+has a finite number of lags, and there is a maximum lag between the two 
+datastreams, typically of order of 1 or 2 $\mu$s. The models must agree
+with reality to this level, or the correlated signal will fall outside
+the range of correlation. An FX correlator has similar limitations. If the
+delay rate residual is too large, then the fringe phase may wrap around
+a half or a full turn per accumulation period, causing loss of fringes or
+weakened fringes, respectively. The natural multiband delay window is set 
+by the spacing of the frequencies of the channels. It is the inverse of the
+GCD of the all of the channel frequency differences.
+
+For all three windows the natural window can be further restricted in
+the post-processing. This is done in order to speed up the fringe search,
+or possibly to restrict the range of a parameter based upon externally-
+supplied information.

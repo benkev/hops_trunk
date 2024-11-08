@@ -1,0 +1,102 @@
+Documentation for the program "interpol" SSD, 24 July 1996
+-------------------------------------------------------------
+
+COMMAND NAME:   interpol
+
+SYNOPSIS:  Interpolates fringe search parameters for non-detections and outputs
+	   either a-file format or windows for fourfit control files.
+
+SYNTAX:  interpol [-ft][-s sbd win] [-b mbd win] [-r rate win] [-m msglevel]
+			[-o outfile] [-l snrlim] [-e exp] input_file(s)
+		-f prints out non-detection scans in a-file format
+		-t prints out all scans with interpolated values in a-file format.
+		-s specifies width of sbdelay window in usec (default = 0).
+		-b specifies width of mbdelay window in usec (default = 0).
+		-r specifies width of dela rate window in ps/s (default = 0). 
+		-m sets verbosity level
+		-o specifies output file (default is stdout).
+		-l sets snr limit below which scans are labeled non-detections
+		-e sets exponent used in fitting routine
+		input_file(s) is(are) mandatory.
+
+OPTION FLAGS:	-f
+			Default operation of interpol is to output new windows
+			for refringing in fourfit control file format.  The 'f' 
+			option outputs all those scans for which new windows
+			were found in a-file format.  This output can drive
+			fourfit in the (-r) mode.
+
+		-t
+			To actually see the interpolated lines, it is useful to
+			output all scans in a-file format with interpolated
+			values filled in for sbd, mbd, rate.  Output from the
+			't' option can be fed into AEDIT and plotted along with
+			the original input file to check goodness of fit and
+			to look for outliers.
+
+		-s sbd window width
+			Sets the width of a window with which to pad the 
+			interpolated value of sbd.  New windows will be centered
+			on the new value with a TOTAL extent of the value
+			specified here.
+
+		-b mbd window width
+			Same as the 's' option but for the multi-band delay
+			parameter.
+
+		-r rate window width
+			Same as the 's' option but for the delay rate parameter.
+
+		-m msglevel
+			The lower the msglevel number, the more verbose the program
+			gets.  The default is 1, and the range -3 to +3 is supported.
+
+		-o outfile
+			If this flag is specified, the program will write its 
+			output to the specified file.  If not, it will write to 
+			stdout.
+
+		-l snrlimit
+			Interpol bases its linear fit only on those scans which 
+			pass through a quality filter.  This filter checks that
+			the quality factor is 1 or greater and that the snr of
+			the scan is greater than the snrlimit specified with the
+			'l' option.  Default is 7.
+		-e exp
+			When finding the best fit line, the user has some choice 
+			of weights used in the fit.  A value of e=2 corresponds
+ 			to least squares weighting while e=0 gives all points the
+			same weight.  e= exponent of snr used as weight.
+
+ARGUMENTS:	input_file(s)
+			These are the names of the Afile(s) to process.  They need 
+			not be sorted in any way and may include any type of afile
+			summary line.  Only the type 2 (fringe) lines will be 
+			considered by interpol.  Currently, interpol does require 
+			that only one frequency be processed at a time.
+
+ENVIRONMENT:	None
+
+
+DESCRIPTION:
+
+It is frequently the case that we can learn where to search for a VLBI detection by 
+examining detections at earlier and later times on the same baseline.  To do this
+requires an interpolation scheme that bridges the gaps between detections.  In the
+extreme case, an experiment will produce fringes on the calibrator sources but 
+none on the target sources.  In this case, one has to interpolate the fringe search
+parameters (single-band delay, multi-band delay, delay rate) based on the calibrator
+detections.  
+
+Interpol reads in a file of a-file summary lines, and selects only those of type 2.
+After an internal sort it selects those scans that pass through a detection filter.
+A scan is a 'detection' if its quality code is greater than 1 and its snr is above
+the value set by the '-l' option (default = 7).  These detections are fit to a straight
+line and the non-detections are assigned new search windows based on these fits.
+The default mode of interpol outputs search windows in fourfit control format that 
+are centered on the interpolated values and with a width set by the user in the 
+control line.  One can also output all scans (including detections) with the interpolated
+values in a-file format for plotting in aedit.  To refringe interpolated scans with 
+fourfit it may be desirable to have a list of the original non-detections that interpol
+found new search values for.  The output of the '-f' option does this and can be used
+to drive fourfit in its '-r' mode.

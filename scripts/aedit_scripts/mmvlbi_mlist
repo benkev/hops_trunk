@@ -1,0 +1,24 @@
+* Aedit runfile in support of mm-VLBI.  This one takes a raw alist file
+* and tries to turn it into a so-called "masterlist" suitable as the
+* starting point for a mm-VLBI analysis run
+
+* Eliminate single-channel fringe searches
+nfreq > 1
+
+* Eliminate short scans
+fraction > 30%
+
+* SNR below this indicates garbage
+snrmin 2
+
+* Only interested in type-2 data
+type 2
+
+* These qcodes indicate garbage in general
+qcodes not 1BEF
+
+* Apply abovedescribed filters
+edit inputs
+
+* Get rid of duplicate processings, keep latest processing
+edit duplicates procdate

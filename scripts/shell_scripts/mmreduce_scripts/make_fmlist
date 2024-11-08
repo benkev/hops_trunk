@@ -1,0 +1,111 @@
+#!/bin/csh -f
+#
+# This sub-script does the incoherent fringe searching job.  It
+# first segments and averages each data file for each point on a
+# user-defined grid of rate and multiband delay, and then invokes
+# the search program to find and interpolate the peak.
+# The starting point is a sanitized list of coherence time fitted
+# records (the cmlistf file).  
+# Called from mmreduce.
+#
+# Written by CJL, 22 February 1996
+#################################################################
+
+					# Skip option
+if (-e $1.fmlist) then
+    echo "mmreduce: A fringe-fitted output file already exists.  If you want"
+    echo "mmreduce: to use it, you should skip this step.  If not, the existing"
+    echo "mmreduce: file will be overwritten"
+    skipask
+    if ($status == 1) exit (0)
+endif
+
+echo "mmreduce: You need to specify the search grid parameters at this point"
+echo "mmreduce: There are three ways in which one can specify the rate/delay"
+echo "mmreduce: grid to the fringex program, detailed in the excerpt from the help"
+echo "mmreduce: file given below (rates and delays are relative to corel)\n"
+echo "mmreduce:         1. lowr,highr,rstep,lowd,highd,dstep"
+echo "mmreduce:                         This form specifies a grid in ps/s"
+echo "mmreduce:                         and ns."
+echo "mmreduce:         2. rxd          This form specifies an r times d"
+echo "mmreduce:                         grid in rate and delay centered on"
+echo "mmreduce:                         zero, with the grid spacing equal to"
+echo "mmreduce:                         the Nyquist intervals."
+echo "mmreduce:         3. all          This form is the same as rxd, except"
+echo "mmreduce:                         that the entire Nyquist range in"
+echo "mmreduce:                         each dimension is used"
+echo "mmreduce:         The multi-pass options are designed to be used in"
+echo "mmreduce:         fringe-searching.  Segmentation is performed for"
+echo "mmreduce:         all grid points, one pass per grid point.\n"
+echo "mmreduce: Please enter a valid grid specification now: \c"
+set grid=$<
+
+echo "mmreduce: Generating the incoherently averaged grid datasets.  This may"
+echo "mmreduce: take a long time, depending on the size of the input dataset"
+echo "mmreduce: and the requested grid.  You should also be aware that the output"
+echo "mmreduce: may be very large (many tens of megabytes may be common)"
+
+fringex -i search -r $1.cmlistf -d $grid -bc | average -b -o $1.srchgrid
+if ($status != 0) then
+    echo "mmreduce: Error return from fringex/average.  This is a problem."
+    exit (1)
+endif
+					# Production search run
+echo "mmreduce: Ready to perform the fringe fitting.  You have a choice"
+echo "mmreduce: of graphical output options.  This will be the production"
+echo "mmreduce: run, but you will get the opportunity of doing another,"
+echo "mmreduce: graphics-only run (no output file), later.  Your options are:"
+echo "mmreduce:     1. X-Window interactive graphics"
+echo "mmreduce:     2. Postscript hardcopy graphics"
+echo "mmreduce:     3. No graphics"
+echo "mmreduce: Pick a number from 1 to 3: \c"
+set reply=$<
+if ($reply == 1) then
+    search -x -o $1.fmlist $1.srchgrid
+else if ($reply == 2) then
+    search -d $1.srch_ps/ps -o $1.fmlist $1.srchgrid
+    if ($status == 0) then
+	echo "mmreduce: Printing search results on postscript printer"
+	lpps $1.srch_ps
+    endif
+else if ($reply == 3) then
+    search -d /null -o $1.fmlist $1.srchgrid
+else
+    echo "mmreduce: Invalid response, will use null graphics device"
+    search -d /null -o $1.fmlist $1.srchgrid
+endif
+if ($status != 0) then
+    echo "mmreduce: Error return from search!  Sorry, but I have to stop here."
+    exit (1)
+endif
+					# This part just for graphics output
+while (1)
+    echo "mmreduce: Search completed successfully, and results were written out"
+    echo "mmreduce: Do you want to generate another set of graphical output? (y/n): \c"
+    set reply=$<
+    if ($reply == "y" || $reply == "Y") then
+	echo "mmreduce: Your options are:"
+	echo "mmreduce:     1. X-Window interactive graphics"
+	echo "mmreduce:     2. Postscript hardcopy graphics"
+	echo "mmreduce: Pick a number from 1 to 2: \c"
+	set reply=$<
+	if ($reply == 1) then
+	    search -x -o /dev/null $1.srchgrid
+	else if ($reply == 2) then
+	    search -d $1.srch_ps/ps -o /dev/null $1.srchgrid
+	    if ($status == 0) then
+	        echo "mmreduce: Printing search results on postscript printer"
+	        lpps $1.srch_ps
+	    endif
+	else
+	    echo "mmreduce: Invalid response, let's go over that again, shall we?"
+	    continue
+	endif
+	break
+    else if ($reply == "n" || $reply == "N") then
+	break
+    else
+	echo "mmreduce: Please answer 'y' or 'n'"
+    endif
+end
+

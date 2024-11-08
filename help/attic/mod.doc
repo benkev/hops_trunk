@@ -1,0 +1,75 @@
+Documentation for the script "mod" CJL, 22 July 1994
+----------------------------------------------------
+
+COMMAND NAME:   mod
+
+SYNOPSIS:  Maintains program modification (.mod) files
+
+SYNTAX:  mod [progname]
+		Where progname is an optional specification of the
+		program, shell script, or subroutine library that
+		was modified.  WARNING: do not use semicolons in
+		your responses to mod.
+
+OPTION FLAGS:	None
+
+ARGUMENTS:	progname
+			If specified, mod will attempt to update the .mod
+			file for "progname", overriding any other ideas it
+			may have for what you want to update (see the
+			description of mod for details).  If progname is
+			omitted, and mod can't figure out what you are
+			modifying, it will ask you.
+
+ENVIRONMENT:	HOPS, MOD
+
+
+DESCRIPTION:
+
+In HOPS, rather than deal with the overhead of a comprehensive code
+management scheme, we have elected to write our own, very simple code
+maintenance utility.  It consists only of a dated history of all
+"significant" source code modifications, with significance determined
+only by the programmer on the spot.  The modification information takes
+the form of a time stamp, a programmer id, a list of affected source
+code routines, and a brief one-line comment describing the change.  This
+information is kept separately for each program, script and subroutine
+library, in a collection of .mod files in the directory $MOD.  The list
+of .mod files grows as programmers enter modifications for a new
+entity, and no explicit administration of the files is necessary.
+
+This whole scheme is implemented by the "mod" script, whose design is
+intended to minimise effort by the programmer, yet ensure a high level
+of accuracy and standardization in the contents of the .mod files.  This
+standardization is important for ensuring the completeness and
+effectiveness of machine searches through the modification database
+(using grep, or awk, for example).  Under normal circumstances, a
+programmer will complete changes in a source code directory.  Upon
+typing "mod", the programmer will be asked whether he wants to update
+the information for the program pertaining to the current directory,
+and may just hit return to confirm.  If the .mod file exists, the 
+script will ask for a list of routines modified, and then for a short
+description of the changes.  Finally, he will be asked if there are
+any more changes to this program to report; hitting return implies a
+negative response and exits the script.  The whole process involves
+two confirmatory hits of the return key, and the data entry itself.
+
+Under a variety of less common circumstances, some additional information
+may be required, such as confirmation that a new .mod file must be
+created, the name of the program/script/library that was modified, 
+and your real username if "mod" cannot figure it out.  The "progname"
+argument to "mod" overrides the automatic detection of which program
+you wish to document.
+
+Each entry in a .mod file consists of a single line, with unconstrained
+length and fields delimited by semicolons.  Because it is not column
+oriented, this format can be hard to look at despite the ease with
+which it can be constructed in a shell script such as "mod".  To 
+address this problem, a filter program "modformat" exists which converts
+each line of a .mod file into a more easily readable multiline format.
+See the "modformat" documentation for details.
+
+WARNING: Because the .mod file format is delimited by semicolons, please
+         do not use semicolons in your replies to "mod" questions.  It
+         may seriously confuse programs and scripts which try to read
+         the .mod files.

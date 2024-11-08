@@ -1,0 +1,125 @@
+#!/usr/bin/expect -f 
+# counts 
+# Counts is an expect script to read the Mark-4 counter.
+# Revised:  2001 March 14, JAB 
+# 
+
+#-------------------------------------------------------------------------------
+# Check environment variables, set defaults if necessary: 
+if { [ array get env BIN ] == "" } { set env(BIN) /correlator/bin } 
+if { [ array get env SYSVEX ] == "" } { set env(SYSVEX) /correlator/sysvex } 
+eval [ exec pivex $env(SYSVEX)/global.ivex ] 
+set adr 03 ;# GPIB address of counter 
+#
+trap { ;# Interrupt 
+  puts "INTERRUPT " 
+  set spawn_id $cid 
+  send "\035" ;# = "^]"  
+  expect "telnet> " 
+  send "close\r" 
+  set spawn_id $sid 
+  send "\035" 
+  expect "telnet> " 
+  send "close\r" 
+  puts "The End " 
+  exit } SIGINT 
+# 
+log_user 1 ;# Log telnet output 
+spawn telnet $machS [ expr 2000 + $ports ] ;# Telnet to switch's spigot
+set sid $spawn_id ;# ID of telnet to switch 
+sleep 1.0 ;# Wait a second 
+expect "*" ;# Clear any extra chars 
+spawn telnet $machC [ expr 2000 + $portc ] ;# Telnet to counter's spigot 
+set cid $spawn_id ;# ID of telnet to counter (cnum) 
+sleep 1.0 
+expect "*" 
+# Following commands are to Micro488/P-901 (RS232 to HPIB converter) 
+for { set i 0 } { $i < 5 } { incr i } { 
+  send "\r" 
+  expect ">" } ;# Initialize (from power-on cold start) 
+send "I\r\n" ;# Initialize (warm restart) 
+expect ">" 
+expect "*" ;# Clear any extra chars 
+send "EC;1\n" ;# Echo on (needed for expect) 
+expect ">" 
+expect "*" 
+send "H;1\n" ;# Wired handshaking 
+expect ">" 
+expect "*" 
+send "X;0\n" ;# Not XON/XOFF handshaking 
+expect ">" 
+expect "*" 
+send "TC;2\n" ;# Serial commands end with \n 
+expect ">" 
+expect "*" 
+send "TB;4\n" ;# GPIB commands end with \r\n 
+expect ">" 
+expect "*" 
+# Following commands go through Micro488/P to HP 53131A counter 
+send "OA;$adr;*RST\r\n" ;# Reset 
+expect ">" 
+expect "*" 
+send "OA;$adr;*CLS\r\n" ;# Clear status 
+expect ">" 
+expect "*" 
+send "O;*SRE 0\r\n" ;# Service request enable 
+expect ">" 
+expect "*" 
+send "O;*ESE 0\r\n" ;# Event status enable 
+expect ">" 
+expect "*" 
+send "OA;$adr;:STAT:PRES\r\n" ;# Preset status registers 
+expect ">" 
+expect "*" 
+send "OA;$adr;:CONF:TINT (@1),(@2)\r\n" ;# Configure time interval 1 to 2 
+expect ">" 
+expect "*" 
+send "OA;$adr;:EVENT1:LEVEL 1.5\r\n" ;# Trigger level 1 to 1.5 volts 
+expect ">" 
+expect "*" 
+send "OA;$adr;:EVENT2:LEVEL 1.5\r\n" ;# Trigger level 2 to 1.5 volts 
+expect ">" 
+expect "*" 
+send "OA;$adr;:SYST:ERR?\r\n" ;# Report errors (to now) 
+expect ">" 
+expect "*" 
+send "EN;$adr\r\n" ;# Read error, if any 
+expect "\[+-\]*\"" 
+puts " $expect_out(0,string) " ;# Print error, if any 
+expect ">" 
+expect "*" 
+log_user 0 ;# Stop loging telnet output 
+send_user -raw [ exec clear ] ;# Clear screen 
+set iis [ lsort [ array names num ] ] ;# Each active switch position 
+while (1) { ;# Loop forever 
+  # for { set i 0 } { $i < $nhexx } { incr i } ? ;# Each active channel 
+  set lin 0 ;# Line number 
+  foreach i $iis { 
+    set spawn_id $sid ;# Talk to switch 
+    set j $num($i) ;# Channel number (should be hex) 
+    send "$j\r" ;# Set switch to channel $j 
+    send "FF\r" ;# Read back channel number 
+    expect "Channel $j" ;# Verify switch channel $j 
+    expect "*" 
+    set spawn_id $cid ;# Talk to counter 
+    send "OA;$adr;READ?\r\n" ;# Make a counter reading 
+    send "EN;$adr\r\n" ;# Get counter reading, seconds 
+    expect "+*\r" ;# Answer to $expect_out() 
+    set ans [ lindex [ split [ string trim \
+        $expect_out(0,string) "\r\n >" ] "\r\n >" ] end ] 
+    if { $ans < $min($i) || $ans > $max($i) } { 
+      set chk "ERROR\007" ;# Out of range min() to max() 
+    } else { set chk OK } ;# In range 
+    send_user -raw [ exec tput cup $lin 0 ] ;# Position cursor 
+    send_user -raw [ exec tput el ] ;# Clear line 
+    puts " $name($i) " ;# Print line 
+    send_user -raw [ exec tput cup $lin 13 ] ;# Position cursor 
+    puts " $ans " 
+    send_user -raw [ exec tput cup $lin 32 ] 
+    puts " $chk " 
+    expect "*" 
+    incr lin } 
+  send_user -raw [ exec tput ed ] ;# Clear to end of display 
+} ;# End of while loop forever 
+# End of counts 
+

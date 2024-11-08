@@ -1,0 +1,22 @@
+vhelp:
+vhelp:  To obtain more information on any program, type "vhelp programname"
+vhelp:  where "programname" is a minimum-matchable name as listed above.
+vhelp:  To get information about various aspects of a program, type
+vhelp:  "vhelp programname aspect", where "aspect" is any of "syntax",
+vhelp:  "options", "arguments", "environment" or "description".
+vhelp:
+vhelp:  Various shell scripts may found in $SRC/shell_scripts.  Not
+vhelp:  all of these are ready for public distribution, but are made
+vhelp:  available on an as-is basis.
+vhelp:
+vhelp:  To get information on available scripts, type "vhelp scripts"
+vhelp:
+vhelp:	Correlator control files can be found in /correlator/schedules
+vhelp:
+vhelp:  To get a verbose overview of the software system, type 'vhelp general'
+vhelp:  To get description of HOPS software libraries, type 'vhelp libraries'
+vhelp:  To get an overview of the VLBI disk areas, type "vhelp disk"
+vhelp:  To get an overview of data retrieval to disk, type "vhelp restore"
+vhelp:  To get information on the caltech package, type "vhelp caltech"
+vhelp:  To get information on aips, type "vhelp aips"
+

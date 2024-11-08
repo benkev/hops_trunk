@@ -1,0 +1,45 @@
+The downside of the auto-* make system is that you have to do alot to
+do something simple.  You can probably just get it to build with a
+simple build script (anoise.sh) based on implicit make rules; e.g.
+something like this:
+
+  #!/bin/sh
+  CPPFLAGS='-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE'
+  make anoise_maker.o CPPFLAGS="$CPPFLAGS"
+  make quant_hacker.o CPPFLAGS="$CPPFLAGS"
+  make anoise_common.o CPPFLAGS="$CPPFLAGS"
+  make anoise_station.o CPPFLAGS="$CPPFLAGS"
+  make anoise_extend.o CPPFLAGS="$CPPFLAGS"
+  make anoise_describe.o CPPFLAGS="$CPPFLAGS"
+  LOADLIBES='anoise_maker.o quant_hacker.o anoise_common.o anoise_station.o anoise_extend.o anoise_describe.o'
+  LDLIBS='-lgsl -lfftw3 -lrt -lm'
+  make anoise LOADLIBES="$LOADLIBES" LDLIBS="$LDLIBS"
+  ./anoise --help
+
+The automake/autoconf requires you to build two files, Makefile.am
+and autoconf.ac after which you do
+
+  aclocal
+  autoconf
+  autoheader
+  automake -af
+  ./configure
+  make
+
+For Makefile.am and configure.ac use Makefile_am and configure_ac.
+
+E.g.
+
+  mkdir $SOMEWHERE
+  touch hops_config.h
+  cp -p anoise.h $SOMEWHERE
+  cp -p anoise.c anoise_maker.c quant_hacker.c $SOMEWHERE
+  cp -p anoise_common.c anoise_station.c anoise_extend.c $SOMEWHERE
+  cp -p anoise_describe.c $SOMEWHERE
+  cp -p Makefile_am $SOMEWHERE/Makefile.am
+  cp -p configure_ac $SOMEWHERE/configure.ac
+
+option three is to pick up the complete hops tarball (e.g.
+/swc/tarpit/hops-dv-difx-tc-3.8swc.tar.gz), untar it and
+follow the instructions in the README.
+

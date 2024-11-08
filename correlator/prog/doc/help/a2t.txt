@@ -1,0 +1,22 @@
+
+----- a2t ----- 
+
+a2t is a rather crude utility program that reads a reprocess list
+in afile fringesum format and writes a reprocess task-stream file
+to stdout.  The lines in the input file should be grouped by
+scan, preferably in time sequence.  Command-line arguments are
+the afile name, an ordered station list, and the number of SUs.  
+The output is normally redirected to a something.tsf file.  Since 
+a2t knows the experiment number but not the experiment key, you 
+may need to edit the output file to add ekey and also mode. 
+
+Typical usage: 
+     a2t  Afilename  Stationlist  NumSUs  >  outfile.tsf 
+or use >> instead of > to append to an existing task-stream file. 
+
+Since a2t can now be called from the composer script, this is the 
+recommended usage. 
+
+
+                                      Revised:  2001 July 19, JAB
+

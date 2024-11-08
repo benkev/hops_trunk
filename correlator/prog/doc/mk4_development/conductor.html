@@ -1,0 +1,128 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="Generator" CONTENT="Microsoft Word 97">
+<TITLE>Letterhead template</TITLE>
+</HEAD>
+<BODY>
+
+<FONT FACE="CG Times (WN)" SIZE=2><P ALIGN="CENTER">MASSACHUSETTS INSTITUTE OF TECHNOLOGY</P>
+<P ALIGN="CENTER">HAYSTACK OBSERVATORY</P>
+<P ALIGN="CENTER">WESTFORD, MASSACHUSETTS 01886</P>
+<P ALIGN="RIGHT">22 October, 1996</P>
+</FONT><FONT FACE="CG Times (WN)" SIZE=1><P ALIGN="RIGHT">Telephone: 508-692-4764</P>
+<P ALIGN="RIGHT">Fax: 617-981-0590</P>
+</FONT><FONT FACE="CG Times (WN)" SIZE=2><P ALIGN="RIGHT">&nbsp;</P>
+</FONT><B><FONT FACE="CG Times (WN)"><P ALIGN="JUSTIFY">To</B>:&#9;Mark 4 Software Group</P>
+<B><P ALIGN="JUSTIFY">From</B>:&#9;Roger Cappallo</P>
+<B><P ALIGN="JUSTIFY">Subject</B>:&#9;Conductor (rev. 2)</P>
+</FONT><I><FONT FACE="Arial" SIZE=1><P ALIGN="JUSTIFY">This document, and its subsequent revisions, will define the function and implementation of conductor</I></FONT><FONT FACE="Arial" SIZE=3>.</P>
+<B><P ALIGN="JUSTIFY">PREAMBLE</P>
+</B><P ALIGN="JUSTIFY">Conductor is at the center (at least topologically) of the Mark 4 real-time software suite (see Figure 1).  Its purpose is to orchestrate the variety of tasks that must take place within the real-time system in disparate modules, in such a fashion as to allow robust and flexible operations.  The design proposed here is quite modular, so that additional functionality can be added to the basic nucleus, as the rest of the software system becomes better defined.</P>
+<B><P ALIGN="JUSTIFY">PURPOSE</P>
+</B><P ALIGN="JUSTIFY">Conductor will handle the sequencing of correlator operations, both for normal operations and for unexpected events, such as operator intervention or fault conditions.  In the Mark 3A correlator system, the analogous sequencing operations were spread across several programs, including COREL, VRUN, VSYNC VJOKY, and SKD71.  Operations which are not primarily sequencing in nature, such as creating/reading files, or interacting with hardware, will be handled by a set of discrete manager programs.</P>
+<B><P ALIGN="JUSTIFY">INTERACTING OBJECTS</P>
+</B><P ALIGN="JUSTIFY">Conductor’s sole interface to all other objects in the real-time system will be via exchange of messages; it will neither read nor write files.  The following modules/objects will interact with conductor:</P>
+
+<UL>
+<P ALIGN="JUSTIFY"><LI>SUM - SU Manager: </FONT><FONT FACE="Arial" SIZE=2>communicates with all of the SU’s. Manages tape mounts/dismounts, SU data files  (type 3 files contain phase cal &amp; state counts), various error conditions involving the tapes (head positioning problems, missing data on tapes, … ), scan pipelining. </FONT><FONT FACE="Arial" SIZE=3> </LI></P>
+<P ALIGN="JUSTIFY"><LI>TAL - Tape Librarian: </FONT><FONT FACE="Arial" SIZE=2>manages requests for information from the online tape library database;</LI></P>
+</FONT><FONT FACE="Arial" SIZE=3><P ALIGN="JUSTIFY"><LI>GEN - genaroot: </FONT><FONT FACE="Arial" SIZE=2>calculates a priori delays and rates via CALC engine; fits quintic spline polynomials to tabular points; creates root files with delay and phase polynomials for each station</LI></P>
+</FONT><FONT FACE="Arial" SIZE=3><P ALIGN="JUSTIFY"><LI>OPI - operator interface: </FONT><FONT FACE="Arial" SIZE=2>handles all operator interactions, including initiation of single scans, status requests, and diagnostic information (fringes, etc.)</LI></P>
+</FONT><FONT FACE="Arial" SIZE=3><P ALIGN="JUSTIFY"><LI>BFM - Batch File Manager: </FONT><FONT FACE="Arial" SIZE=2>(merge with OPI??) generates correlation scripts for multiple scan processing</LI></P>
+</FONT><FONT FACE="Arial" SIZE=3><P ALIGN="JUSTIFY"><LI>CRM - CU Resource Manager: </FONT><FONT FACE="Arial" SIZE=2>manages correlator and input boards; responsible for allocation, configuration, and status monitoring.</LI></P>
+</FONT><FONT FACE="Arial" SIZE=3><P ALIGN="JUSTIFY"><LI>CDM - CU Dataflow Manager: </FONT><FONT FACE="Arial" SIZE=2>manages correlator output files; creates them and writes correlator lag and status data to them.</LI></P>
+</FONT><FONT FACE="Arial" SIZE=3><P ALIGN="JUSTIFY"><LI>RCM - ROT Clock Manager: </FONT><FONT FACE="Arial" SIZE=2>sends realtime messages to SU’s setting their ROT clocks, and thus controlling the detailed timing (pacing) of the correlations</LI></P>
+</FONT><FONT FACE="Arial" SIZE=3><P ALIGN="JUSTIFY"><LI>CLM - Correlator Log Manager: </FONT><FONT FACE="Arial" SIZE=2>receives log messages from other modules, time-stamps them, and writes them to a log file associated with current scan</LI></P></UL>
+
+</FONT><B><FONT FACE="Arial" SIZE=3><P ALIGN="JUSTIFY">ARCHITECTURE</P>
+</B><P ALIGN="JUSTIFY">Conductor will be implemented as an interpreter for a table-driven state machine.  It is unclear how all of the desired functionality could be achieved by merely stepping through states and passing messages.  Such an approach was considered and abandoned, as it would lead to a proliferation of external message processors.  Thus it is proposed that conductor also have internal actions associated with each state transition.  These actions will be implemented as a small piece of C code which will perform the requisite activity.  All of the large scale sequencing will be inherent in the state machine.  The conductor code to implement actions will be restricted to local, immediate actions that require no waiting.  Typical actions would involve such things as reading and writing to conductor’s own data structures, making arithmetic and logical calculations, and deciding to post messages.</P>
+<B><P ALIGN="JUSTIFY">STATE TABLE</P>
+</B><P ALIGN="JUSTIFY">An FSM table entry would include four fields: &lt;state&gt;, &lt;event&gt;, &lt;action&gt;, &lt;next state&gt;.  The FSM goes from &lt;state&gt; to &lt;next state&gt; when an &lt;event&gt; occurs, which in conductor is always the receipt of a message.  The &lt;action&gt; which is taken might involve manipulation of  data structures within conductor and the transmission of messages.  Additional flexibility can be afforded by allowing the action routines to place messages upon conductor’s input queue.  One effect of this is to allow branching (i.e. state sequencing) decisions to be made in the routines, since they can generate an event to force a transition into the desired target state.  The special state <B>any_state</B>, which will be matched by any state, is used as a way of handling general conditions not tied to any particular state.  In such a case, the resultant state is not generally altered.  The state machine searches the state table in order, trying to find a match for both &lt;state&gt; and &lt;event&gt;.  The global events which have <B>any_state</B> as their &lt;state&gt;, would naturally be placed at the bottom of the table.  Similarly, there is a global event matcher called <B>any_event</B>  A skeleton FSM table can be found in Appendix A, while Appendix B contains pseudo-code for the actions indicated by the FSM.</P>
+<B><P ALIGN="JUSTIFY">MESSAGES</P>
+</B><P ALIGN="JUSTIFY">The messaging sub-system will be taken, as much as possible, from the EVN correlator.  Their message format apparently has all of the capabilities we need, such as a message ID, reference ID, message source and destination, a time stamp, and variable format data blocks.  Their system also allows messages to be queued for later execution at a specified ROT (we may find it useful to expand this capacity to allow a COT epoch for command execution).  For more detail concerning the messaging system consult the EVN Memo #42.  Appendix C contains a complete list of the messages that are sent and received by conductor.</P>
+<B><P ALIGN="JUSTIFY">MULTIPLE CORRELATIONS</P>
+</B><P ALIGN="JUSTIFY">One constraint which drives the design is the necessity to handle multiple concurrent correlations.  These simultaneous scans can be handled neatly through use of multiple state pointers, in some ways analogous to a saved PC (program counter) in a multi-tasking system, and some ancillary state information, which would be analogous to saved registers.  We can then define a state structure, which contains the current state pointer, and all of the state information needed to contextualize a scan (see Figure 2).  When an event occurs, the software must figure out which scan it references, and switch context by loading the correct state pointer and state information, before operating upon the event. At the highest level, the program can be considered to be a state-processor, with the following sequencing:</P>
+<OL>
+
+<P ALIGN="JUSTIFY"><LI>read next event in queue</LI></P>
+<P ALIGN="JUSTIFY"><LI VALUE=1>determine which state structure is in context, <I>I. e. </I>which scan is being referenced, from the message contents</LI></P>
+<P ALIGN="JUSTIFY"><LI VALUE=1>load the state</LI></P>
+<P ALIGN="JUSTIFY"><LI VALUE=1>process the event</LI></P>
+<P ALIGN="JUSTIFY"><LI VALUE=1>save the new state</LI></P>
+<P ALIGN="JUSTIFY"><LI VALUE=1>wait for next event in queue</LI></P></OL>
+
+<B><P>PIPELINED SCANS</P>
+</B><P>A design goal of the Mark 4 software is that scans will be processed as expeditiously as possible.  Thus it is desirable to have scans be processed &quot;on the fly&quot;, or in a pipelined fashion whenever feasible, with continuous tape motion.  In most experiments there will only be a 5 to 10 second gap on the tape between scans, caused by the tape stopping and starting at record time.  As a result, the realtime correlator software needs to be flexible and responsive enough to be ready to start correlating the subsequent scan in a few seconds.</P>
+<P>It is proposed that the basic responsibility for detecting scans which can be pipelined, should be given to the SUM, which will have access to the tape library database.  The SUM, when tapes are requested, will need to examine the database of what is actually on the tapes, and see if the requested scan follows the current scan, on all tapes, and in the same direction.  If so, it develops a useable time based upon its <I>a priori</I> information, and doesn’t actually try to manipulate the tapes.  The intended pipelining is reported back to the conductor through the <B>valid time</B> message.</P>
+</FONT><FONT FACE="Arial" SIZE=5><P>Appendix A - Skeleton FSM Table</P>
+</FONT><B><FONT FACE="Arial"><P>STATE&#9;EVENT (</B>originator<B>)&#9;ACTION&#9;NEXT STATE</P>
+</FONT><FONT FACE="Arial" SIZE=2><P>await_root&#9;root_complete </B>(GEN)&#9;<B>acquire_tapes&#9;await_valid_times</P>
+<P>await_valid_times&#9;valid_time </B>(SUM)<B>&#9;process_valid_time&#9;await_valid_times</P>
+<P>await_valid_times&#9;have_all_times </B>(CON)<B>&#9;make_cu_request&#9;configuring_corr</P>
+<P>await_valid_times&#9;cant_find_time </B>(SUM)<B>&#9;no_time_oper_alert&#9;await_valid_times</P>
+<P>await_valid_times&#9;remove_station </B>(OPI)<B>&#9;deactivate_station&#9;await_valid_times</P>
+<P>await_valid_times&#9;time_status_change </B>(OPI)<B>&#9;check_time_status&#9;await_valid_times</P>
+<P>configuring_corr&#9;corr_resource_avail</B> (CRM)<B>&#9;begin_correlator_pass&#9;tape_startup</P>
+<P>tape_startup&#9;drive_synchronized </B>(SUM)<B>&#9;add_synced_drive&#9;tape_startup</P>
+<P>tape_startup&#9;all_synced</B> (CON)&#9;<B>post_all_synced&#9;correlating</P>
+<P>correlating&#9;end_of_scan</B> (CDM)&#9;<B>end_correlation&#9;&lt;null&gt;</P>
+<P>any_state&#9;correlate_scan</B> (OPI)&#9;<B>setup_new_scan&#9;await_root</P>
+</B><P>&nbsp;</P>
+<P ALIGN="CENTER">&nbsp;</P>
+</FONT><FONT FACE="Arial" SIZE=5><P ALIGN="CENTER">Appendix B - Action Pseudo-code</P>
+</FONT><B><FONT FACE="Arial" SIZE=2><P>acquire_tapes:</P>
+<P>&#9;</B>save root filename, etc.</P>
+<P>&#9;send message to SUM requesting tape mount/access</P>
+<B><P>process_valid_time:</P>
+<P>&#9;</B>store time in <B>time_array[station]</P>
+</B><P>&#9;change <B>station</B> status to <B>time_found</P>
+<P>&#9;</B>if all stations have <B>time_found</B> status <B>assert_event</B> (<B>have_all_times</B>)</P>
+<B><P>make_cu_request:</P>
+<P>&#9;</B>send message to CRM requesting necessary correlator resources</P>
+<B><P>begin_correlator_pass:</P>
+<P>&#9;</B>determine initial ROT clock setting</P>
+<P>&#9;send message to RCM to start at the initial time ASAP</P>
+<B><P>no_time_oper_alert:</P>
+<P>&#9;</B>send message to OPI reporting missing time</P>
+<B><P>deactivate_station:</P>
+<P>&#9;</B>send message to SUM removing designated <B>station</P>
+</B><P>&#9;<B>assert_event</B> (<B>time_status_change</B>)</P>
+<B><P>setup_new_scan:</P>
+<P>&#9;</B>initialize new scan thread</P>
+<P>&#9;send message to GEN requesting root generation</P>
+<B><P>add_synced_drive:</P>
+<P>&#9;</B>update current state to reflect drive status</P>
+<P>&#9;if no more drives unsynced <B>assert_event (all_synced)</P>
+<P>end_correlation:</P>
+<P>&#9;</B>send message to CLM logging scan stats</P>
+<P>&#9;remove current scan’s state structure from list</P>
+<P>&#9;search other threads for applicable pipeline-pending; act upon result</P>
+<P ALIGN="CENTER">&nbsp;</P>
+</FONT><FONT FACE="Arial" SIZE=5><P ALIGN="CENTER">Appendix C - Conductor Messages</P><DIR>
+
+</FONT><B><U><FONT FACE="CG Times (WN)"><P ALIGN="JUSTIFY">message</U>&#9;<U>source</U>&#9;<U>destination</U>&#9;<U>data</U>&#9;<U>comments</P>
+</B></U><P ALIGN="JUSTIFY">generate_root&#9;CON&#9;GEN&#9;ccf name</P>
+<P ALIGN="JUSTIFY">&#9;&#9;&#9;scan time</P>
+<P ALIGN="JUSTIFY">corr_resource_req&#9;CON&#9;CUR&#9;resource specifier</P>
+<P ALIGN="JUSTIFY">&#9;&#9;&#9;wait bit&#9;set if OK to wait</P>
+<P ALIGN="JUSTIFY">request_tapes&#9;CON&#9;SUM&#9;station list</P>
+<P ALIGN="JUSTIFY">&#9;&#9;&#9;scan time</P>
+<P ALIGN="JUSTIFY">have_all_times&#9;CON&#9;CON&#9;</P>
+<P ALIGN="JUSTIFY">configure_tapes&#9;CON&#9;SUM&#9;track configurations</P>
+<P ALIGN="JUSTIFY">define_outfile&#9;CON&#9;CDM&#9;filename structure</P>
+<P ALIGN="JUSTIFY">start_rot_clock&#9;CON&#9;RCM&#9;ROT</P>
+<P ALIGN="JUSTIFY">current status&#9;CON&#9;OPI&#9;processing state</P>
+<P ALIGN="JUSTIFY">root_complete&#9;GEN&#9;CON&#9;root filename</P>
+<P ALIGN="JUSTIFY">valid_time&#9;SUM&#9;CON&#9;station</P>
+<P ALIGN="JUSTIFY">&#9;&#9;&#9;first useable time</P>
+<P ALIGN="JUSTIFY">&#9;&#9;&#9;pipeline status</P>
+<P ALIGN="JUSTIFY">cant_find_time&#9;SUM&#9;CON&#9;station</P>
+<P ALIGN="JUSTIFY">CU_resource_avail&#9;CRM&#9;CON&#9;track configurations</P>
+<P ALIGN="JUSTIFY">remove_station&#9;OPI&#9;CON&#9;station</P>
+<P ALIGN="JUSTIFY">correlate_scan&#9;OPI&#9;CON&#9;ccf name</P>
+<P ALIGN="JUSTIFY">&#9;&#9;&#9;scan time</P>
+<P ALIGN="JUSTIFY">&#9;&#9;&#9;station list</P>
+<P ALIGN="JUSTIFY">query_status&#9;OPI&#9;CON&#9;scan time</P></DIR>
+</FONT></BODY>
+</HTML>

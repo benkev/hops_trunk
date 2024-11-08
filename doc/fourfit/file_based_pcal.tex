@@ -1,0 +1,42 @@
+For some applications, such as mm-wave VLBI where the atmospheric coherence time scale is short, it is advantageous to be able to make a priori phase corrections in a fringe fit. Typically the phases will be derived through some other avenue, such as other instruments (e.g. water-vapor radiometers) or information from other polarization senses. For full flexibility, one can make corrections for each frequency channel as a function of time within each scan. 
+
+The full time-frequency array is specified in a flat 2-dimensional ASCII file, one file per each station. Typically, though not necessarily, a single file would be used for an entire experiment. The file would be given a name that identifies the station whose data it contains. 
+
+Each line in the file begins with an epoch, and then has entries for all channels for that epoch, represented by space-delimited phases in degrees. The UT epoch is in decimal days since the beginning of the year. (0300UT on Jan 2 is 1.125). Comments begin with an asterisk, and everything including and beyond an asterisk on each line is stripped prior to reading.
+
+Thus an example of a rather short phase file (having only 4 channels, with data points each 10 sec) might appear as:
+
+\texttt{
+* Westford phases for chans at 221120.0 221152.0 221184.0 221216.0 \\
+* \\
+223.041667 13.2 -39.3 57.1 177.0 \\
+223.041782 9.7 -36.2 77.0 -176.5 \\
+223.041898 8.8 -37.7 92.4 -171.9 \\
+}
+
+The new fourfit control file commands to support this capability are: \\
+\obeyspaces{\texttt{
+adhoc\_phase file               * denotes that file mode pcal will be used \\
+adhoc\_file <file\_name>          * relative or absolute file name containing phases \\
+adhoc\_file\_chans <channel\_list>  * where channel\_list is ff chan codes \\
+}}
+
+An example of a block of a fourfit control file might be: \\
+\texttt{
+if station E \\
+adhoc\_phase file \\
+adhoc\_file pcal\_x3970\_wf \\
+adhoc\_file\_chans abcd \\
+}
+
+{\bf Algorithm}
+
+The time points are considered to be either instantaneous values, or the result of a linear average of the phase, symmetric about the specified epoch. The algorithm within fourfit performs a linear interpolation between the specified points, and then finds the average value of the piece-wise linear function so derived over each accumulation period in a fringe fit. If the ap data extends beyond the range of the piecewise linear pcal function, then the function is extrapolated linearly (if possible) to cover the ap.
+
+The phase values are considered to be equivalent to measured pcal phase for a station. Thus the value will be removed from the data phase prior to the fringe fit. In other words, the data phase will be counter-rotated by the given pcal phase. The ad hoc file-based phases are applied in addition to any extracted phase cal (as invoked by pc\_mode multitone, normal, or manual). In order to zero out the
+extracted pcal, one can simply use pc\_mode manual without any phases being specified in a pc\_phases command, as the default is 0.
+
+Note that fourfit channel codes (abcde) have an implied context of the mk4 fileset it is being applied to. It is possible to recorrelate with a changed vex file, and have the resulting channel codes change. This shouldnÕt present a problem with a modicum of caution on the part of the fringe fitter.
+
+
+

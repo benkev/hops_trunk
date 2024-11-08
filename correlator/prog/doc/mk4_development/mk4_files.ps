@@ -1,0 +1,1837 @@
+%!PS-Adobe-3.0
+%%Title: mk4_files.txt
+%%For: Shep Doeleman
+%%Creator: a2ps version 4.13
+%%CreationDate: Tue Sep 18 15:11:02 2007
+%%BoundingBox: 24 24 588 768
+%%DocumentData: Clean7Bit
+%%Orientation: Portrait
+%%Pages: 11
+%%PageOrder: Ascend
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: font Courier
+%%+ font Courier-Bold
+%%+ font Courier-BoldOblique
+%%+ font Courier-Oblique
+%%+ font Helvetica
+%%+ font Helvetica-Bold
+%%+ font Symbol
+%%+ font Times-Bold
+%%+ font Times-Roman
+%%DocumentProcessColors: Black 
+%%DocumentSuppliedResources: procset a2ps-a2ps-hdr
+%%+ procset a2ps-black+white-Prolog
+%%+ encoding ISO-8859-1Encoding
+%%EndComments
+/a2psdict 200 dict def
+a2psdict begin
+%%BeginProlog
+%%Copyright: (c) 1988, 89, 90, 91, 92, 93 Miguel Santana
+%%Copyright: (c) 1995, 96, 97, 98 Akim Demaille, Miguel Santana
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+
+% EPSF import as in the Red Book
+/BeginInclude {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack 
+  userdict begin
+    0 setgray 0 setlinecap
+    1 setlinewidth 0 setlinejoin
+    10 setmiterlimit [ ] 0 setdash newpath
+    gs_languagelevel 1 ne {
+      false setstrokeadjust false setoverprint 
+    } if
+} bind def
+
+/EndInclude {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+/BeginEPSF {
+  BeginInclude
+  /showpage { } def
+} bind def
+
+/EndEPSF {
+  EndInclude
+} bind def
+
+% Page prefeed
+/page_prefeed {         % bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} bind def
+
+/deffont {
+  findfont exch scalefont def
+} bind def
+
+/reencode_font {
+  findfont reencode 2 copy definefont pop def
+} bind def
+
+% Function c-show (str => -)
+% centers text only according to x axis.
+/c-show { 
+  dup stringwidth pop
+  2 div neg 0 rmoveto
+  show
+} bind def
+
+% Function l-show (str => -)
+% prints texts so that it ends at currentpoint
+/l-show {
+  dup stringwidth pop neg 
+  0 
+  rmoveto show
+} bind def
+
+% center-fit show (str w => -)
+% show centered, and scale currentfont so that the width is less than w
+/cfshow {
+  exch dup stringwidth pop
+  % If the title is too big, try to make it smaller
+  3 2 roll 2 copy
+  gt
+  { % if, i.e. too big
+    exch div
+    currentfont exch scalefont setfont
+  } { % ifelse
+    pop pop 
+  }
+  ifelse
+  c-show			% center title
+} bind def
+
+% Return the y size of the current font
+% - => fontsize
+/currentfontsize {
+  currentfont /FontType get 0 eq {
+    currentfont /FontMatrix get 3 get
+  }{
+    currentfont /FontMatrix get 3 get 1000 mul
+  } ifelse
+} bind def
+
+% reencode the font
+% <encoding-vector> <fontdict> -> <newfontdict>
+/reencode { %def
+  dup length 5 add dict begin
+    { %forall
+      1 index /FID ne 
+      { def }{ pop pop } ifelse
+    } forall
+    /Encoding exch def
+
+    % Use the font's bounding box to determine the ascent, descent,
+    % and overall height; don't forget that these values have to be
+    % transformed using the font's matrix.
+    % We use `load' because sometimes BBox is executable, sometimes not.
+    % Since we need 4 numbers an not an array avoid BBox from being executed
+    /FontBBox load aload pop
+    FontMatrix transform /Ascent exch def pop
+    FontMatrix transform /Descent exch def pop
+    /FontHeight Ascent Descent sub def
+
+    % Define these in case they're not in the FontInfo (also, here
+    % they're easier to get to.
+    /UnderlinePosition 1 def
+    /UnderlineThickness 1 def
+    
+    % Get the underline position and thickness if they're defined.
+    currentdict /FontInfo known {
+      FontInfo
+      
+      dup /UnderlinePosition known {
+	dup /UnderlinePosition get
+	0 exch FontMatrix transform exch pop
+	/UnderlinePosition exch def
+      } if
+      
+      dup /UnderlineThickness known {
+	/UnderlineThickness get
+	0 exch FontMatrix transform exch pop
+	/UnderlineThickness exch def
+      } if
+      
+    } if
+    currentdict 
+  end 
+} bind def
+
+% composite fonts for ASCII-EUC mixed string
+% Version 1.2 1/31/1990
+% Orignal Ken'ichi HANDA (handa@etl.go.jp)
+% Modified Norio Katayama (katayama@rd.nacsis.ac.jp),1998
+% Extend & Fix Koji Nakamaru (maru@on.cs.keio.ac.jp), 1999
+% Anyone can freely copy, modify, distribute this program.
+
+/copyfont {	% font-dic extra-entry-count  copyfont  font-dic
+	1 index maxlength add dict begin
+	{	1 index /FID ne 2 index /UniqueID ne and
+		{def} {pop pop} ifelse
+	} forall
+	currentdict
+	end
+} bind def
+
+/compositefont { % ASCIIFontName EUCFontName RomanScale RomanOffset Rot(T/F) compositefont font
+    /RomanRotation exch def
+    /RomanOffset exch def
+    /RomanScale exch def
+    userdict /fixeucfont_dict known not {
+	userdict begin
+	    /fixeucfont_dict 2 dict begin
+		/UpperByteEncoding [
+		    16#00 1 16#20 { pop 0 } for
+		    16#21 1 16#28 { 16#20 sub } for
+		    16#29 1 16#2F { pop 0 } for
+		    16#30 1 16#74 { 16#27 sub } for
+		    16#75 1 16#FF { pop 0 } for
+		] def
+	        /LowerByteEncoding [
+		    16#00 1 16#A0 { pop /.notdef } for
+		    16#A1 1 16#FE { 16#80 sub 16 2 string cvrs
+				    (cXX) dup 1 4 -1 roll
+				    putinterval cvn } for
+		    /.notdef
+		] def
+		currentdict
+	    end def
+	end
+    } if
+    findfont dup /FontType get 0 eq {
+	14 dict begin
+	    %
+	    % 7+8 bit EUC font
+	    %
+	    12 dict begin
+		/EUCFont exch def
+		/FontInfo (7+8 bit EUC font) readonly def
+		/PaintType 0 def
+		/FontType 0 def
+		/FontMatrix matrix def
+		% /FontName
+		/Encoding fixeucfont_dict /UpperByteEncoding get def
+		/FMapType 2 def
+		EUCFont /WMode known
+		{ EUCFont /WMode get /WMode exch def }
+		{ /WMode 0 def } ifelse
+		/FDepVector [
+		    EUCFont /FDepVector get 0 get
+		    [ 16#21 1 16#28 {} for 16#30 1 16#74 {} for ]
+		    {
+			13 dict begin
+			    /EUCFont EUCFont def
+			    /UpperByte exch 16#80 add def	
+			    % /FontName
+			    /FontInfo (EUC lower byte font) readonly def
+			    /PaintType 0 def
+			    /FontType 3 def
+			    /FontMatrix matrix def
+			    /FontBBox {0 0 0 0} def
+			    /Encoding
+				fixeucfont_dict /LowerByteEncoding get def
+			    % /UniqueID
+			    % /WMode
+			    /BuildChar {
+				gsave
+				exch dup /EUCFont get setfont
+				/UpperByte get
+				2 string
+				dup 0 4 -1 roll put
+				dup 1 4 -1 roll put
+				dup stringwidth setcharwidth
+				0 0 moveto show
+				grestore
+			    } bind def
+			    currentdict
+			end
+			/lowerbytefont exch definefont
+		    } forall
+		] def
+		currentdict
+	    end
+	    /eucfont exch definefont
+	    exch
+	    findfont 1 copyfont dup begin
+		RomanRotation {
+			/FontMatrix FontMatrix
+			[ 0 RomanScale neg RomanScale 0 RomanOffset neg 0 ]
+			matrix concatmatrix def
+		}{
+			/FontMatrix FontMatrix
+			[ RomanScale 0 0 RomanScale 0 RomanOffset ] matrix concatmatrix
+			def
+			/CDevProc
+			    {pop pop pop pop 0 exch -1000 exch 2 div 880} def
+		} ifelse
+	    end
+	    /asciifont exch definefont
+	    exch
+	    /FDepVector [ 4 2 roll ] def
+	    /FontType 0 def
+	    /WMode 0 def
+	    /FMapType 4 def
+	    /FontMatrix matrix def
+	    /Encoding [0 1] def
+	    /FontBBox {0 0 0 0} def
+%	    /FontHeight 1.0 def % XXXX
+	    /FontHeight RomanScale 1.0 ge { RomanScale }{ 1.0 } ifelse def
+	    /Descent -0.3 def   % XXXX
+	    currentdict
+	end
+	/tmpfont exch definefont
+	pop
+	/tmpfont findfont
+    }{
+	pop findfont 0 copyfont
+    } ifelse
+} def	
+
+/slantfont {	% FontName slant-degree  slantfont  font'
+    exch findfont 1 copyfont begin
+    [ 1 0 4 -1 roll 1 0 0 ] FontMatrix exch matrix concatmatrix
+    /FontMatrix exch def
+    currentdict
+    end
+} def
+
+% Function print line number (<string> # -)
+/# {
+  gsave
+    sx cw mul neg 2 div 0 rmoveto
+    f# setfont
+    c-show
+  grestore
+} bind def
+
+% -------- Some routines to enlight plain b/w printings ---------
+
+% Underline
+% width --
+/dounderline {
+  currentpoint
+  gsave
+    moveto
+    0 currentfont /Descent get currentfontsize mul rmoveto
+    0 rlineto
+    stroke
+  grestore
+} bind def
+
+% Underline a string
+% string --
+/dounderlinestring {
+  stringwidth pop
+  dounderline
+} bind def
+
+/UL {
+  /ul exch store
+} bind def
+
+% Draw a box of WIDTH wrt current font
+% width --
+/dobox {
+  currentpoint
+  gsave
+    newpath
+    moveto
+    0 currentfont /Descent get currentfontsize mul rmoveto
+    dup 0 rlineto
+    0 currentfont /FontHeight get currentfontsize mul rlineto
+    neg 0 rlineto
+    closepath
+    stroke
+  grestore
+} bind def
+
+/BX {
+  /bx exch store
+} bind def
+
+% Box a string
+% string --
+/doboxstring {
+  stringwidth pop
+  dobox
+} bind def
+
+%
+% ------------- Color routines ---------------
+%
+/FG /setrgbcolor load def
+
+% Draw the background
+% width --
+/dobackground {
+  currentpoint
+  gsave
+    newpath
+    moveto
+    0 currentfont /Descent get currentfontsize mul rmoveto
+    dup 0 rlineto
+    0 currentfont /FontHeight get currentfontsize mul rlineto
+    neg 0 rlineto
+    closepath
+    bgcolor aload pop setrgbcolor
+    fill
+  grestore
+} bind def
+
+% Draw bg for a string
+% string --
+/dobackgroundstring {
+  stringwidth pop
+  dobackground
+} bind def
+
+
+/BG {
+  dup /bg exch store
+  { mark 4 1 roll ] /bgcolor exch store } if
+} bind def
+
+
+/Show {
+  bg { dup dobackgroundstring } if
+  ul { dup dounderlinestring } if
+  bx { dup doboxstring } if
+  show
+} bind def
+
+% Function T(ab), jumps to the n-th tabulation in the current line
+/T {
+  cw mul x0 add
+  bg { dup currentpoint pop sub dobackground } if
+  ul { dup currentpoint pop sub dounderline } if
+  bx { dup currentpoint pop sub dobox } if
+  y0 moveto
+} bind def
+
+% Function n: move to the next line
+/n {
+  /y0 y0 bfs sub store
+  x0 y0 moveto
+} bind def
+
+% Function N: show and move to the next line
+/N {
+  Show
+  /y0 y0 bfs sub store
+  x0 y0 moveto
+} bind def
+
+/S {
+  Show
+} bind def
+
+%%BeginResource: procset a2ps-a2ps-hdr 2.0 2
+%%Copyright: (c) 1988, 89, 90, 91, 92, 93 Miguel Santana
+%%Copyright: (c) 1995, 96, 97, 98 Akim Demaille, Miguel Santana
+% Function title: prints page header.
+% <ct> <rt> <lt> are passed as argument
+/title { 
+  % 1. Draw the background
+  x v get y v get moveto
+  gsave
+    0 th 2 div neg rmoveto 
+    th setlinewidth
+    0.95 setgray
+    pw 0 rlineto stroke
+  grestore
+  % 2. Border it
+  gsave
+    0.7 setlinewidth
+    pw 0 rlineto
+    0 th neg rlineto
+    pw neg 0 rlineto
+    closepath stroke
+  grestore
+  % stk: ct rt lt
+  x v get y v get th sub 1 add moveto
+%%IncludeResource: font Helvetica
+  fHelvetica fnfs 0.8 mul scalefont setfont
+  % 3. The left title
+  gsave
+    dup stringwidth pop fnfs 0.8 mul add exch % leave space took on stack
+    fnfs 0.8 mul hm rmoveto
+    show			% left title
+  grestore
+  exch
+  % stk: ct ltw rt
+  % 4. the right title
+  gsave
+    dup stringwidth pop fnfs 0.8 mul add exch % leave space took on stack
+    dup
+    pw exch stringwidth pop fnfs 0.8 mul add sub
+    hm
+    rmoveto
+    show			% right title
+  grestore
+  % stk: ct ltw rtw
+  % 5. the center title
+  gsave
+    pw 3 1 roll
+    % stk: ct pw ltw rtw
+    3 copy 
+    % Move to the center of the left room
+    sub add 2 div hm rmoveto
+    % What is the available space in here?
+    add sub fnfs 0.8 mul sub fnfs 0.8 mul sub
+    % stk: ct space_left
+%%IncludeResource: font Helvetica-Bold
+  fHelvetica-Bold fnfs scalefont setfont
+    cfshow
+  grestore
+} bind def
+
+% Function border: prints virtual page border
+/border { %def
+  gsave				% print four sides
+    0 setgray
+    x v get y v get moveto
+    0.7 setlinewidth		% of the square
+    pw 0 rlineto
+    0 ph neg rlineto
+    pw neg 0 rlineto
+    closepath stroke
+  grestore
+} bind def
+
+% Function water: prints a water mark in background
+/water { %def
+  gsave
+    scx scy moveto rotate
+%%IncludeResource: font Times-Bold
+  fTimes-Bold 100 scalefont setfont
+    .97 setgray
+    dup stringwidth pop 2 div neg -50 rmoveto
+    show
+  grestore
+} bind def
+
+% Function rhead: prints the right header
+/rhead {  %def
+  lx ly moveto
+  fHelvetica fnfs 0.8 mul scalefont setfont
+  l-show
+} bind def
+
+% Function footer (cf rf lf -> -)
+/footer {
+  fHelvetica fnfs 0.8 mul scalefont setfont
+  dx dy moveto
+  show
+
+  snx sny moveto
+  l-show
+  
+  fnx fny moveto
+  c-show
+} bind def
+%%EndResource
+%%BeginResource: procset a2ps-black+white-Prolog 2.0 1
+
+% Function T(ab), jumps to the n-th tabulation in the current line
+/T { 
+  cw mul x0 add y0 moveto
+} bind def
+
+% Function n: move to the next line
+/n { %def
+  /y0 y0 bfs sub store
+  x0 y0 moveto
+} bind def
+
+% Function N: show and move to the next line
+/N {
+  Show
+  /y0 y0 bfs sub store
+  x0 y0 moveto
+}  bind def
+
+/S {
+  Show
+} bind def
+
+/p {
+  false UL
+  false BX
+  fCourier bfs scalefont setfont
+  Show
+} bind def
+
+/sy {
+  false UL
+  false BX
+  fSymbol bfs scalefont setfont
+  Show
+} bind def
+
+/k {
+  false UL
+  false BX
+  fCourier-Oblique bfs scalefont setfont
+  Show
+} bind def
+
+/K {
+  false UL
+  false BX
+  fCourier-Bold bfs scalefont setfont
+  Show
+} bind def
+
+/c {
+  false UL
+  false BX
+  fCourier-Oblique bfs scalefont setfont
+  Show
+} bind def
+
+/C {
+  false UL
+  false BX
+  fCourier-BoldOblique bfs scalefont setfont
+  Show 
+} bind def
+
+/l {
+  false UL
+  false BX
+  fHelvetica bfs scalefont setfont
+  Show
+} bind def
+
+/L {
+  false UL
+  false BX
+  fHelvetica-Bold bfs scalefont setfont
+  Show 
+} bind def
+
+/str{
+  false UL
+  false BX
+  fTimes-Roman bfs scalefont setfont
+  Show
+} bind def
+
+/e{
+  false UL
+  true BX
+  fHelvetica-Bold bfs scalefont setfont
+  Show
+} bind def
+
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier
+%%IncludeResource: font Courier-Oblique
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Times-Roman
+%%IncludeResource: font Symbol
+%%IncludeResource: font Courier-BoldOblique
+%%BeginResource: encoding ISO-8859-1Encoding
+/ISO-8859-1Encoding [
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/space /exclam /quotedbl /numbersign /dollar /percent /ampersand /quoteright 
+/parenleft /parenright /asterisk /plus /comma /minus /period /slash 
+/zero /one /two /three /four /five /six /seven 
+/eight /nine /colon /semicolon /less /equal /greater /question 
+/at /A /B /C /D /E /F /G 
+/H /I /J /K /L /M /N /O 
+/P /Q /R /S /T /U /V /W 
+/X /Y /Z /bracketleft /backslash /bracketright /asciicircum /underscore 
+/quoteleft /a /b /c /d /e /f /g 
+/h /i /j /k /l /m /n /o 
+/p /q /r /s /t /u /v /w 
+/x /y /z /braceleft /bar /braceright /asciitilde /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/space /exclamdown /cent /sterling /currency /yen /brokenbar /section 
+/dieresis /copyright /ordfeminine /guillemotleft /logicalnot /hyphen /registered /macron 
+/degree /plusminus /twosuperior /threesuperior /acute /mu /paragraph /bullet 
+/cedilla /onesuperior /ordmasculine /guillemotright /onequarter /onehalf /threequarters /questiondown 
+/Agrave /Aacute /Acircumflex /Atilde /Adieresis /Aring /AE /Ccedilla 
+/Egrave /Eacute /Ecircumflex /Edieresis /Igrave /Iacute /Icircumflex /Idieresis 
+/Eth /Ntilde /Ograve /Oacute /Ocircumflex /Otilde /Odieresis /multiply 
+/Oslash /Ugrave /Uacute /Ucircumflex /Udieresis /Yacute /Thorn /germandbls 
+/agrave /aacute /acircumflex /atilde /adieresis /aring /ae /ccedilla 
+/egrave /eacute /ecircumflex /edieresis /igrave /iacute /icircumflex /idieresis 
+/eth /ntilde /ograve /oacute /ocircumflex /otilde /odieresis /divide 
+/oslash /ugrave /uacute /ucircumflex /udieresis /yacute /thorn /ydieresis 
+] def
+%%EndResource
+% Initialize page description variables.
+/sh 792 def
+/sw 612 def
+/llx 24 def
+/urx 588 def
+/ury 768 def
+/lly 24 def
+/#copies 1 def
+/th 20.000000 def
+/fnfs 15 def
+/bfs 8.000000 def
+/cw 4.800000 def
+
+% Dictionary for ISO-8859-1 support
+/iso1dict 8 dict begin
+  /fCourier ISO-8859-1Encoding /Courier reencode_font
+  /fCourier-Bold ISO-8859-1Encoding /Courier-Bold reencode_font
+  /fCourier-BoldOblique ISO-8859-1Encoding /Courier-BoldOblique reencode_font
+  /fCourier-Oblique ISO-8859-1Encoding /Courier-Oblique reencode_font
+  /fHelvetica ISO-8859-1Encoding /Helvetica reencode_font
+  /fHelvetica-Bold ISO-8859-1Encoding /Helvetica-Bold reencode_font
+  /fTimes-Bold ISO-8859-1Encoding /Times-Bold reencode_font
+  /fTimes-Roman ISO-8859-1Encoding /Times-Roman reencode_font
+currentdict end def
+/bgcolor [ 0 0 0 ] def
+/bg false def
+/ul false def
+/bx false def
+% The font for line numbering
+/f# /Helvetica findfont bfs .6 mul scalefont def
+/fSymbol /Symbol findfont def
+/hm fnfs 0.25 mul def
+/pw
+   cw 117.400000 mul
+def
+/ph
+   693.600000 th add
+def
+/pmw 0 def
+/pmh 0 def
+/v 0 def
+/x [
+  0
+] def
+/y [
+  pmh ph add 0 mul ph add
+] def
+/scx sw 2 div def
+/scy sh 2 div def
+/snx urx def
+/sny lly 2 add def
+/dx llx def
+/dy sny def
+/fnx scx def
+/fny dy def
+/lx snx def
+/ly ury fnfs 0.8 mul sub def
+/sx 0 def
+/tab 8 def
+/x0 0 def
+/y0 0 def
+%%EndSetup
+
+%%Page: (1) 1
+%%BeginPageSetup
+/pagesave save def
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.360000 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(Mk4 File Format Definitions -- CJL May 13 1999) p n
+(--------------------------------------------------------------) N
+() N
+(This document defines the detailed file and record formats to be used for the) N
+(Mk4 correlator system.  It also provides background information on the Mk4 data) N
+(files and software system.) N
+() N
+(FILESETS AND FILE TYPES) N
+(-----------------------) N
+() N
+(1. MkIII system) N
+(---------------) N
+() N
+(The MkIII system uses three file types, numbered 0, 1 and 2, and referred to) N
+(respectively as root, corel and fringe files, all of which are binary format.  A) N
+(fileset consists of a single root file, and multiple type-1 and type-2 files all) N
+(of which "belong" to a type-0 root file.  The root files contain global) N
+(information about the scan, while the type-1 \(corel\) and type-2 \(fringe\) files) N
+(contain respectively the raw correlation counts plus minimal identification) N
+(information, and the results of a fringe-fitting operation.  There is at least) N
+(one type-1 per baseline correlated, and one type-2 file per baseline) N
+(fringe-fitted.  In general, there may be many type-1 files per baseline, due to) N
+(multiple correlations using the same root, and there may be many type-2 files) N
+(per type-1 file, due to multiple passes of the fringe-fitting software, and) N
+(multiple subsets of data \(such as frequency bands\) within a single type-1 file.) N
+() N
+(A naming convention was devised to handle MkIII files in a Unix setting.) N
+(Filesets are bound together by a common "root code" filename extension,) N
+(indicating to which root the type-1 and type-2 files belong.  This root code is) N
+(a time-tag expressed as a 6-digit base-26 number, encoded in lower-case) N
+(alphabetic characters, and corresponds to the root creation time in units of 4) N
+(seconds.  While somewhat obscure, this 6-character string is concise, unique) N
+(under normal circumstances, and has an acceptably long rollover period of about) N
+(40 years.) N
+() N
+(The root file name consists of the source name and the root code, separated by a) N
+(single period \(period characters in a source name are mapped to underscores\).) N
+(Corel files consist of the 2-character baseline ID, a fileset sequence number,) N
+(and the rootcode, all three fields separated by periods.  Fringe file names) N
+(consist of the baseline ID, a single-character frequency group ID, a fileset) N
+(sequence number, and the rootcode, all four fields being separated by periods.) N
+(The fileset sequence numbers are necessary in order to uniquely identify) N
+(multiple instances of type-1 and type-2 files for the same baseline.  Those) N
+(familiar with MkIII will recognize the fileset sequence number as the HP-1000) N
+(file extent number, carried over into the Unix world.) N
+() N
+(Below is an example of a MkIII fileset.  Note the multiple type-1 files for the) N
+(AB baseline, indicating multiple correlations under the same root.  There are) N
+(also multiple runs of fourfit for the AB baseline at S-band.) N
+() N
+(root file      type-1 files     type-2 files ) N
+(---------------------------------------------) N
+(3C345.ngsbdc   AB.1.ngsbdc      AB.S.5.ngsbdc) N
+(               AC.2.ngsbdc      AB.X.6.ngsbdc) N
+(               BC.3.ngsbdc      AB.S.7.ngsbdc) N
+(               AB.4.ngsbdc      AC.S.8.ngsbdc) N
+(                                BC.S.9.ngsbdc) N
+(                                BC.X.10.ngsbdc) N
+() N
+() N
+(2. Mk4 modifications and extensions) N
+(-----------------------------------) N
+() N
+(The Mk4 system is modeled after MkIII to a degree.  The concept of root, corel) N
+(and fringe files persists, but two additional file types have been added.  These) N
+(are the type-3 \(station data\) files, and the type-4 \(log\) file.  The type-3) N
+(files, one per station, contain model spline coefficients, phasecal data, state) N
+(count information, and tape error statistics \(in MkIII, some of this information) N
+(was embedded in the type-1 file records\).  The type 4 file, one per root,) N
+(contains generalized ascii log information both from the field system and from the) N
+(correlator, specific to the fileset.  In addition to the new file types, the) N
+(provision for multiple correlations under the same root file has been removed.) N
+() N
+(New filenaming conventions have been devised to deal with Mk4 data files.  The) N
+(intent is to modify conventions as little as possible, to maximize the utility) N
+(of existing postprocessing code, while eliminating redundant or useless) N
+(information in the filenames.  The naming conventions for root files and type-2) N
+(\(fringe\) files are unchanged.  Type-1 files no longer need a fileset sequence) N
+(number, so it has been removed leaving the baseline ID, two periods, and the) N
+(root code.  The double period distinguishes type-1 files from root files with) N
+(2-character source names.  Type-3 files have the single-character station ID, a) N
+(double period, and the root code.  Type 4 files have the string "log", a period,) N
+(and the root code.  An example MK4 fileset is shown below.  Three stations were) N
+(correlated in a geodetic S/X experiment, A, B and C.  Baselines AB and BC were) N
+(fringe-fitted at both S and X band, and baseline AC only at S-band.  Baseline) N
+(AB was refringed at S-band, resulting in file AB.S.3.ngsbdc with a fileset) N
+(mk4_files.txt) (Page 1/11) (Jun 03, 99 15:01) title
+border
+grestore
+(Printed by Shep Doeleman) rhead
+() (1/11) (Tuesday September 18, 2007) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (2) 2
+%%BeginPageSetup
+/pagesave save def
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.360000 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(sequence number of 3.) p n
+() N
+(root file      type-1 files     type-2 files      type-3 files    type-4 file) N
+(----------------------------------------------------------------------------- ) N
+(3C345.ngsbdc   AB..ngsbdc       AB.S.1.ngsbdc     A..ngsbdc       log.ngsbdc) N
+(               AC..ngsbdc       AB.X.2.ngsbdc     B..ngsbdc) N
+(               BC..ngsbdc       AB.S.3.ngsbdc     C..ngsbdc) N
+(                                AC.S.4.ngsbdc) N
+(                                BC.S.5.ngsbdc) N
+(                                BC.X.6.ngsbdc) N
+() N
+() N
+(3. VEX root files) N
+(-----------------) N
+() N
+(In a major departure from MkIII, root files in the Mk4 system are ascii files in) N
+(the VEX format.  VEX is known to the global VLBI community as the language used) N
+(to describe how a VLBI experiment will be observed, and which is generated by) N
+(scheduling programs.  This public definition of VEX does not include a variety) N
+(of parameters needed to run a correlator.  The Mk4 correlator software system) N
+(therefore includes definitions for several new flavors of VEX, designed to) N
+(configure and run the various subsystems of the Mk4 correlator.  These flavors,) N
+(described in detail elsewhere, have been labelled OVEX, IVEX, EVEX, SVEX, CVEX) N
+(and LVEX.  The public flavor used for observing is OVEX.  The Mk4 root file is) N
+(defined to be the concatenation of all relevant portions of these six flavors of) N
+(VEX, which then constitutes a complete description of how the information in the) N
+(data files originated, from observation right through the correlator system,) N
+(with details specified down to the insides of each correlator chip in the) N
+(system.  Much of this information is of diagnostic interest only, but the format) N
+(is relatively compact, and a typical root file consumes less than 50 kilobytes.) N
+(Root files are read using a VEX parsing and utility library.  Any software) N
+(seeking to use Mk4 data will likely need a copy of this VEX library, which is) N
+(written in standard C.) N
+() N
+(BINARY FILE TYPES) N
+(-----------------) N
+() N
+(Only type-1, type-2 and type-3 files are binary.  These files are comprised of a) N
+(series of binary records, which with few restrictions may occur in arbitrary) N
+(order.  Because of architectural differences between the MkIII and Mk4) N
+(correlators, these binary record formats have been developed from scratch, and) N
+(bear no relation to MkIII record formats.  Any software which reads Mk4) N
+(correlator data files will need a new IO interface at the minimum.  An IO) N
+(library has been written which transparently deals with multiple format revision) N
+(levels \(see below\), and which should ease the task of reading and writing Mk4) N
+(data files.  The library is written in standard C.) N
+() N
+(Before defining record formats in detail, we first describe features common to) N
+(all binary records and files in the Mk4 system.) N
+() N
+(GENERAL RECORD CONSIDERATIONS) N
+(-----------------------------) N
+() N
+(1. Record identification) N
+(------------------------) N
+() N
+(In order to facilitate the reading and decoding of Mk4 binary files, all data) N
+(records are "typed".  This is done, with one notable exception, in the Mk3) N
+(system.  For Mk4, we have devised a typing scheme that allows format evolution,) N
+(and which is distinct from the Mk3 system to avoid possible confusion.  Each) N
+(record has, in the first 8 bytes, ascii characters which uniquely identify the) N
+(record type, and which tell the IO software exactly how to handle it.  The use) N
+(of ascii information rather than binary integers allows pure ascii records to be) N
+(typed in a uniform manner, yet carries no penalty.  This 8-byte header contains) N
+(2 fields.  The first 3 bytes contain the record type number, which in Mk4 cannot) N
+(exceed 999.  The next 2 bytes contain a format version number, up to 99.  These) N
+(two numbers are formatted with leading zeros.  The remaining 3 bytes are) N
+(reserved for future use, and are normally blank filled.  However, in a few cases) N
+(of binary variable length records, binary information needed to calculate the) N
+(record length is stored there.) N
+() N
+(1.1 Record types) N
+(----------------) N
+() N
+(For simplicity, and to make it easier for programmers to remember what file type) N
+(they are dealing with, the record type numbers are equal to the binary file type) N
+(number x 100 \(currently 1 through 3\) plus some offset.  Thus a record type 120) N
+(is immediately recognizable as belonging to a type-1 \(corel\) file.  The only) N
+(exception to this rule is the type-000 record, which is the first record of) N
+(every binary file regardless of file type.  The offsets are organized into) N
+(logical groupings.  Where it makes sense, all records dealing with a particular) N
+(aspect of the data are sequentially numbered.  When a new aspect of the data is) N
+(encountered, the record type jumps to the next multiple of 10.  Permissible) N
+(record type numbers are therefore:) N
+() N
+(Type-1 \(corel\) files:   100 to 199) N
+(mk4_files.txt) (Page 2/11) (Jun 03, 99 15:01) title
+border
+grestore
+(Printed by Shep Doeleman) rhead
+() (Tuesday September 18, 2007) (2/11) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (3) 3
+%%BeginPageSetup
+/pagesave save def
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.360000 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(Type-2 \(fringe\) files:  200 to 299) p n
+(Type-3 \(sdata\) files:   300 to 399) N
+() N
+(This scheme allows ample expansion for both record and file types, is sharply) N
+(distinct from the Mk3 convention to avoid confusion, and is reasonably obvious) N
+(and logical to the programmer.) N
+() N
+(1.2 Format version number) N
+(-------------------------) N
+() N
+(The 2-digit format version number allows a mechanism for evolution of the file) N
+(format in response to unforeseen needs with minimal modifications to previously) N
+(written software.  The IO software picks up this number, and copies the record) N
+(into the memory structure appropriate to the record type and version.  Most of) N
+(the structure elements will have unchanged names from previous versions, so) N
+(software downstream of the IO library will in general not care what the version) N
+(number was.  To implement a new format version, all that must be done is to) N
+(update the header file containing the structure definitions, and write code to) N
+(process the newly-introduced fields.  Applications must include a structure) N
+(definition that incorporates a superset of all fields from all version numbers,) N
+(and the IO library must fill the fields appropriately.  In general, this) N
+(prevents the use of simple HOPS Mk3-style memory overlays into structures for) N
+(version numbers greater than 0, but the CPU overhead of explicitly filling) N
+(structure elements is minimal.  While updating the IO library for a new version) N
+(number may be non-trivial, it needs to be done in only one place, not in each) N
+(application.) N
+() N
+(The ease with which this can be done at the application level \(where most of the) N
+(complexity lies\) should encourage elegant and complete solutions to file-format) N
+(related difficulties, rather than counterintuitive and complicating workarounds.) N
+() N
+(The rationale for carrying a format version number with records instead of files) N
+(is that you don't want to increment a file version number for each small) N
+(modification to some obscure record.  Record version control also increases) N
+(flexibility, allowing one to transparently mix record version numbers in files,) N
+(though in practise this will seldom occur.) N
+() N
+(2. Continuation number vs. variable record lengths) N
+(--------------------------------------------------) N
+() N
+(Certain types of information have variable space requirements.  There are two) N
+(ways this might be handled.  The Mk3 system uses fixed-length 256-byte records,) N
+(and stacks records using record continuation numbers.  Under UNIX, we have the) N
+(freedom to use variable-length records with little penalty in code complexity.) N
+(After some deliberation, the decision was made to move away from continuation) N
+(numbers and toward variable-length records for Mk4.  The majority of records) N
+(nevertheless remain fixed-length simply because the amount of information needed) N
+(is invariant.) N
+() N
+(3. File identification) N
+(----------------------) N
+() N
+(In order to facilitate consistency checks of data files, and to ease) N
+(programmatic manipulations for filesets, it has been decided to place a special) N
+(file identification record at the beginning of each file.  This record is typed) N
+(in the same way as all other Mk4 records.  The record type is 000, and the) N
+(record length is fixed at 64 bytes.  For various reasons, it is desirable for) N
+(this record to be entirely ascii, not least because then it is trivial to) N
+(generate a greppable and user-comprehensible summary of many data files.  The) N
+(format of the type 000 record is as follows.  All fields are ascii.) N
+() N
+(Field    Length    Description) N
+(------------------------------) N
+(Type     3         Fixed at 000) N
+(Version  2         Normal meaning) N
+(Unused   3         Spaces) N
+(Date     16        " yyyyddd-hhmmss ", original file creation date.) N
+(                   Note preceding/trailing space) N
+(Name     32        Filename relative to data directory, preceded by) N
+(                   a space, NULL-padded.  With current unix correlator) N
+(                   filenaming conventions, the maximum length of a) N
+(                   name starting with the experiment directory is 31) N
+(                   characters.) N
+(Unused   8         NULLs.) N
+() N
+() N
+(4. Data alignment) N
+(-----------------) N
+() N
+(In the record definitions below, care has been taken to ensure that variables) N
+(are properly aligned.  This means that if a variable occupies n bytes, the) N
+(location of the variable within the record is an integral number times n bytes) N
+(from the start of the record.  In a few places, padding is used.  This practise,) N
+(which causes some rearrangement of variables from the order in which they might) N
+(otherwise have been stored, ensures that it will always be possible to map a) N
+(copy of the record format on disk directly onto a C structure.  In addition,) N
+(mk4_files.txt) (Page 3/11) (Jun 03, 99 15:01) title
+border
+grestore
+(Printed by Shep Doeleman) rhead
+() (3/11) (Tuesday September 18, 2007) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (4) 4
+%%BeginPageSetup
+/pagesave save def
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.360000 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(record lengths are kept to a multiple 8 bytes, to ensure that each record starts) p n
+(on a suitable boundary.) N
+() N
+(Type-1 \(corel\) file record formats) N
+(----------------------------------) N
+() N
+(Similar to Mk3, each correlator output record corresponds to a single AP for a) N
+(single channel, with multiple lags.  The records are variable-length, with the) N
+(length determined by the number of lags present.  Each type-1 file has, as the) N
+(first record after the type 000 record, a record which contains pertinent) N
+(file-wide information, and eliminates the current "orphan" potential of the) N
+(current Mk3 system.  Mk4 correlator files are dependent on the root file for the) N
+(correct interpretation of their contents, but not for the mere identification of) N
+(the data.  The general organization of a type-1 file is as follows:) N
+() N
+(Type 000 record         Standard for all binary Mk4 files) N
+(Type 100 record         Identifies data by baseline, parent root, correlation) N
+(                        time, etc.  Specifies how many data records are present.  ) N
+(Type 101 records        Track-specific correlator hardware configuration) N
+(                        information similar to what goes into the Mk3) N
+(                        type-2000 record and cross-reference table.) N
+(                        There is one type-101 record for each index number.) N
+(                        Needed for correct interpretation of the type 120) N
+(                        records.) N
+(Type 120 records        Correlation lag data records for various modes.  The) N
+(                        different modes may involve inclusion or exclusion) N
+(                        of bitcounts by lag, autocorrelations, and so on.) N
+(                        There is only one mode per file.) N
+() N
+(Because of the presence of variable length records, the type 100 record must) N
+(precede all type 101 and 120 records.  For simplicity, the number of lags \(and) N
+(correlator blocks\) must be constant in any given type-1 file.  There is one type) N
+(100 record, multiple type 101 records, and multiple type 120 records per type) N
+(101 record.  Some of the information in the type 100 record may not be available) N
+(until the rest of the file is written, necessitating re-writing of that record.) N
+() N
+(Type 100 \(general data description\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       100) N
+(Version         ascii           2       0-99) N
+(Unused          ascii           3       Spaces) N
+(procdate        date            12      Time of correlation) N
+(Baseline        ascii           2       Standard baseline id) N
+(rootname        ascii           34      Name of root, from exp. dir) N
+(Qcode           ascii           2       Correlation "quality", criteria TBD) N
+(Unused2         ascii           6       spaces for padding) N
+(Percent done    r*4             4       0-100% of scheduled data processed) N
+(start           date            12      Time of 1st AP) N
+(stop            date            12      Time of last AP) N
+(ndrec           i*4             4       Total no of data records in file) N
+(nindex          i*4             4       Number if index numbers present) N
+(nlags           i*2             2       Number of lags/type-120 record) N
+(nblocks         i*2             2       Number of blocks per index number) N
+() N
+(Record length is fixed at 104 bytes.  This record can be thought of as a) N
+("consistency control" record, which should be examined to make sure that) N
+(the data are what you think they should be.  The IO library should do) N
+(most of this checking, and raise the alarm to the application programmer) N
+(when discrepancies are found.  Global hardware configuration information) N
+(is also stored here.) N
+() N
+(Type 101 \(index number parameter\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       101) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           1       Space) N
+(nblocks         i*2             2       Number of block table entries) N
+(Index           i*2             2       Index number) N
+(Primary         i*2             2       Index number of primary 101) N
+(Ref_chan_id     ascii           8       from vex, e.g. X1R) N
+(Rem_chan_id     ascii           8       from vex, e.g. X1L) N
+(Corr. board     i*2             2       Correlator board serial #) N
+(Corr. slot      i*2             2       Correlator board slot) N
+(Ref channel     i*2             2       SU output channel numbers) N
+(Rem channel     i*2             2       ) N
+(Post mortem     i*4             4       Up to 32 1-bit flags) N
+(Block table     i*4         4*nblocks   One entry per block in snake) N
+() N
+(Record length is variable at 40+\(4*nblocks\), but with a wrinkle.  In order to) N
+(maintain the record length as a multiple of 8 bytes, if nblocks is an odd) N
+(number, the block table will be padded as if nblocks were equal to the next even) N
+(number. There are i records, where i is given by \(high index - low index + 1\).) N
+(mk4_files.txt) (Page 4/11) (Jun 03, 99 15:01) title
+border
+grestore
+(Printed by Shep Doeleman) rhead
+() (Tuesday September 18, 2007) (4/11) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (5) 5
+%%BeginPageSetup
+/pagesave save def
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.360000 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(This record describes channel-by-channel hardware configuration information for) p n
+(this correlation.  Each 'Block table' entry consists of 3 bytes of static) N
+(configuration information followed by the block number on the correlator board;) N
+(order of entries is from head of snake to tail of snake.) N
+() N
+(Some information in the type 101 records is analogous to that in the ) N
+(type-2000 records of the Mk3 system.  The Mk4 scheme helps isolate ) N
+(baseline-dependent information in the baseline-dependent type-1 files.) N
+(Type-1 files are not intended to be made standalone by this change.) N
+() N
+() N
+(Type 120 \(sorted lag data\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       120) N
+(Version         ascii           2       0-99 ) N
+(corrtype        ascii           1       Binary 1-4, lagdata struct type) N
+(nlags           i*2             2       Number of lags present) N
+(Baseline        ascii           2       Standard baseline id) N
+(rootcode        ascii           6       Standard root suffix) N
+(Index           i*4             4       Index into type 101 record) N
+(AP              i*4             4       Accumulation period number) N
+(Flag            i*4             4       Up to 32 correlation flags) N
+(Status          i*4             4       Up to 32 status bits) N
+(Bitshift        r*4             4       Bit shift rate) N
+(Fbit            r*4             4       Fractional bitshift at AP center) N
+(lagdata         array        variable   Correlation counts) N
+() N
+(where lagdata can have any one of four structures:) N
+(1. COUNTS_PER_LAG format, lagdata is an array of size nlags, each element) N
+(having the structure below.) N
+(coscor          i*4             4       Cosine correlation count) N
+(cosbits         i*4             4       Cosine total bit count) N
+(sincor          i*4             4       Sine correlation count) N
+(sinbits         i*4             4       Sine total bit count) N
+() N
+(2. COUNTS_GLOBAL format, lagdata is a structure containing an array as shown) N
+(below.) N
+(cosbits         i*4             4       Cosine total bit count) N
+(sinbits         i*4             4       Sine total bit count) N
+(array[nlags], each element is:) N
+(        coscor  i*4             4       Cosine correlation count) N
+(        sincor  i*4             4       Sine correlation count) N
+() N
+(3. AUTO_PER_LAG format, lagdata is an array of size nlags. each element) N
+(having the structure below.) N
+(coscor          i*4             4       Cosine correlation count) N
+(cosbits         i*4             4       Cosine total bit count) N
+() N
+(4. AUTO_GLOBAL format,lagdata is a structure containing an array as shown ) N
+(below.) N
+(cosbits         i*4             4       Cosine total bit count) N
+(Unused          ascii           4       Padding for alignment) N
+(coscor[nlags]   i*4         nlags*4     Array of correlation counts    ) N
+() N
+(Record length is variable, depending on the number of lags and the mode.) N
+(Only one mode, and therefore one lagdata format, is present in any given file.) N
+() N
+() N
+(Type-2 \(fringe\) file record formats \(caution ... data alignment not yet done\)) N
+(-----------------------------------) N
+() N
+(Type 2 files may in general consist of several logically distinct sections.) N
+(In the current Mk3 system, there are two such sections, namely the binary) N
+(fringe search results section \(with some auxiliary root information\), and) N
+(an ascii "fringe plot" section which displays the results pseudo-graphically.) N
+(One can imagine other possible sections, such as fringe-rate/delay) N
+(amplitude arrays, and postscript graphics.  The Mk4 record typing) N
+(convention are used to accomodate these different sections.) N
+() N
+(The basic pattern is for type 200 through type 208 records to contain) N
+(information progressively less generic, and progressively more specific) N
+(to the fringe fit process that generated the type-2 file.  The progression) N
+(goes from baseline-independent information from the root in the type 200) N
+(record to the final fringe-fit solution values in the type 208 record.  Various) N
+(processed versions of the input data records are stored in record types 210 to) N
+(212, and user-oriented graphical output information is stored in records 220 and) N
+(higher.) N
+() N
+() N
+(Type 200 \(general information\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       200) N
+(mk4_files.txt) (Page 5/11) (Jun 03, 99 15:01) title
+border
+grestore
+(Printed by Shep Doeleman) rhead
+() (5/11) (Tuesday September 18, 2007) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (6) 6
+%%BeginPageSetup
+/pagesave save def
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.360000 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(Version         ascii           2       0-99 ) p n
+(Unused          ascii           3       Spaces) N
+(Revision        i*2 x 10        20      Revision levels for many progs) N
+(Experiment      i*4             4       Experiment number) N
+(Program         ascii           32      Observing program name) N
+(Scan name       ascii           32      Name of scan) N
+(Scantime        date            12      Scan time to 1 second) N
+(Corr_date       date            12      Date of correlation) N
+(FPT             date            12      Fourfit processing date) N
+(FRT             date            12      Fourfit reference time) N
+() N
+(Record length is fixed at 144 bytes.) N
+() N
+(Type 201 \(source information\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       201) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(Source          ascii           32      Source name) N
+(Coord           sky_coord       16      of epoch) N
+(Epoch of ra/dec i*2             2       1950 or 2000) N
+(Unused2         ascii           6       Padding) N
+(R.A. rate       r*8             8       Proper motion \(rad/sec\)) N
+(Dec. rate       r*8             8       Proper motion \(rad/sec\)) N
+(Pulsar phase    r*8 x 4         32      Polynomial of pulse timing) N
+(Pulsar epoch    r*8             8       reference time for polynomial) N
+(Dispersion      r*8             8       Pulsar dispersion measure) N
+() N
+(Record length is fixed at 128 bytes.  This record contains source-specific) N
+(information.) N
+() N
+(Type 202 \(baseline information\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       202) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(Baseline        ascii           2       Standard baseline ID) N
+(Ref intl_id     ascii           2       International 2-char ID) N
+(Rem intl_id     ascii           2       International 2-char ID) N
+(Unused2         ascii           2       padding) N
+(Ref name        ascii           8       Station names) N
+(Rem name        ascii           8       ) N
+(Ref tape        ascii           8       Tape VSNs) N
+(Rem tape        ascii           8       ) N
+(Ref xpos        r*8             8       Station X coords \(meters\)) N
+(Rem xpos        r*8             8       ) N
+(Ref ypos        r*8             8       Station Y coords \(meters\)) N
+(Rem ypos        r*8             8       ) N
+(Ref zpos        r*8             8       Station Z coords \(meters\)) N
+(Rem zpos        r*8             8       ) N
+(U               r*8             8       fringes/arcsec E-W at 1GHz at FRT) N
+(V               r*8             8       fringes/arcsec N-S at 1GHz at FRT) N
+(UF              r*8             8       mHz/arcsec/GHz in R.A. at FRT) N
+(VF              r*8             8       mHz/arcsec/GHz in dec. at FRT) N
+(Ref clock       r*4             4       Clock offsets \(usec\) at FRT) N
+(Rem clock       r*4             4       ) N
+(Ref clockrate   r*4             4       Clock rates \(sec/sec\)) N
+(Rem clockrate   r*4             4       ) N
+(Ref idelay      r*4             4       Instrumental delays \(usec\)) N
+(Rem idelay      r*4             4       ) N
+(Ref zatm del.   r*4             4       Zenith atmospheric delay \(nsec\)) N
+(Rem zatm del.   r*4             4       ) N
+(Ref elev        r*4             4       Elevation of source at FRT \(deg\)) N
+(Rem elev        r*4             4) N
+(Ref az          r*4             4       Azimuth of source at FRT \(deg\)) N
+(Rem az          r*4             4       ) N
+() N
+(Record length is fixed at 176 bytes.  This record contains baseline) N
+(specific information, independent of fourfit parameters except FRT.) N
+() N
+(Type 203 \(channel information\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       202) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(Channels x 32) N
+(    index       i*2             2       Index number in type-1 file \(0=empty\)) N
+(    Sample rate i*2             2       kbits/sec) N
+(    refsb       ascii           1       Ref station sideband) N
+(    remsb       ascii           1       Rem station sideband) N
+(mk4_files.txt) (Page 6/11) (Jun 03, 99 15:01) title
+border
+grestore
+(Printed by Shep Doeleman) rhead
+() (Tuesday September 18, 2007) (6/11) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (7) 7
+%%BeginPageSetup
+/pagesave save def
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.360000 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(    refpol      ascii           1       Ref station polarization) p n
+(    rempol      ascii           1       Rem station polarization) N
+(    ref_freq    r*8             8       Ref station LO freq \(Hz\)) N
+(    rem_freq    r*8             8       Rem station LO freq \(Hz\)) N
+(    ref_chan_id ascii           8       Ref station channel id) N
+(    rem_chan_id ascii           8       Rem station channel id) N
+() N
+(Record length is fixed at 1288 bytes.  This is a copy of the information in all) N
+(the \(non-mirrored\) type 101 records in the type-1 file, regardless of whether) N
+(the channels are used in the current fringe-fit.) N
+() N
+(Type 204 \(execution setup\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       204) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(ff_version      i*2 x 2         4       Fourfit revision level) N
+(Platform        ascii           8       hppa, linux, alpha etc. version) N
+(Control file    ascii           96      Control file full pathname) N
+(ffcf_date       date            12      Control file modification date) N
+(Override        ascii           128     Command line override parms) N
+() N
+(Record length is fixed at 256 bytes.  The strings are null-terminated.  If) N
+(they overflow, the strings are set to null.  This record is just a tracer) N
+(of the execution parameters for possible subsequent human intervention.) N
+() N
+(Type 205 \(fourfit setup\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       205) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(Utc_central     date            12      Central time of baseline/scan) N
+(Offset          r*4             4       FRT offset from central time \(sec\)) N
+(ffmode          ascii           8       Fourfit execution modes) N
+(Search parm     r*4 x 6         24      SBD, MBD, Rate windows) N
+(Filters         r*4 x 8\(?\)      32      Filter thresholds) N
+(Start           date            12      Start of requested data span) N
+(Stop            date            12      End of requested data span) N
+(Ref freq        r*8             8       Fourfit reference frequency \(Hz\)) N
+(channels x 16) N
+(    LSB_chan    i*2             2       Index into type 203 array, -1=absent) N
+(    USB_chan    i*2             2       Index into type 203 array, -1=absent) N
+() N
+(Record length is fixed at 184 bytes.  This record describes the setup) N
+(of the fourfit execution, independent of the AP data.) N
+() N
+(Type 206 \(data filtering\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       206) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(Start           date            12      Time at start of 0th AP) N
+(first_ap        i*2             2       Number of 1st valid AP) N
+(last_ap         i*2             2       Number of last valid AP) N
+(Accepted        i*2 x 2 x 16    64      APs accepted by channel/sband) N
+(Intg time       r*4             4       Effective integration time \(secs\)) N
+(Accept ratio    r*4             4       % ratio of min/max data accepted) N
+(discard         r*4             4       % of data discarded) N
+(????????        i*2 x 2 x 16    64      Discards due to reason 1 \(?\)) N
+(????????        i*2 x 2 x 16    64      Discards due to reason 2 \(?\)) N
+(????????        i*2 x 2 x 16    64      Discards due to reason 3 \(?\)) N
+(????????        i*2 x 2 x 16    64      Discards due to reason 4 \(?\)) N
+(????????        i*2 x 2 x 16    64      Discards due to reason 5 \(?\)) N
+(????????        i*2 x 2 x 16    64      Discards due to reason 6 \(?\)) N
+(????????        i*2 x 2 x 16    64      Discards due to reason 7 \(?\)) N
+(????????        i*2 x 2 x 16    64      Discards due to reason 8 \(?\)) N
+(ratesize        i*2             2       Size of fringe rate transform) N
+(MBD size        i*2             2       Size of MBD transform) N
+(SBD size        i*2             2       Size of SBD transform) N
+(Unused2         ascii           6       Padding) N
+() N
+(Record length is fixed at 556 bytes.  This record describes the data) N
+(filtering action taken by fourfit in detail.  The AP flagging criteria) N
+(for Mk4 will undoubtedly be different, but this is a start.  Info is) N
+(much more detailed than Mk3, since records are kept by channel/sband.) N
+(The record also describes the array sizes that fourfit decided to use.) N
+() N
+(Type 207 \(phasecal and error rate\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(mk4_files.txt) (Page 7/11) (Jun 03, 99 15:01) title
+border
+grestore
+(Printed by Shep Doeleman) rhead
+() (7/11) (Tuesday September 18, 2007) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (8) 8
+%%BeginPageSetup
+/pagesave save def
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.360000 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(-----           ----            -----   -----------) p n
+(Type            ascii           3       207) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(Pcal ampl.      r*4 x 4 x 16    256     Pcal amp by sband, ref/remote) N
+(Pcal phase      r*4 x 4 x 16    256     Pcal phases) N
+(Pcal freq       r*4 x 4 x 16    256     Pcal frequencies) N
+(pcalrate ref    r*4             4       Pcal rate reference station) N
+(pcalrate rem    r*4             4       Pcal rate remote station) N
+(errorate        r*4 x 4 x 16    256     Error rates by sband, ref/remote) N
+() N
+(Record length is fixed at 1040 bytes.  The phasecal and errorate) N
+(numbers are as used by fourfit after extraction from the type-3 files,) N
+(and interpretation in terms of the fourfit input parameters.  Errorates) N
+(are by channel, translated from track error rates by some algorithm TBD.) N
+() N
+(Type 208 \(solution parameter\)record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       208) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(Quality         ascii           1       Fringe quality 0 to 9) N
+(Errorcode       ascii           1       Similar to current letter codes) N
+(Tape qcode      ascii           6       Backwards compatibility?) N
+(Adelay          r*8             8       Total apriori delay at FRT \(usec\)) N
+(Arate           r*8             8       Total apriori rate at FRT \(usec/sec\)) N
+(Aaccel          r*8             8       Total apriori acceleration \(usec/sec/sec\)) N
+(Obs. delay      r*8             8       Total group delay \(usec\)) N
+(Obs. sbdelay    r*8             8       Total sband delay \(usec\)) N
+(Obs. rate       r*8             8       Total rate \(usec/sec\)) N
+(Obs. delay c.   r*8             8       Total group delay central epoch \(usec\)) N
+(Obs. sbdelay c. r*8             8       Total sband delay central epoch \(usec\)) N
+(Obs. rate c.    r*8             8       Total rate central epoch \(usec/sec\)) N
+(Resid. delay    r*4             4       MBD residual to model \(usec\)) N
+(Resid sbd       r*4             4       SBD residual to model \(usec\)) N
+(Resid rate      r*4             4       Rate resid to model \(usec/sec\)) N
+(MBD error       r*4             4       MBD error calc'd from data \(usec\)) N
+(SBD error       r*4             4       SBD error calc'd from data \(usec\)) N
+(Rate error      r*4             4       Rate error calc'd from data \(usec/sec\)) N
+(ambig.          r*4             4       Group delay ambiguity \(usec\)) N
+(Coh ampl.       r*4             4       Coherent amplitude \(corr. coeff.\)) N
+(Inc ampl. 1     r*4             4       Amp. from incoherent segment addition) N
+(Inc ampl. 2     r*4             4       Amp. from incoherent channel addition) N
+(SNR             r*4             4       SNR in sigmas) N
+(Prob. false     r*4             4       Probability of false detection) N
+(totphase        r*4             4       Total observed fringe phase \(deg\)) N
+(totphase_cen    r*4             4       Total phase central epoch \(deg\)) N
+(totphase_ec     r*4             4       Total earth-centered fringe phase \(deg\)) N
+(resphase_ec     r*4             4       Residual earth-centered phase \(deg\)) N
+() N
+(Record length is fixed at 152 bytes.  This record contains the essentials of) N
+(the fringe fit solution.) N
+() N
+(WARNING:) N
+(--------) N
+(Type 2xx record formats below this point are considerably less stable, and are) N
+(likely to change extensively in response to development of fourfit.) N
+() N
+(Type 210 \(channel data\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       210) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(Amp-phase       r*4 x 2 x 16    128     Amp/phase by channel resid to model) N
+() N
+(Record length is fixed at 134 bytes.  The entries are equivalent to the entries) N
+(in the Mk3 type-4500 record.) N
+() N
+(Type 211 \(data slices\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       211) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(Rate spectrum   r*4 x r         4r      Rate spectrum at peak) N
+(MBD function    r*4 x m         4m      MBD resolution function at peak) N
+(SBD function    r*4 x s         4s      SBD function at peak) N
+(Xpower total    r*4 x s         4s      Crosspower spectrum avg'd across chans) N
+(Xpower chans    r*4 x s x c     4sc     Xpower spectra for each freq channel) N
+(MBD solutions   r*4 x s         4s      Best MBD values for each SBD chan.) N
+(Rate spectrum   r*4 x r x s     4sr     Rate spectra at best MBD for each SBD chan.) N
+(mk4_files.txt) (Page 8/11) (Jun 03, 99 15:01) title
+border
+grestore
+(Printed by Shep Doeleman) rhead
+() (Tuesday September 18, 2007) (8/11) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (9) 9
+%%BeginPageSetup
+/pagesave save def
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.360000 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+() p n
+(The numbers r, m, s and c are the sizes of the rate spectrum, multiband delay) N
+(function, singleband delay function, and channel array, respectively.  The numbers) N
+(r, m and s can be found in the type 205 record, and the number c can be found) N
+(in the type 204 record.  Record length is variable, given by ) N
+(4*\(r + m + s*\(3+c+r\)\) + 6 bytes.  This record gives the information required to ) N
+(reconstruct everything that appears in the upper graphical portion of the Mk3 ) N
+(fringe plot, plus some additional information.  It can be used to generate ) N
+(high-resolution graphics by a suitable program.) N
+() N
+(Type 212 \(AP data\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       212) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(channel         i*2             2       Channel number for this record) N
+(SBD chan        i*2             2       SBD chan. no. for this record) N
+(data            r*4 x 3 x a     12a     Amp, phase, pcal phase by a.p.) N
+() N
+(The number a is the number of APs in the processed data span.  Record length ) N
+(is variable, given by 10 + 12*a.  There are multiple type-212 records.  ) N
+(The data are rotated to the fourfit solution, unless additional SBD channels ) N
+(are dumped in which case those records are rotated to the center of the SBD ) N
+(channel in question.) N
+() N
+(Type 220 \(fringe plot\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       220) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(Fringe plot     ascii           15360   Standard fringe plot image) N
+() N
+(Record length is fixed at 15366 bytes.  This is simply a record-typed version) N
+(of the Mk3 fringe plot image.) N
+() N
+(Type 221 \(postscript plot\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       221) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(Post. plot      ascii           ??      High-res postscript graphics of fringe) N
+() N
+() N
+(Type 3 \(Station unit data\) file record formats) N
+(-----------------------------------------------------------) N
+() N
+(The type 3 files contain station-specific information for each of the) N
+(stations involved in the scan.  They are initially created by genaroot, which) N
+(writes the type 300 and 301/2 records.  These contain the delay and phase spline) N
+(polynomials which describe the correlator model, and which drive the station) N
+(unit in its delay compensation and frame header construction.  The files are) N
+(appended to by the station unit manager software during or after the) N
+(correlation, with information on track error rates, state counts, and extracted) N
+(phasecal values in type 304, 306 and 308 records respectively.) N
+() N
+(Type 300 \(station ID and model parameter\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       300) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(Id              ascii           1       1-char vex letter code) N
+(Intl_id         ascii           2       2-char international station code) N
+(Name            ascii           32      Full station name) N
+(Unused          ascii           1       Padding for alignment) N
+(Model_date      date            12      Start time for 1st spline) N
+(Model interval  r*4             4       Spline interval in seconds) N
+(Nsplines        i*2             2       Number of splines in scan) N
+() N
+(Record length is fixed at 64 bytes.) N
+() N
+(Type 301 \(delay polynomial coefficient\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       301) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(Interval        i*2             2       Sequential model interval number) N
+(mk4_files.txt) (Page 9/11) (Jun 03, 99 15:01) title
+border
+grestore
+(Printed by Shep Doeleman) rhead
+() (9/11) (Tuesday September 18, 2007) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (10) 10
+%%BeginPageSetup
+/pagesave save def
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.360000 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(Chan_id         ascii           32      Frequency channel identifier) p n
+(Unused          ascii           6       Padding for alignment) N
+(Delay_spline    r*8 x 6         48      Delay spline coefficients) N
+() N
+(Record length is fixed at 58 bytes.) N
+() N
+(Type 302 \(phase polynomial coefficient\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       302) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(Interval        i*2             2       Sequential model interval number) N
+(Chan_id         ascii           32      Frequency channel identifier) N
+(Unused          ascii           6       Padding for alignment) N
+(Phase_spline    r*8 x 6         48      Phase spline coefficients) N
+() N
+(Record length is fixed at 96 bytes.) N
+() N
+(Type 303 \("raw" track error statistics\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       303) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(Format TBD \(PAH/SRS\)) N
+() N
+(Type 304 \("cooked" track error statistics\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       304) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(Time            date            12      Start time of current error stats) N
+(Duration        r*4             4       Duration of current error stats \(sec\)) N
+(Statistics x 64) N
+(   Error_rate   r*4             4       Fraction) N
+(   Frames       i*4             4       Count) N
+(   Bad_frames   i*4             4       Count) N
+(   Slip_sync    i*4             4       Count) N
+(   Missing_sync i*4             4       Count) N
+(   CRC_error    i*4             4       Count) N
+() N
+(Record length is fixed at 1560 bytes.) N
+() N
+(Type 305 \("raw" state count\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       305) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(Format TBD \(PAH/SRS\)) N
+() N
+(Type 306 \("cooked" state count\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       306) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(Time            date            12      Start time of current counts) N
+(Duration        r*4             4       Duration of current counts \(sec\)) N
+(Stcount x 16) N
+(    Chan_id     ascii           32      Frequency channel identifier) N
+(    Bigpos      i*4             4       Count of big positive voltage samples) N
+(    Pos         i*4             4       Count of small positive voltage samples) N
+(    Neg         i*4             4       Count of small negative voltage samples) N
+(    Bigneg      i*4             4       Count of big negative voltage samples) N
+() N
+(Record length is fixed at 792 bytes.) N
+() N
+(Type 307 \("raw" phase cal value\) record format:) N
+() N
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       307) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(Format TBD \(ARW\).) N
+() N
+() N
+(Type 308 \("cooked" phase cal value\) record format:) N
+(mk4_files.txt) (Page 10/11) (Jun 03, 99 15:01) title
+border
+grestore
+(Printed by Shep Doeleman) rhead
+() (Tuesday September 18, 2007) (10/11) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (11) 11
+%%BeginPageSetup
+/pagesave save def
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.360000 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+() p n
+(Field           type            bytes   Description) N
+(-----           ----            -----   -----------) N
+(Type            ascii           3       308) N
+(Version         ascii           2       0-99 ) N
+(Unused          ascii           3       Spaces) N
+(Time            date            12      Start time of pcal average) N
+(Duration        r*4             4       Duration of pcal average \(sec\)) N
+(Pcal x 16) N
+(    Chan_id     ascii           32      Frequency channel identifier) N
+(    Freq        r*4             4       frequency \(Hz rel. to chan freq\)) N
+(    Real        r*4             4       Phasecal vector) N
+(    Imaginary   r*4             4       Phasecal vector) N
+() N
+(Record length is fixed at 728 bytes.) N
+() N
+() N
+(mk4_files.txt) (Page 11/11) (Jun 03, 99 15:01) title
+border
+grestore
+(Printed by Shep Doeleman) rhead
+() (11/11) (Tuesday September 18, 2007) footer
+end % of iso1dict
+pagesave restore
+showpage
+
+%%Trailer
+end
+%%EOF

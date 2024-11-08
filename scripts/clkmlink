@@ -1,0 +1,9 @@
+#!/bin/ksh
+# $MK4_DIST_D/src/scripts/share/clkmlink
+# resync the clkm module's xmtr link     rjc 2000.2.21
+
+#-------------------------------------------------------------------------------
+. $MK4_CONF_D/mk4.conf
+
+#-------------------------------------------------------------------------------
+$mk4_cr0_rsh clkmlink

@@ -1,0 +1,246 @@
+A-FILE FORMAT 
+  
+General rules:
+  1. Any line with a '*' in column 1 is a comment.
+  2. Each field in a data line is separated by one or more spaces.
+  3. A-files are all named #Axxxx where xxxx is a serial# assigned
+     in order of generation.  Each A-file acts as a summary and index 
+     for the corresponding set of "A" and "B" archive tapes.
+  
+OLD FORMAT: (up through and including A0918): 
+  
+ 1. File name  (6-chars)
+ 2. Extent type  (2-chars)
+ 3. Extent#  (2-chars)
+ 4. #blocks in extent (4-chars)  1 block=256 bytes
+ 5. Expt serial#  (3 chars)   (Haystack-assigned) 
+ 6. Processing date  (10 chars) 
+ 7. Year of scan  (2-chars) 
+ 8. Scan ID  (8-chars, in format DDD-HHMM of scheduled start time)
+ 9. Source name  (8-chars)
+10. Baseline  (2-chars) 
+    FRNGE quality code (1-char) See below.
+11. Reference tape#  (8-chars)
+12. Remote tape#  (8-chars) 
+13. Frequency code  (1-char)
+    #frequencies processed by FRNGE  (2-chars)
+14. Correlation amplitude  (F5.1, in units of 1.0E-04)
+15. SNR  (4-chars)
+16. Residual phase  (Earth centered)  (degrees F5.1)
+17. Residual single-band delay  (usec F5.2) 
+18. Residual multi-band delay  (usec F7.4)
+19. Residual delay rate  (psec/sec F7.2)
+20. Tape quality codes  (6-chars)  See below. 
+21. "A-file#"  (5-chars)
+  
+    Total of 131 characters on line.
+  
+ NEW FORMAT (from A0919): 
+  
+Field#
+ 1. File name  (6-chars)
+ 2. Extent type (2-chars) 50=ROOT 51=COREL 52=FRNGE 
+ 3. Extent#  2-chars
+ 4. Dual purpose (4-chars): 
+      For Type 50 & 51 extents: #blocks in extent (1 block=256 bytes) 
+      For Type 52: #seconds in scan processed by FRNGE
+ 5. Expt serial#  (3-chars)   (Haystack-assigned) 
+ 6. Processing date and time (10-chars) (6th char indicates COREL version#) 
+ 7. Year of scan  (2-chars) 
+ 8. Scan ID (8-chars, in format DDD-HHMM of scheduled start time) 
+ 9. Source name  (8-chars)
+10. Baseline  (2-chars) 
+    FRNGE quality code (1-char) See below.
+11. Reference tape#  (8-chars)
+12. Remote tape#  (8-chars) 
+13. Frequency code  (1-char)
+    Mode  (1-char)
+    #Frequencies processed by FRNGE  (2-chars)
+14. Correlation amplitude (F6.2 OR F6.1)  (units of 1.0E-04)
+15. SNR (I4 format, clips at 9999)
+16. Residual phase (Earth centered)  (deg F5.1) 
+17. Residual single-band delay  (usec F5.2) 
+18. Residual multi-band delay   (usec F7.4) 
+19. Residual delay rate         (psec/sec F7.2) 
+20. Tape quality codes  (6-chars) 
+21. "A-file#"  (5 chars)
+  
+    Total of 131 characters in fields 1-21. 
+    Normally, only these fields are printed out.
+    Columns beyond 131 contain additional information as follows: 
+  
+22. UT Epoch (mmss) to which observables are referred 
+23. Total Earth-centered phase (degrees F5.1) 
+24. Total phase-delay rate (usec/sec F11.8) 
+25. Total multi-band delay (usec F13.6) 
+26. Total single-band delay minus total multiband delay (usec F5.3) 
+27. Multiband group-delay ambiguity (usec F4.3) 
+28. Type 51 extent from which data came, or 0 if data came from multiple
+    Type 51 extents (this information starting in A1718). 
+The following fields were added starting in A2923:  
+29. Phase of phase-cal for channel#1 on station 1 (0-360) 
+30. Phase of phase-cal for last channel on station 1
+31. Phase of phase-cal for channel#1 on station 2 (0-360) 
+32. Phase of phase-cal for last channel on station 2
+
+MODIFIED NEW FORMAT (from A3459): 
+
+Same as "new format" except for following fields--
+ 2. Extent type (1-char) 0-ROOT 1-COREL 2-FRNGE   (instead of 50,51,52) 
+ 3. Extent# (2-char)  shifted left 1-column 
+ 4. Dual purpose (4-chars) (shifted left 1-column): 
+      For Type 50 & 51 extents: #blocks in extent (1 block=256 bytes) 
+      For Type 52: #seconds in scan processed by FRNGE
+ 5. Expt serial# expanded to allow 4-chars
+  
+EXAMPLE (including title lines, column indicators, and key#'s): 
+  
+*!NAME TYP X  LEN EX#   PROCDATE YR   RUN#   SOURCE   BSQ       TAPES       FM#C   AMP  SNR RPHAS SBDLY   MBDLY  DRATE ESDESP ARCHV 
+*!           (sec)                                                                          (deg) (usec)  (usec) (ps/s) 
+<31800 2  2   75  113 82099?0133 82 083-1800 NRAO150  EF9 SAO-2018 HS001481 XC08   7.68  21  70.9   .02  -.0193    .17 790306 A0992 
+*'''/''''1''''/''''2''''/''''3''''/''''4''''/''''5''''/''''6''''/''''7''''/''''8''''/''''9''''/''''0''''/''''1''''/''''2''''/''''3' 
+*F# 1   2  3    4  5       6      7    8        9     10     11      12      13     14   15   16    17     18       19   20     21
+  
+Beyond character #150: Use LISTV to view as EDIT will only show 150 chars.
+  
+ EPOC TPHAS   TOTDRATE    TOTMBDELAY  SBRES  AMB X51 -PCAL1- -PCAL2-
+ mmss (deg)  (usec/sec)     (usec)   (usec) (usec)    (deg)   (deg) 
+ 0055 354.4  -.34549878   6785.276752 -.095 .200   3 221 202  57  42
+'''/''''4''''/''''5''''/''''6''''/''''7''''/''''8''''/''''9''''/''''0''''/
+ 22    23       24           25        26    27   28  29  30  31  32
+  
+FRNGE QUALITY CODE: 
+  
+Q= quality factor of the run,0= no fringes 3=poor,9=good
+            i.e. higher numbers indicate better quality 
+Q quality factor starts at 9 and is reduced by: 
+       1 point if RMS PH/SEG >11.46 and theoretical RMS < 5.73
+       2 points if RMS PH/SEG >22.92 and theoretical RMS <11.46 
+the factor is further reduced by: 
+       1 point if RMS AMP/SEG >20.00% and theoretical RMS <10.00% 
+       2 points if RMS AMP/SEG >40.00% and theoretical RMS <20.00%
+the factor is futher reduced by:
+       1 point  if RMS PH/FRQ  > 11.46 and theoretical RMS < 5.73 
+       2 points if RMS PH/FRQ  > 22.92 and theoretical RMS <11.46 
+the factor is further reduced by: 
+       1 point  if RMS AMP/FRQ  > 20.00% and theoretical RMS <10.00%
+       2 points if RMS AMP/FRQ  > 40.00% and theoretical RMS <20.00%
+any error condition sets the quality factor to  letter code in which
+                      A= freqency sequence cannot be handled by FRNGE 
+                         requires an FFT of more than 256 points
+                      B= interpolation error check search range fringes 
+                         may be on the edge of range
+                      C= epoch error condition all frequencies not at same
+                         epoch
+                      D= no phasecal or manually entered phasecal values
+                      E= single band delay residual too large CAUTION 
+                         fringe amplitude may be more than 5% low 
+                      F= no data found- dummy FRNGE output
+                   Q=0= probability of false detection greater than 1.0E-9
+                         i.e. NO FRNGES 
+                   Q=1= one or more phase cal signals less than 1% or greater 
+                         than 20% in voltage
+                   Q=2= one or more channels have amplitude less than half
+                         the strength of the coherent average and SNR.GT.20 
+  
+TAPE QUALITY CODES: 
+  
+TAPEQ=6 character tape quality code 
+        E (Char 1)=ref.tape error rate exponent i.e. 0=1.0E00  9=1.0E-9 
+        S (Char 2)=ref.tape slip sync rate      i.e. 0=10%     9=1% 
+        D (Char 3)=percentage data discarded    i.e. 0=10%     9=1% 
+        E (Char 4)=rem.tape error rate exponent i.e. 0=1.0E00  9=1.0E-9 
+        S (Char 5)=rem.tape slip sync rate      i.e. 0=10%     9=1% 
+        P (Char 6)=fraction of data processed   i.e. 0=<5%     9=>95% 
+                   that is, INTG.TIME/scheduled run duration
+  
+  
+"PSEUDO" A-FILES: 
+  
+    Several programs generate output in A-file like format as follows:
+  
+CLOSR-Program which computes closure
+  
+Field# 1-15 standard A-file 
+Field# 16-19 same as A-file but with closure phase,singleband delay,multiband 
+             delay and rate.
+Field# 20. Closure triangle (A3),fixed "*",closure SNR (I2 format,clips at 99)
+Field# 21 standard A-file 
+Field# 22-28 blank
+  
+FRNGX-Program which segments FRNGE output 
+  
+Field# 1-5 standard 
+Field# 6. Processing date and time (6th char indicates mode)
+          ":"phases residual to COREL+FRNGE "."phases residual to COREL 
+          "&"total observed phases "*"residual to COREL+FRNGE(offset coords)
+          "%"total earth centered 
+Field# 7-9  standard
+Field# 10. Baseline (2-chars) FRNGE quality blank 
+Field# 11. Decimal seconds of segment CENTER (F5.1) 
+Field# 11A. Nominal start time or scan time (hrs 0=0,9=9,A=10 ; min)
+Field# 12. Frequency in MHZ  (F8.2) (mean of all frequencies in sequence) 
+Field# 13. Frequency code,blank,#frequencies
+Field# 14-15 standard (note amp. in field 14 is coherent and is NOT noise corrected)
+Field# 16 residual phase (or difference phase if reference file is used)
+Field# 17 incoherent amplitude (cumulative from first segment of scan-NOISE-corrected)
+Field# 18 incoherent SNR       (cumulative from first segment of scan)
+Field# 19 reference file   amplitude or sum of phase cal phases-all freqs 
+          or segment number (in mode 10)
+Field# 20 reference file name or Allan var. 
+Field# 21 reference file name extent# or coherent integration sec 
+Field# 22-28 blank
+  
+FRNGX second line (when run in astrometric mode)
+
+Field# 1 standard 
+Field# 2 "3"
+Field# 3 standard 
+Field# 4 delay in ns
+Field# 5 delay error in ns
+Field# 6 delay rate in ps/s 
+Field# 7 delay rate error in ps/s 
+Field# 8 total phase deg
+Field# 9 ref. station elevation deg 
+Field# 10 rem. station elevation deg
+Field# 11 Correlation coeff. for incoherent addition of frnge segments
+Field# 12 U of standard epoch(1950 or 2000) in millions of wavelengths
+Field# 13 V of standard epoch(1950 or 2000) in millions of wavelengths
+Field# 14 Probability of false detection
+
+VFIND-Program to search EC and A-files for various quantities 
+  
+Field #7.  The year is deleted, and in its place in I3 format is field
+           #29, the type 51 extent number from which this type 52 was 
+           generated. 
+
+CRITERIA FOR DATA EXPORT AND QF REPORTS 
+
+Because there are processing duplicates in most experiments a choice has
+to be made on which one to accept.The method of duplicate deletion used 
+is to first sort the A file of all scans so that all duplicates are adjacent
+and then RU,CLOSR,-64,File of all scans,File of last scan in each set of
+duplicates. With this scheme the criteria of acceptance depends on the order
+in which the duplicates are sorted. 
+
+OLD METHOD: accepts most recent processing - used for astronomy 
+
+SORT ORDER (MOST SIGNIFICANT FIRST ): 
+ SCAN TIME(37:03,41:04),[SOURCE(46:08)],FREQ CODE(77:01),BASELINE(55:02), 
+ PROC TIME(23:10) 
+
+where [] indicates that this step is usually unnecessary i.e. there 
+is normally only one source associated with one scan
+
+      () Afile column # start : # columns 
+
+NEW METHOD: accepts quality factors 8 & 9  with highest SNR -used for geodesy   
+
+SORT ORDER (MOST SIGNIFICANT FIRST ): 
+ SCAN TIME(37:03,41:04),[SOURCE(46:08)],FREQ CODE(77:01),BASELINE(55:02)  
+ QFF(58:01),SNR(88:04),[PROC TIME(23:10)]   
+
+where  QFF=2 for QF=8 and 9 
+       QFF=1 for QF=7,6,5,4,3,2,1,0 
+       QFF=0 for QF=letter codes  and fringe searches (NFREQ=1) 
+       QFF is derived from Afile using EDIT commands

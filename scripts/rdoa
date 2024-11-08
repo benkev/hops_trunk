@@ -1,0 +1,63 @@
+#!/bin/ksh
+# $MK4_DIST_D/src/scripts/share/rdoa
+
+me="`basename $0`"
+
+#-------------------------------------------------------------------------------
+. $MK4_CONF_D/mk4.conf
+ 
+#-------------------------------------------------------------------------------
+control_hosts="cc0 cc1"
+crate_hosts="cr0 cr1 "
+playback_hosts="pu0 pu1 pu2 pu3 pu4 pu5 pu6 pu7 pu8 pu9 pua pub puc pud
+ pue puf"
+all_hosts="$control_hosts $crate_hosts $playback_hosts"
+
+#-------------------------------------------------------------------------------
+host_list="$1"
+case $host_list in
+   control  ) host_list="$control_hosts"  ;;
+   crate    ) host_list="$crate_hosts"    ;;
+   playback ) host_list="$playback_hosts" ;;
+   all      ) host_list="$all_hosts"      ;;
+   *        ) : ;;
+esac
+shift
+
+#-------------------------------------------------------------------------------
+for virtual_host in $host_list ; do
+   eval real_host=\$mk4_$virtual_host
+   [ -z "$real_host" ] && continue
+   case "$virtual_host" in 
+      cc0 ) $mk4_cc0_rsh doa "$@" </dev/null >$TMP/$$cc0 2>&1 & ;;
+      cc1 ) $mk4_cc1_rsh doa "$@" </dev/null >$TMP/$$cc1 2>&1 & ;;
+      cr0 ) $mk4_cr0_rsh doa "$@" </dev/null >$TMP/$$cr0 2>&1 & ;;
+      cr1 ) $mk4_cr1_rsh doa "$@" </dev/null >$TMP/$$cr1 2>&1 & ;;
+      pu0 ) $mk4_pu0_rsh doa "$@" </dev/null >$TMP/$$pu0 2>&1 & ;;
+      pu1 ) $mk4_pu1_rsh doa "$@" </dev/null >$TMP/$$pu1 2>&1 & ;;
+      pu2 ) $mk4_pu2_rsh doa "$@" </dev/null >$TMP/$$pu2 2>&1 & ;;
+      pu3 ) $mk4_pu3_rsh doa "$@" </dev/null >$TMP/$$pu3 2>&1 & ;;
+      pu4 ) $mk4_pu4_rsh doa "$@" </dev/null >$TMP/$$pu4 2>&1 & ;;
+      pu5 ) $mk4_pu5_rsh doa "$@" </dev/null >$TMP/$$pu5 2>&1 & ;;
+      pu6 ) $mk4_pu6_rsh doa "$@" </dev/null >$TMP/$$pu6 2>&1 & ;;
+      pu7 ) $mk4_pu7_rsh doa "$@" </dev/null >$TMP/$$pu7 2>&1 & ;;
+      pu8 ) $mk4_pu8_rsh doa "$@" </dev/null >$TMP/$$pu8 2>&1 & ;;
+      pu9 ) $mk4_pu9_rsh doa "$@" </dev/null >$TMP/$$pu9 2>&1 & ;;
+      pua ) $mk4_pua_rsh doa "$@" </dev/null >$TMP/$$pua 2>&1 & ;;
+      pub ) $mk4_pub_rsh doa "$@" </dev/null >$TMP/$$pub 2>&1 & ;;
+      puc ) $mk4_puc_rsh doa "$@" </dev/null >$TMP/$$puc 2>&1 & ;;
+      pud ) $mk4_pud_rsh doa "$@" </dev/null >$TMP/$$pud 2>&1 & ;;
+      pue ) $mk4_pue_rsh doa "$@" </dev/null >$TMP/$$pue 2>&1 & ;;
+      puf ) $mk4_puf_rsh doa "$@" </dev/null >$TMP/$$puf 2>&1 & ;;
+      *    ) : ;;
+   esac
+done
+wait
+
+#-------------------------------------------------------------------------------
+for virtual_host in $host_list ; do
+   eval real_host=\$mk4_$virtual_host
+   [ -z "$real_host" ] && continue
+   cat $TMP/$$$virtual_host | grep -v duplicate
+   rm  $TMP/$$$virtual_host
+done

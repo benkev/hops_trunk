@@ -1,0 +1,42 @@
+#!/bin/csh -f
+#
+# This sub-script applies an automatic aedit filter to the raw
+# alist file in order to generate a list of coherently
+# detected scans.  Called from mmreduce.
+#
+# Written by CJL, 22 February 1996
+#################################################################
+
+					# Skip option
+if (-e $1.codet) then
+    echo "mmreduce: A list of coherent detections already exists.  If you want"
+    echo "mmreduce: to use it, you should skip this step.  If not, the existing"
+    echo "mmreduce: list will be overwritten"
+    skipask
+    if ($status == 1) exit (0)
+endif
+					# Generate aedit script and give user
+					# the option of manually adjusting it
+cp $AESCRIPTS/mmvlbi_codet $1.aescript
+echo "write $1.codet; exit" >> $1.aescript
+while (1)
+    echo "mmreduce: Preparing to construct list of coherent detections"
+    echo "mmreduce: You have the option of editing the aedit runfile"
+    echo "mmreduce: If you choose to do so, do not alter the 'write' statement"
+    echo "mmreduce: Do you wish to edit the runfile? (y/n): \c"
+    set reply=$<
+    if ($reply == "y" || $reply == "Y") then
+	$EDITOR $1.aescript
+	break
+    else if ($reply != "n" || $reply != "N") then
+	break
+    else
+	echo "mmreduce: Please answer 'y' or 'n'"
+    endif
+end
+					# Do the aedit run
+aedit -r $1.aescript -f $1.mlistf
+if ($status != 0) then
+    echo "mmreduce: Oh no!  I got an error return from aedit.  I'm quitting"
+    exit (1)
+endif

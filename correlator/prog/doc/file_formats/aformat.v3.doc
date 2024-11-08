@@ -1,0 +1,213 @@
+Unix-based A-file format		Documentor CJL, 28 January 1994
+-----------------------			-------------------------------
+
+Below is a description of the A-file format, version 2 and higher.  Version 2
+was introduced for two purposes.  First, deficiencies in the old format
+were fixed.  Various useful quantities were added, and the scan time
+precision was improved to 1 second, allowing trivial construction of
+a unique unix data file name from the A-file line.  Second, a mechanism
+for future support of A-file format evolution was included via the
+version number in field 1.
+
+A ground rule is that the new format is field-oriented, not column-oriented.
+Fields are delimited by spaces.  In general, A-file format writing routines
+will stick to the same columns to facilitate viewing of the files, but these
+columns are NOT fixed, and any software that uses these files will not care
+about the columns.  Many fields, however, will normally have fixed widths 
+(indicated by definite number of characters in the width column below).
+Extreme values in any field cause the field width to expand.  Common to all
+lines is a format version number in the first field.  A non-numeric
+character implies version 1 (the old HP-1000 format).  Future modifications
+to the format will increment this version number.  All unix software will
+support all A-file format versions, including files with mixed formats.  In
+the latter case, however, certain fields will be missing in certain lines,
+and processing of those quantities may be blocked by programs that encounter
+such mixed-format files.
+
+Note that version 2+ or mixed format A-files CANNOT be used on the HP-1000
+systems.  If you need to ship an A-file back there, for reprocessing perhaps,
+it MUST be a version 1 A-file.  Control over the output format from the unix
+programs is provided.
+
+Below are the formal definitions of the formats for different line types,
+format version number 3.
+
+The contents of the type 0 lines are as follows:
+
+Field # Contents		Width/type	Comments
+------- --------		----------	--------
+1	Format version #	1/i		Non-numeric = version 1
+2	Root id code		6/c		6-char lower case
+3	File type (0)		1/i		Root file record
+4	Extent #		2/i		Should always be zero
+5	Size 			4/i		# of 256-byte records in file
+6	Expt serial #		4/i		Part of filename
+7	Procdate yyddd?hhmm	10/c		Corel run date, ? is corel version
+8	Year of scan		2/i		Two-digit year
+9	Scan time ddd-hhmmss	10/c		Equals scan directory name
+10	Source name		8/c		Blank padded
+11	Station list		variable/c	1 character per station
+
+Changes version 1 to 2: Deletion of the archive number (obsolete 
+                        under unix), repositioning of the root id code, 
+                        and addition of seconds precision to the scan.  
+                        The FMGR file name is also dropped.
+Changes version 2 to 3: None
+
+
+The contents of the type 1 lines are as follows:
+
+Field # Contents		Width/type	Comments
+------- --------		----------	--------
+1	Format version #	1/i		Non-numeric = version 1
+2	Root id code		6/c		6-char lower case
+3	File type (1)		1/i		Corel file record
+4	Extent #		2/i		Part of filename
+5	Size			4/i		# of 256-byte records in file
+6	Expt serial #		4/i		Part of filename
+7	Procdate yyddd?hhmm	10/c		Corel run date, ? is corel version
+8	Year of scan		2/i		Two-digit year
+9	Scan time ddd-hhmmss	10/c		Equals scan directory name
+10	Source name		8/c		Blank-padded
+11	Baseline/QF		3/c		2-char baseline id and 1-char qcode
+						Meaning of qcode in corel.doc
+12	Scheduled duration	4/i		Seconds
+13	Reference drive	#	1/i		
+14	Remote drive #		1/i		
+15	frequencies		2/c		E.g. SX
+16	Reference clock error	7/f		Microsec
+17	Ref/rem clock diff.	7/f		Microsec
+18	Status bits		6/octal		See corel.doc for details
+
+Changes version 1 to 2: Repositioning of the root id code, addition of 
+                        seconds precision to the scan, separating reference 
+                        and remote drive numbers into two fields (in case 
+                        they go over 9), omission of the scheduled scan start 
+                        seconds (now in the scan field), and omission of 
+                        correlation start/stop times and EQTs, which are not 
+                        present in the root file, and therefore not accessible 
+                        under unix.  The FMGR file name is also dropped.
+Changes version 2 to 3: None
+
+
+The contents of the type 2 lines are as follows:
+
+Field #	Contents		Width/type	Comments
+-------	--------		----------	--------
+1	Format version #	1/i		Non-numeric = version 1
+2	Root id code		6/c		6-char lower case
+3	File type (2)		1/i		General format for fringe data
+4	Extent #		2/i		Part of filename
+5	Duration		4/i		Nominal duration of this datum (sec)
+6	Length 			4/i		Seconds of data represented.
+7	Offset			4/i		Offset (sec) of mean time of data from
+						nominal scan time (field 11)
+8	Expt serial #		4/i		Part of filename
+9	Procdate yyddd?hhmm	10/c		FRNGE/fourfit processing time
+						char 6 is corel version number
+10	Year of scan		2/i		Two-digit year.
+11	Scan time ddd-hhmmss	10/c		Nominal start time of data record
+12	Source name		8/c		Blank-padded ascii string
+13	Baseline/QF		3/c		2-char baseline id and 1-char qcode
+						Meaning of qcode defined in fourfit
+14	Freq/mode/#freq		4/c		e.g. XC08 for X-band mode C 8 freqs
+15	Amplitude		6/f		In units of 1/10000
+16	SNR			5/f		4 significant digits
+17	Phase(deg)		5/f		Can be of various type, see field 16
+18	Data type		2/c		First char specifies data origin:
+						A = ap by ap data from fringex
+						C = coherently avgd data from fringex
+						I = incoherently avgd data from average
+						J = incoherently avgd data from average,
+						    for various seg times (seg time in
+						    "duration", field 5)
+						S = scan summary from alist
+						O = overlapping coh. avg. from fringex
+						Second char specifies phase type:
+						f = residual to corel+fourfit, e.c.
+						c = residual to corel only
+						t = total phase (geodetic definition)
+						e = total earth-centered phase
+19	Resid SBD		5/f		Microseconds
+20	Resid MBD		8/f		Microseconds
+21	MBD ambiguity		6/f		Microseconds
+22	Resid rate		7/f		Picoseconds/second
+23	Ref. elevation		4/f		At reference epoch, degrees
+24	Rem. elevation		4/f		At reference epoch, degrees
+25	Ref. azimuth		5/f		At reference epoch, degrees
+26	Rem. azimuth		5/f		At reference epoch, degrees
+27	u (megalambda)		6/f		precision 4 sig. digits
+28	v (megalambda)		6/f		precision 4 sig. digits
+29	ESDESP			6/c		E=ref.tape error rate exponent: 
+							0=1.0E00  9=1.0E-9
+						S=ref.tape slip sync rate: 
+							0=10%     9=1%
+						D=percentage data discarded:
+							0=10%     9=1%
+						E=rem.tape error rate exponent:
+							0=1.0E00  9=1.0E-9
+						S=rem.tape slip sync rate:
+							0=10%     9=1%
+						P=fraction of data processed:
+							0=<5%     9=>95%
+						i.e. INTG.TIME/scheduled run duration
+30	Reference epoch		4/c		mmss at which various time-dependent
+						quantities are calculated
+31	Reference frequency	8/f		Precision 10 KHz
+32	Total e.c. phase	5/f		Regardless of field 16
+33	Total drate		11/f		At ref epoch, microsec/sec
+34	Total mbdelay		13/f		At ref epoch, microsec
+35	Total SBD-MBD		5/f		At ref epoch, microsec
+36	Parent corel extent(s)  variable	up to 4 numbers, "a,b,c,d"
+
+
+Changes version 1 to 2: Brand new fields are 1, 18, 23, 24, 25, 26, 27, 28, 31.  
+                        Modified or enhanced fields are 11, 16, 20, 21, 36.  
+                        Discarded fields are FMGR file name, reference and remote 
+                        tape labels, A-file number, phasecal numbers for first 
+                        and last channels, reference and remote.  
+Changes version 2 to 3: Addition of fields 5 and 7.  
+
+The above is intended to fulfill data export needs, but is insufficient for 
+astrometric purposes.
+
+
+The contents of the type 3 lines are as follows:
+
+Field #	Contents		Width/type	Comments
+-------	--------		----------	--------
+1	Format version #	1/i
+2	Expt serial #		4/i		
+3	File type (3)		1/i		Closure triangle data
+4	Year of scan		2/i		Two-digit year.
+5	Scan time ddd-hhmmss	10/c		Nominal start time of data record
+6	Source name		8/c		Blank-padded ascii string
+7	Freq/mode		2/c		e.g. XC for X-band mode C
+8	Triangle		3/c		e.g. ABC
+9	root extension(s)	6-20/c		If more than one, comma separated
+10	extents			i,i,i		For baselines AB, BC, CA
+11	lengths			i,i,i		For baselines AB, BC, CA
+12	Duration		4/i		Nominal duration of datum
+13	Offset			4/i		Offset from nominal scan time of
+						mean time of all contributing data
+14	Scan quality		1/c		Based on baseline qf's
+15	Data quality		1/c		Based on data values
+16	ESDESP			6/c		Minimum of baseline values
+17	bispectral amp		9/f		Units of 10**-12
+18	bispectral snr		7/f		
+19	bispectral phase	5/f		Closure phase (degrees)
+20	Data type		2/c		Analogous to type 2 field 16, 
+						meaning yet to be defined
+21	closure sbd		6/f		Microseconds
+22	closure mbd		8/f		Microseconds
+23	closure mbd ambig.	6/f		Microseconds
+24	closure delay rate	7/f		Picosec/sec
+25	Elevations		f,f,f		For stations A,B,C
+26	Azimuths		f,f,f		For stations A,B,C
+27	Reference epoch		4/c		mmss at which various time-dependent
+						quantities are calculated
+28	Reference frequency	8/f		Precision 10 KHz
+
+
+Changes version 1 to 2: There was no version 1.
+Changes version 2 to 3: Added fields 12, 13, 20.

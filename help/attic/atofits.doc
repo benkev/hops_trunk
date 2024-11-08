@@ -1,0 +1,43 @@
+Documentation for the program "atofits" CJL, 9 December 1996
+------------------------------------------------------------
+
+COMMAND NAME:   atofits
+
+SYNOPSIS:  Translates type-2 A-file records to FITS format
+
+SYNTAX:  atofits [-m msglevel] [-o outfile] afilename ccfilename
+
+OPTION FLAGS:	-m msglevel
+			Verbosity control parameter, ranging from -3 to +3,
+			with lower numbers being more verbose.  The default
+			value is 1.
+		-o outfile
+			If specified, this flag directs the FITS output
+			of atofits to the named file.  The default output
+			goes to a file named "atofits.out".
+
+ARGUMENTS:	afilename
+			This is the input data file.  Only the type-2
+			(fringe) records are processed.  Only one experiment,
+			frequency code, and source is permitted per
+			execution of the program.
+		ccfilename
+			This is the name of the correlator control file
+			associated with the input data file.  It is used to
+			get the information necessary to write the antenna
+			table.  It is also needed for some of the header
+			information (source coordinates, for example).
+
+ENVIRONMENT:	None
+
+
+DESCRIPTION:
+
+The program "atofits" is just about the simplest possible FITS writer for HOPS
+A-file data.  It implements the old-style AIPS random parameter uv-FITS format
+(not the new interferometry format used for the VLBA).  Multi-source files
+are not supported, since convenient filtering is available in HOPS, and
+concatenation is available in AIPS.  The data records are written assuming
+"calamp" has already be invoked to convert amplitudes into Jy.  The data
+record weights are proportional to the square root of the SNR as determined
+by HOPS.  The output file seems to be digestible by the AIPS program FITLD.

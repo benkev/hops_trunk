@@ -1,0 +1,11 @@
+* Aedit runfile in support of mm-VLBI.  This one simply selects the
+* coherent detections which one hopes are present in the final
+* masterlist (the mlistf file).  
+
+* Standard coherent detection threshold
+snrmin 7
+
+* Any other criteria for weeding out false detections should go here
+
+* Apply filter(s)
+edit inputs

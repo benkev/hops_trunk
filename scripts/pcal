@@ -1,0 +1,27 @@
+#
+# pcal -- turn on and off pcal data requests
+# Fri Feb 11 16:20:46 EST 2000
+#
+# NB! a value of 0 for accumulation period
+#	stops sending pcal data -- otherwise,
+#	the acc period needs to be an integral
+#	number of seconds
+
+if( ${#argv} != 2 ) then
+	echo ""
+	echo "USAGE:  pcal  su#  AccPeriod"
+	echo "  an AccPeriod of 0 turns requests off"
+	echo "  nominal AccPeriod is 5 seconds"
+else
+	set su     = $1
+#   set accper = `echo $2 | awk '{printf "0x%08x", $0 * 32.0e6}'`
+    set accper = $2
+
+	echo "sendnote tx${su} 0x00000010 0x53554d20 0 0 0 0x00000000 0 0 0 0 0 0 0 0x80 0x00070300 \
+			0 0 0 0 0 0 0 \
+			0x0300000d 0x01030000 1 0x01035001 0x1c 0 0 0x18 0 ${accper}"
+
+	sendnote tx${su} 0x00000010 0x53554d20 0 0 0 0x00000000 0 0 0 0 0 0 0 0x80 0x00070300 \
+		0 0 0 0 0 0 0 \
+		0x0300000d 0x01030000 1 0x01035001 0x1c 0 0 0x18 0 ${accper}
+endif

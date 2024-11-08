@@ -1,0 +1,161 @@
+#!/bin/csh -f
+#
+# This script is responsible for handling the real-time flow of
+# correlator data from the A-900.  It goes into an infinite loop,
+# waking up periodically to invoke the renamer and ftp acknowledgements
+# back to the A-900
+#
+# Written by CJL, June 30 1994
+####################################################################
+set nonomatch
+					# For easy customization
+set hp1000=grumpy
+set hpuser=mat
+set hppass=mat!
+set hpdir=/vftp
+                                        # Make sure we have proper setup
+env_check dribble
+					# This set locally in monitor
+					# dribble should not be started
+					# manually
+if ($?DRIBBLEOK == 0) then
+    echo "dribble: Cannot run dribble script on its own"
+    echo "dribble: Invoke it by using the monitor command"
+    exit(1)
+endif
+                                        # Get to correct directory
+if ($?TRANSFER == 1) then
+    if (-d $TRANSFER) then
+	cd $TRANSFER
+    else
+        echo "dribble: Transfer area " $TRANSFER " appears not to exist"
+	exit(1)
+    endif
+else
+    echo "dribble: TRANSFER environment variable not set, check setup.csh"
+    exit (1)
+endif
+					# OK, we are a go.  Initialize
+					# error return strings
+set renamerr=("Failure in rename program"\
+		"Problem with unix directory for CI files"\
+		"Malformed root file name in dribble script"\
+		"Requested root file not found by renamer"\
+		"Garbage root file contents"\
+		"Mismatch between root info and corel names"\
+		"Garbage in corel file(s)"\
+		"Mismatch between root info and fringe names"\
+		"Problem in rename figuring out file sizes"\
+		"Problem in rename figuring out free disk space"\
+		"Not enough space to receive renamed files"\
+		"Problem in rename creating mv command file"\
+		"Error return from move command"\
+		"No .sent file after 30 minutes of waiting")
+					# Start up the loop ...
+echo "dribble: Starting Unix Transfer Monitor"
+
+while (1)
+					# Make list of all root files
+					# (in normal operation should be only 1)
+    set rootlist=(*.a0*)
+    if ($#rootlist == 1) then
+	if ($rootlist:e != "a000") set rootlist=""
+    endif
+
+					# loop over them all
+    foreach root ($rootlist)
+					# Record of error if it occurs
+	set errfile=`printf "%s.error" $root:r`
+					# This is file to be sent back to A-900
+	set renamed=`printf "%s.u000" $root:r`
+
+					# Skip if no completion file from A-900
+	set completion=`printf "%s.sent" $root:r`
+	if (-e "$completion") then
+					# Tell user what we are about to do
+	    echo "dribble: Processing root family $root:r at `date`"
+					# Do the actual move, record result
+					# Save shell script, it contains the
+					# target root filename
+	    rename -d "$root" -m 2
+	    set retcode=$status
+
+					# Do a test fourfit run
+ 	    if ($retcode == 0) then
+					# Extract control file name and unix
+					# root name from file left by rename
+ 		set destname=`printf "%s.dest" $root:r`
+ 		set cfile=`awk '{print $1}' $destname`
+ 		set unix_root=`awk '{print $2}' $destname`
+					# Use control file if present
+		echo "dribble: Performing fringe-fit ..."
+		if (-e "$cfile") then
+		    echo "dribble: using control file $cfile"
+ 		    fourfit -m 2 -c $cfile $unix_root | grep snr
+		else
+		    echo "dribble: using default fourfit control parameters"
+		    fourfit -m 2 $unix_root | grep snr
+		endif
+		rm $destname
+ 	    else
+ 		echo "dribble: rename failed for root family $root:r"
+#		set retcode=1
+ 	    endif
+
+					# Insert rename retcode in .u file
+	    echo $retcode >! $renamed
+	    echo $renamerr[$retcode] >> $renamed
+					# Send .u file back as acknowledgement
+	    printf "user $hpuser $hppass\ncd $hpdir\nput %s\nbye" $renamed >! ftp_com
+	    ftp -n $hp1000 < ftp_com >>&! ftp_log
+
+					# Report success or failure, tidy up
+	    if ($status != 0) then
+		echo "dribble: error ftp'ing $renamed to $hp1000"
+	    else
+		if ($retcode != 0) then
+		    cp $renamed $errfile
+		    echo "dribble: Logged error for family $root:r at `date`"
+					# Tell user what we just did
+		else
+		    echo "dribble: Completed transfer of family $root:r at `date`"
+		endif
+		rm $renamed
+	    endif
+					# Cleanup
+	    rm "$completion" ftp_com
+
+					# No completion file, see how long
+					# it's been, raise alarm if too long
+	else
+	    set root_age=`age $root`
+					# Error identified ... need to use "drool"
+	    if (-e "$errfile") then
+		echo "dribble: WARNING: Root family $root:r failed transfer"
+
+					# Declare this one a failure
+	    else if ($root_age > 30) then
+		echo "dribble: Error: Root family $root:r never got a completion"
+		echo "dribble:        file from $hp1000, giving up."
+		echo 14 >! $renamed
+		echo $renamerr[14] >> $renamed
+					# Send .u file back
+		printf "user $hpuser $hppass\ncd $hpdir\nput %s\nbye" $renamed >! ftp_com
+		ftp -n $hp1000 < ftp_com >>&! ftp_log
+		if ($status != 0) then
+		    echo "dribble: error ftp'ing $renamed to $hp1000"
+		else
+		    cp $renamed $errfile
+		endif
+		rm "$renamed"
+
+					# Just warning ... maybe can be fixed
+	    else if ($root_age > 5) then
+		echo "dribble: WARNING: Root family $root:r may have been interrupted"
+		echo "dribble:          during transfer from $hp1000 ... please check"
+	    endif
+	endif
+    end
+					# Wait a while before rechecking
+    sleep 60
+end

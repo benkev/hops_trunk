@@ -1,0 +1,148 @@
+#!/bin/csh 
+# composer 
+# Calls tgen or a2t.  Details below. 
+# Revised:  2001 July 18, JAB 
+# 
+set me = $0:t 
+# Check that needed environment variables are set.  Use defaults if not: 
+if ( ! $?TASK ) then 
+  setenv TASK /correlator/task 
+  echo "$me WARNING:  TASK set to default $TASK " 
+endif 
+if ( ! $?BIN ) then 
+  setenv BIN /correlator/prog/bin/hppa 
+  echo "%me WARNING:  BIN set to default $BIN " 
+endif 
+# Set local variables to defaults: 
+set expt = "2611_std" # Default experiment name 
+set key = "." # Correlator mode key 
+set numd = 6 # Number of useable tape drives 
+set slist = "." # Station list 
+set afile = "2611_alist" # Reprocess list 
+set stime = "." # Start time 
+set etime = "." # End time 
+set ulvex = "Y" # Use lvex? 
+set ofile = "mytask" # Output file (in $TASK) 
+# 
+retry: 
+# Tgen or a2t? 
+echo "This $me script can run either tgen or a2t to write a task (tsf) file " 
+echo "  for opera to send to conductor.  Tgen reads vex files for initial " 
+echo "  processing; a2t reads a reprocess list in afile fringesum format. " 
+echo "Type T for tgen or A for a2t:  \c" 
+set tst = $< 
+if ( "$tst" != "T" && "$tst" != "t" && "$tst" != "A" && "$tst" != "a" ) then 
+  echo "That won't do.  Sorry.  Try again. " 
+  goto retry 
+endif 
+echo "For each question, just Enter or Return to keep defaults. " 
+if ( "$tst" == "T" || "$tst" == "t" ) goto restart 
+# 
+# Set up to call a2t ... 
+set slist = "NULL" # Default for a2t 
+redo: 
+echo "Reprocess (afile) list is $afile, change to:  \c" 
+set tst = $< 
+if ( "$tst" != "" ) set afile = $tst 
+# 
+echo "Number of useable tape drives is $numd, change to:  \c" 
+set tst = $< 
+if ( "$tst" != "" ) set numd = $tst 
+# 
+echo "Station list is a string of one-letter station codes with no spaces. " 
+echo "Station list is $slist, change to:  \c" 
+set tst = $< 
+if ( "$tst" != "" ) set slist = $tst 
+# 
+echo "The output file will be created or, if it exists, appended. " 
+/bin/echo "Output file (in directory \044TASK) is $ofile, change to:  \c" 
+set tst = $< 
+if ( "$tst" != "" ) set ofile = $tst 
+if ( $ofile:e != tsf ) then 
+  set ofile = $ofile.tsf 
+  echo "  I changed that to $ofile " 
+endif 
+# 
+echo "If this is all OK, just Enter or Return.  Or to fix (correct) " 
+echo "  any of your entries, type F; to abort, type ^C (Ctrl C):  \c" 
+set tst = $< 
+if ( "$tst" == "F" || "$tst" == "f" ) goto redo 
+# 
+/bin/echo "A2t will write to file \044TASK/$ofile = $TASK/$ofile " 
+echo "$me starting a2t ... " 
+# Debuggery: 
+echo "  a2t $afile $slist $numd > $ofile " 
+a2t $afile $slist $numd >>! $TASK/$ofile 
+echo "$me  done. " 
+exit ( 0 ) 
+# End of a2t 
+# 
+# Set up to call tgen ...  
+restart: 
+echo "Experiment code (in global.evex) is $expt, change to:  \c" 
+set tst = $< 
+if ( "$tst" != "" ) set expt = $tst 
+# 
+if ( "$key" == "." ) then 
+  echo "Correlator mode key defaults from evex, change to:  \c" 
+else 
+  echo "Correlator mode key is $key, change to:  \c" 
+endif 
+set tst = $< 
+if ( "$tst" != "" ) set key = $tst 
+# 
+echo "Number of useable tape drives is $numd, change to:  \c" 
+set tst = $< 
+if ( "$tst" != "" ) set numd = $tst 
+# 
+echo "Station list is a string of one-letter station codes with no spaces. " 
+if ( "$slist" == "." ) then 
+  echo "Station list defaults to all in ovex, change to:  \c" 
+else 
+  echo "Station list is $slist, change to:  \c" 
+endif 
+set tst = $< 
+if ( "$tst" != "" ) set slist = $tst 
+# 
+echo "Following times are in the format ddd-hh:mm:ss. " 
+if ( "$stime" == "." ) then 
+  echo "Start time defaults to start of ovex, change to:  \c" 
+else 
+  echo "Start time is $stime, change to:  \c" 
+endif 
+set tst = $< 
+if ( "$tst" != "" ) set stime = $tst 
+# 
+if ( "$etime" == "." ) then 
+  echo "End time defaults to end of ovex, change to:  \c" 
+else 
+  echo "End time is $etime, change to:  \c" 
+endif 
+set tst = $< 
+if ( "$tst" != "" ) set etime = $tst 
+# 
+echo "Use Lvex (Y or N) is $ulvex, change to:  \c" 
+set tst = $< 
+if ( "$tst" != "" ) set ulvex = $tst 
+# 
+echo "The output file will be created or, if it exists, appended. " 
+/bin/echo "Output file (in directory \044TASK) is $ofile, change to:  \c" 
+set tst = $< 
+if ( "$tst" != "" ) set ofile = $tst 
+if ( $ofile:e != tsf ) then 
+  set ofile = $ofile.tsf 
+  echo "  I changed that to $ofile " 
+endif 
+# 
+echo "If this is all OK, just Enter or Return.  Or to fix (correct) " 
+echo "  any of your entries, type F; to abort, type ^C (Ctrl C):  \c" 
+set tst = $< 
+if ( "$tst" == "F" || "$tst" == "f" ) goto restart 
+# 
+/bin/echo "Tgen will write to file \044TASK/$ofile = $TASK/$ofile " 
+echo "$me starting tgen, be patient ... " 
+# Debuggery: 
+echo "  tgen $expt $key $numd $slist $stime $etime $ulvex > $ofile " 
+tgen $expt $key $numd $slist $stime $etime $ulvex >>! $TASK/$ofile 
+echo "$me  done. " # End of tgen 
+

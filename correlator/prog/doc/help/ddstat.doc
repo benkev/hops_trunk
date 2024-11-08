@@ -1,0 +1,48 @@
+Documentation for the program "ddstat", CJL, 18 January 1994
+------------------------------------------------------------
+
+COMMAND NAME:   ddstat
+
+SYNOPSIS:  Verifies integrity and reports status of main data areas
+
+SYNTAX:  ddstat [-a] [-t nnn] [expt1 expt2 ... exptn]
+		Where all arguments are optional.
+		Note: all option flags must appear before the experiment list
+
+OPTION FLAGS:	-a
+			Tells ddstat to report only those experiments
+			which have data physically present on the disk
+
+		-m pri
+			Adjusts verbosity level.  The value 'pri' is an 
+			integer from -3 to 3, lower is more verbose.
+			The default is 3 (very quiet).
+
+		-t days
+			Tells ddstat to locate experiments which have
+			been archived, and which have not been touched
+			for a certain number of days, and move them to
+			the long-term storage area defined by the
+			OLDDATA environment variable.  This will help
+			to keep the main data area uncluttered.
+
+ARGUMENTS:	experiments
+			You can optionally give ddstat a list of
+			experiment numbers, and it will operate on only
+			those.  The default is all experiments in the
+			main data area pointed to by CORDATA.
+
+ENVIRONMENT:	CORDATA, DATA1 ... DATAn, OLDDATA
+
+DESCRIPTION:
+
+This program is used to monitor the status of experiment directories, and to
+check the integrity of the data areas.  At the present time, it is acquiring
+various options and gaining in capabilities.  It is still hardcoded to the 
+$CORDATA main data area, and cannot be used to report on other data areas.  
+Future versions will have data area arguments.  
+
+If the data areas pass a run of ddstat without errors, you can be pretty certain
+that the data contained therein conform to all rules for correlator data file
+naming conventions, symbolic linking between main and subsidiary data areas,
+and other requirements.  The program checks rather thoroughly.  

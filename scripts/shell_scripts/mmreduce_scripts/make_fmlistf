@@ -1,0 +1,48 @@
+#!/bin/csh -f
+#
+# This sub-script allows the user to examine and edit the fringe
+# fitted masterlist file using aedit.  Called from mmreduce.
+#
+# Written by CJL, 22 February 1996
+#################################################################
+
+					# Skip option
+if (-e $1.fmlistf) then
+    echo "mmreduce: A 'final' fringe-fitted masterlist file already exists."
+    echo "mmreduce: If you want to use it, you should skip this step.  If not,"
+    echo "mmreduce: the existing file will be overwritten"
+    skipask
+    if ($status == 1) exit (0)
+endif
+
+while (1)
+    echo "mmreduce: Do you want to use aedit to inspect (and possibly"
+    echo "mmreduce: edit) the fringe-fitted masterlist file? (y/n): \c"
+    set reply=$<
+    if ($reply == "y" || $reply == "Y") then
+	echo "mmreduce: Starting up aedit.  When you write out the data,"
+	echo "mmreduce: please make a note of the filename you choose"
+	aedit -f $1.fmlist
+	if ($status != 0) then
+	    echo "mmreduce: Whoops, error return from aedit.  Let's try again"
+	    continue
+	else
+	    echo "mmreduce: Enter the name of the file you wrote out from aedit,"
+	    echo "mmreduce:       or just hit return to use the unmodified list: \c"
+	    set reply=$<
+	    if ($reply == "") then
+		cp $1.fmlist $1.fmlistf
+	    else
+		cp $reply $1.fmlistf
+	    endif
+	endif
+	break
+    else if ($reply == "n" || $reply == "N") then
+	cp $1.fmlist $1.fmlistf
+	break
+    else
+	echo "mmreduce: Please answer 'y' or 'n'"
+    endif
+end
+
+exit (0)

@@ -1,0 +1,7 @@
+type 2
+edit inp
+*edit dup qcode
+sort baseline
+sort time
+write vlist.temp
+exit

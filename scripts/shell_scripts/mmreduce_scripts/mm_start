@@ -1,0 +1,46 @@
+#!/bin/csh -f
+#
+# This sub-script generates the starting alist file for the analysis.
+# Called from mmreduce.
+#
+# Written by CJL, 22 February 1996
+#################################################################
+
+					# Skip option
+if (-e $1.alist) then
+    echo "mmreduce: A raw alist file already exists. To use it, you should skip"
+    echo "mmreduce: this step.  If not, the existing file will be overwritten"
+    skipask
+    if ($status == 1) exit (0)
+endif
+
+
+while (1)
+    echo "mmreduce: Do you have an 'alist' file to start from? (y/n): \c"
+    set reply=$<
+					# User-supplied, get it and check out
+    if ($reply == "y" || $reply == "Y") then
+	echo "mmreduce: Please supply the name of your alist file: \c"
+	set reply=$<
+	if (! -e $reply) then
+	    echo "mmreduce: File '$reply' does not exist, let's try again"
+	    continue
+	else
+	    cp $reply $1.alist
+	    break
+	endif
+					# Need to run alist
+    else if ($reply == "n" || $reply == "N") then
+	echo "mmreduce: OK, I will run alist now.  Please be patient"
+	alist -o $1.alist $2
+	if ($status != 0) then
+	    echo "mmreduce: OOPS!  The run of alist failed, I'm giving up."
+	    exit (1)
+	else
+	    echo "mmreduce: Raw alist file successfully generated"
+	    break
+	endif
+    else
+	echo "mmreduce: Please answer 'y' or 'n'"
+    endif
+end

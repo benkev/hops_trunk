@@ -1,0 +1,69 @@
+General Description of Fourfit Fringe Plots
+-------------------------------------------
+
+The fourfit fringe plot has a long history and the format continues to
+be tweaked; but the basic idea is to capture on a single page everything
+you want to know about each fringe fit.  Most experiments have multiple
+sources and many stations, and the fringing is usually performed on the
+individual baselines between stations for polarization products as the
+user commands.  At the top of the page (bold) is the version of the
+software used for the correlation and fringing as well as the source,
+scan name, baseline and polarization product.  Below this is an 'executive'
+summary of the observables and several plots: a combined delay-rate
+and multiband-delay plot, a singleband delay plot and a cross-power
+spectral plot.   Below this is a per-channel time history with indicators
+of validity and phase calibrations (with corresponding observables below
+in rather fine print).  Finally, the fit is made with reference to a model
+of the earth rotation and all of the parameters associated with that are
+printed in the block at the bottom.  Now for some details....
+
+Observables: The principal ones are the SNR, correlation amplitude (x 10000)
+and phase for the integration time correlated.  Heuristics are used to
+comment on the 'quality' of the fringe (0 is lousy, 9 very good).  A
+probability of false detection (PFD) is supplied; if it isn't 0, you 
+probably don't have a fringe.  Also given are the residual single and
+multiband delays as well as the fringe rate (these are all referenced
+to the model).  Finally information about the scan and its processing
+is also given.
+
+Singleband Delay (green curve): this is the easiest to understand.
+Fundamentally we are cross-correlating two signals that have been adjusted
+for the geometric model so this should look like a delta-function if you
+have a good correlation.  The height of the peak is the correlation amplitude.
+Note that this is effectively an average over all channels.
+
+Xpower (Cross-power) Spectrum: this is the fourier transform of the
+singleband delay.  The blue trace is the amplitude as a function of
+frequency and the red trace is the phase.  For a delta-function-like
+cross-correlation, both traces should be flat.
+
+Delay Rate and Multiband Delay: the delay rate is the red curve and the
+multiband delay is the blue curve (note each has separate axis labels).
+The delay-rate curve tells you how the mean delay changed over the scan;
+typically it is somewhat ratty due to fluctuating atmospheric delays.
+The multiband delay is constructed from the singleband phases for each
+of the channels.  (A variation of phase with frequency is a delay.)  In
+a well tuned system, the multiband delay provides a finer delay measurement,
+but it is subject to ambiguities (i.e. multiples of 2pi in phase between
+channels).  Note that fourfit does search in the 3 dimensions of singleband,
+multiband and delay rate space, so the peaks of the delay rate and multiband
+delay should also peak at the same amplitude as the singleband delay.
+
+Channel plots: the individual frequency channels are labelled a..z A..Z 0..9
+(and two additional characters).  Depending on the duration of the scan,
+the time variation of the fringe is averaged over some number of AP
+(integration periods used by the correlator for output time resolution).
+In each channel there are thus amplitude and phase variations with time
+in the scan (left-to-right in each channel) and the channels are deployed
+in increasing frequency.  If there are issues with the recording (which
+would vary with time) the validity bars (showing the fractional amount of
+data present on a scale of zero to one) are colored red instead of green.
+There is also a panel for the average amplitude and phase with time.  Below
+these per-channel plots are the figures of merit for each box--the information
+is mostly for tracking down problems and not really readable.  If phase cals
+are employed (actual phase calibration measurements or a priori manual phase
+adjustments) these are plotted in colors related two the two stations
+(reference station in green, remote station in magenta).
+
+
+

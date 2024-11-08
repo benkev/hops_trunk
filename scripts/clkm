@@ -1,0 +1,10 @@
+#!/bin/ksh
+# $MK4_DIST_D/src/scripts/share/clkm
+# setup the clkm module          rjc 99.5.13
+# clkm  -  configure clkm module (remotely)
+
+#-------------------------------------------------------------------------------
+. $MK4_CONF_D/mk4.conf
+
+#-------------------------------------------------------------------------------
+$mk4_cr0_rsh config_clkm

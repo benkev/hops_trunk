@@ -1,0 +1,515 @@
+Documentation for the program "fourfit", CJL 26 November 1993
+-------------------------------------------------------------
+
+COMMAND NAME:   fourfit
+
+SYNOPSIS:  Performs fringe searching for MkIV data
+
+SYNTAX:  fourfit [-a] [-b BB:F] [-c controlfile] [-d display device]
+	    [-m value] [-o delay offset] [-r afile] [-stux] data file list 
+	    [set <control file syntax statements>]
+		 Where all arguments except the data file list are optional.
+		 The [-r afile] option replaces the data file list, however.
+		 The "set" argument and the commands which follow it must
+		 come last.  All option flags must appear before the data file
+		 list.  Option flags can come in any order.
+
+	Here are two examples of command-line invocations of fourfit, with
+	an explanation of what they do:
+
+fourfit -txas -m 1 -c control 018-234505 set mb_win -0.0034 .004 freqs a b
+		Test mode, xwindow display, accounting switched on, cross power
+		spectrum plot switched on, moderately verbose, use control file
+		named "control" in current working directory, process all data in
+		scan directory 018-234505, override multiband delay search
+		window and select channels 'a' and 'b' only.
+
+fourfit -r refr_list -c control -d hardcopy -b AT:S
+		Process all data referenced by type 2 lines in the A-file named
+		"refr_list", use control file "control", print the fringe plot 
+		on the default printer, process only baseline AT frequency 
+		subgroup S. 
+
+OPTION FLAGS:   -a
+			If specified, this option switches on accounting
+			of CPU time and wall-clock time used in the various
+			parts of fourfit.  When the program finishes, it
+			produces a summary of these timing statistics.
+
+		-b BB:F
+			Allows the user to override the control file
+			with a specification of the baseline and/or
+			frequency group to be processed.  The syntax is
+			flexible.  0, 1 or 2 characters before the colon
+			refer to the baseline (one character is interpreted
+			as a station), and 0 or 1 character after the colon
+			is interpreted as the frequency subgroup.  You can
+			use the control file wildcard character '?' in
+			the baseline, but remember to protect it from the
+			C-shell either by escaping it with a backslash '\'
+			or enclosing the entire -b argument in single
+			quotes.  If you wish only to specify the baseline,
+			the colon may be omitted.  An error in the -b
+			flag argument causes the flag to be ignored, and
+			fourfit will continue execution.
+
+		-c controlfile
+			Specifies the file which contains parameters
+			to control the operation of the program.  If
+			absent, fourfit will use only the file pointed to
+			by the environment variable DEF_CONTROL, which
+			in turn defaults to $FF/cf_default as defined
+			in the $HOPS/setup.csh file.  Any parameters
+			set in a control file specified with the -c option
+			override the default file values.  A description
+			of the syntax of the control file, with an example,
+			can be found later in this document.
+
+		-d display_device
+			Upon completion of a fringe-fit, fourfit can
+			optionally display the results in graphical form.
+			At present, the only form of output is the
+			traditional fringe plot (somewhat modified from
+			the FRNGE version).  It can be presented in three
+			ways:  In an X-window popup, in a disk file, and
+			as hardcopy.  The corresponding values of the
+			string 'display_device' are "xwindow", "diskfile",
+			and "hardcopy".  For "xwindow", be sure to set
+			your DISPLAY environment variable appropriately.
+			The "diskfile" option is currently hardcoded to the
+			filename "temp.fplot" in the current working
+			directory.  The hardcopy option sends the plot to
+			a printer under control of the script
+			"/usr/local/bin/fplot_print".  At Haystack, this
+			currently uses the printer named "east".
+
+		-m value
+			This flag controls the verbosity of the program via
+			the integer argument "value", which ranges from 3
+			(virtually silent except for major errors) to -3 
+			(incredibly verbose, of use only to the authors of 
+			the program).  The default is 2.
+			
+
+		-o nnn
+			The fringe search algorithm in fourfit is not yet
+			and may never be equipped to handle spectral line
+			data.  The input data files are expected to contain
+			8 lags, as in a standard continuum correlation.
+			When it is desired to read in and manipulate data
+			with more lags than this, the -o flag allows selection
+			of a subset of 8 lags, so that the rest of fourfit
+			can treat the data sensibly.  The number "nnn"
+			corresponds to the delay offset in lags of the center
+			of the lag range to pass the filtering of the data.
+			Specifically, fourfit will process the lag range
+			between nnn-4 and nnn+3, inclusive.
+
+		-r afile
+			Puts fourfit into "refringe" mode.  Fourfit refringing
+			is driven by an A-file input, which overrides any 
+			correlator root files directly specified on the command
+			line (i.e. the latter are ignored when the -r flag
+			is specified).  The input A-file, of which there can
+			be only one, may contain root, corel or fringe lines,
+			but only the fringe lines are used to determine which
+			data to process, by baseline and frequency subgroup.
+			Obviously, the -r flag is inconsistent with the -u
+			flag, and specifying both is an error.  Note that for
+			afiles using HP-1000 (version 1) line formats, fourfit
+			has to pre-check the disk for the existence of the 
+			type 2 files.  The data area is controlled by the
+			DATADIR environment variable.  It defaults to the
+			value of $CORDATA.
+
+		-s
+			By default, the cross-power amplitude and phase are
+			plotted only when the SNR exceeds a threshold value (100).
+			This option causes the spectrum to be plotted regardless
+			of SNR.
+
+		-t
+			This flag places fourfit in test mode.  Everything
+			works as normal, except that the output file is not
+			written to disk, and the root file is not updated.
+			This is useful when experimenting with different
+			fringe-fitting strategies, in order to avoid cluttering
+			up the disk.
+
+		-u
+			Normally, fourfit processes all data consistent with
+			the data file list and the control information.  When
+			this flag is specified, fourfit will also check the
+			information in the type-2100 record of the root to 
+			see if the data have already been processed by fourfit.
+			If so, the data in question are skipped.  The "u"
+			stands for update mode.
+
+		-x
+			Shorthand for -d xwindow.
+
+ARGUMENTS:	data file list
+			This mandatory argument or arguments tells fourfit
+			which data files to process.  The format of the data
+			file specification is the standard one for all MkIV
+			software.  You may specify individual filenames, 
+			scan directories which contain data files, 
+			experiment directories, or any combination of
+			these three.  In the latter two cases,
+			fourfit will descend the directory tree looking for
+			data files to add to its internal list of files to
+			process.  Only root files need be specified.  The
+			data files actually fringe-searched are determined
+			by the combination of the root files specified and the
+			restrictions imposed by the control file or control
+			parameter list (see below).  In the absence of 
+			such restrictions, all data associated with the 
+			specified root files are processed.
+
+			Beware of trying to specify too many
+                        files or scan directories, as it is possible to
+                        overflow the Unix argument list buffer on large
+                        experiments.  In such cases, specify the experiment
+                        directory instead.
+
+		set <control file syntax statements>
+			This command line argument is optional, and
+			is intended to permit rapid, temporary modification
+			of 'fourfit' behaviour without the need to edit the
+			control file.  The word "set" tells fourfit to expect
+			additional control information on the rest of the
+			command line.  The syntax of this control information
+			is identical to that of the control file (see
+			detailed description below).  The control file
+			parser will detect syntax errors and abort if you
+			do not follow the rules as laid down.  The control
+			information you specify after the "set" argument
+			on the command line applies to all data to be
+			processed, and overrides whatever the control file
+			itself specified for the parameters in question.
+
+ENVIRONMENT:	DEF_CONTROL, DISPLAY, DATADIR
+
+DESCRIPTION:
+
+fourfit is the functional analogue of FRNGE on the HP-1000 systems, and searches
+the data represented by the root and corel files for fringes, writing the results
+of the search to files of type fringe.  The emphasis in the design of the
+program has been speed and flexibility, particularly with regard to future
+enhancements.  Algorithmically, the program is closely modelled on FRNGE, with
+only minor enhancements as yet, based on the availablity of greater computing
+resources.
+
+Below is a preliminary form of a document describing in detail the format and
+syntax of the control file:
+
+* Example of current syntax for fourfit control file  - last modified 94.1.16 
+* This file makes no semantic sense for a real experiment; rather, it is used
+* to illustrate typical command syntaxes.
+
+max_parity 0.001                       * global commands come first
+ref_freq  8213.15 
+x_crc       discard 
+x_slip_sync keep  
+y_slip_sync discard
+start -10
+
+if station L and f_group X
+   freqs a+ b c d- e f g h
+   pc_phases abcdefgh 5 -11 12 38 -56 13.2 11 -29
+   pc_mode ap_by_ap
+
+if station L and f_group S
+   pc_phases ijkmn 4.5 -78 39 +12 0
+   pc_mode normal
+
+if (station V or baseline KT) and source 3C279       * parentheses NYI
+   sb_win -0.5 0.5    mb_win 0.02 0.02  dr_win -1.0E-6 0.5E-6
+
+else
+   sb_win 0.0 0.0     mb_win 0.02 0.02  dr_win -1.0E-6 0.5E-6
+
+if scan 288-210210
+   sb_win .37 .37
+
+if scan > 289-132510
+   skip true
+
+if baseline K? and not scan 250-120000 to 251-235959
+   switched scan_start
+   period 30
+   gates abcfgh  0 30  0 10  15 25     0 10  15 25  0 30
+
+
+* End of sample control file
+
+
+
+SELECTOR KEYWORDS       VALUES
+   station            1 character
+   baseline           2 characters
+   source             string of 1-8 chars
+   f_group            1 character
+   scan               UT-epoch (special format), or:
+		      < UT-epoch
+		      > UT-epoch
+		      UT-epoch1 to UT-epoch2  (inclusive time range)
+
+
+
+SYNTACTIC KEYWORDS
+   if
+   else   (NYI)
+   and
+   or
+   not
+   ()     (NYI)
+   <>
+   to
+   ?
+
+ACTION KEYWORDS         VALUES
+   max_parity         float
+   x_slip_sync        `keep', `discard', or an integer
+   y_slip_sync          "        "        "    "  
+   x_crc              `keep' or `discard'
+   y_crc                "           "    
+   freqs              n chars
+   index              n ints
+   pc_phases          n char string, followed by n floats
+   lsb_offset         float
+   ref_freq           float
+   pc_mode            `normal', `ap_by_ap', or `manual'
+   sb_win             2 floats
+   mb_win             "   "
+   dr_win             "   "
+   start              integer
+   stop                  "     
+   skip               `true' or `false'
+   switched           `scan_start' or `each_minute'
+   period             int
+   gates              n char string, followed by 2n floats
+   adhoc_phase        'sinewave' or 'polynomial'
+   adhoc_period       float
+   adhoc_amp          float
+   adhoc_tref         float
+   adhoc_poly         <7 floats/integers (mixture OK)
+   ra_offset          float
+   dec_offset         float
+   passband           2 floats
+
+KEYWORD SEMANTICS
+
+**scan selection**
+
+   skip          if this is set to true in the body of an if_block, then 
+		 any scans matching the if conditions will be skipped. Note: as of
+         99.2.19 fourfit will not properly skip data if f_group is specified.
+
+**filtering**    determines whether or not each AP is accepted
+
+   max_parity    maximum allowable fraction of bytes in error
+   x_slip_sync   maximum # of frames w/ re-sync in reference station
+   y_slip_sync      "    "  "    "   "     "     " remote      "
+   x_crc         either keep or discard AP if reference time has CRC error
+   y_crc           "      "   "    "    "  "  remote      "   "   "    "
+   freqs         controls which frequency channels get included in the fit.
+		 The letters a-p correspond to the order that the frequencies
+		 appear in the root file. With no suffix, DSB is implied, if
+		 both sidebands are present. A plus suffix denotes USB, a
+		 minus is used for LSB.
+   index         alternate method used to select data channels, based on the
+		 original corel index number. Not as well supported as freqs,
+		 and is current being phased out.
+   start         start time for data to be included.
+   stop          stop    "   "    "  "   "    "
+
+	 Arguments of start and stop are integers with an optional minus sign. A
+	 positive integer is interpreted as an absolute time in seconds past the
+	 hour (of the scan start time). When a minus sign precedes the start time
+	 it is considered to be a time relative to, and later than, the
+	 scheduled scan start. Similarly, a negative stop time precedes the
+	 scheduled scan stop time, by the indicated number of seconds.
+
+   switched      turns on (frequency) switched mode, which discards some AP's
+		 and keeps others, depending on a gating waveform
+   period        period in seconds of the gating waveform
+   gates         for each freq. channel, the starting delay and duration, in
+		 seconds, of the gating waveform
+   passband      specifies in MHz the edges of a passband, outside of which
+                 all data will be discarded, at the stage when cross-power
+                 spectra are formed
+   
+**search**       control the fringe-searching process
+
+   sb_win        single band delay search window bounds, in us
+   mb_win        multiband     "     "      "       "     "  "; if the upper
+		 bound (2nd number) is less than the lower bound (1st number),
+		 then fourfit performs a "wrap-around" search, in order to handle 
+		 the case of a delay near to the multiband (semi-) ambiguity.
+   dr_win        delay_rate search window bounds, in us/s
+   ra_offset     apply right asc.offset (asec) to re-center search windows
+   dec_offset      "   declination  "   (asec) "      "        "      "   
+
+**corrections**  apply corrections to the data, either before or after fit
+
+   pc_mode       specify whether phase_cal mode is normal (model linear in
+		 time is extracted from the data), manual (specified totally 
+		 by the user), or ap_by_ap (phase cal is extracted independently
+		 for each AP)
+   pc_phases     phase_cal phases in deg, for each of the listed freq channels;
+		 these offset phases are added to the underlying model, as
+		 specified by pc_mode, above
+   lsb_offset    additive phase in degrees, for the LSB relative to the USB;
+		 often necessary when correlating VLBA data against Mk 3
+   ref_freq      specifies a frequency in MHz at which the phase delay
+		 is determined (default is total LO of first frequency)
+   adhoc_phase   specify mode of ad hoc phase corrections. No corrections
+		 are made if this isn't present, or is set to false.
+   adhoc_period  For ad hoc sinewave model; the period in integer seconds.
+   adhoc_amp      "   "  "     "       "    amplitude in degrees of phase.
+   adhoc_tref    For both ad hoc phase models; the reference time in seconds
+		 past the most recent hour.
+   adhoc_poly    For the ad hoc phase polynomial model; From 1-6 coefficients
+		 describing a power-series model in time. (deg/sec^n)
+
+
+SPECIAL KEYWORD VALUES
+   ?         wild card character
+   keep      32767
+   discard       0
+   true          1
+   false         0
+   
+
+
+SPECIAL FORMATS
+   UT-epochs: 
+         UT-epochs are expressed in the format ddd-hhmmss, where all 10
+	 characters are necessary, including leading 0's if appropriate.
+	 This format will match that of a scan directory, if the UT-epoch
+	 that is being specified is an actual scan time.
+
+
+GENERAL GUIDELINES
+
+   1) White space is ignored; i.e., multiple spaces and line feeds all
+      collapse to a single space.
+   2) Multiple commands per line are fine.
+   3) Comments: anything from an asterisk through the end of the line
+      is ignored.
+   4) Nested ifs are not allowed (or necessary). Nested parentheses in
+      an if condition are fine (NYI).
+      As of 94.1.16, parentheses are not supported. The logical operators,
+      in decreasing order of precedence are (not, and, or).
+   5) Wildcard "?" matches any single character for f_group, station, or
+      baseline, any string (of up to 8 characters) for source, and any
+      time-value for scan.
+   6) Phase cal is normally treated station by station. 
+   7) Only freqs that are chosen for both stations in a baseline are 
+      present in the fit.
+   8) If multiple if-blocks match a particular passes' choice of baseline,
+      f_group, source, and scan criteria, then the later values assigned
+      to each parameter overwrite the earlier ones.
+
+
+
+
+The output of fourfit differs in some ways from FRNGE.  Below is a list of most
+of the key differences in the fringe plot:
+
+
+Principal differences between FRNGE plots and fourfit plots    CJL 4/11/94
+-----------------------------------------------------------
+
+1. Frequencies are labelled with alphabetic characters instead of numbers.
+   This scheme follows through to the channel-by-channel plots and information
+   on the lower half of the page.  These frequency identifiers are tied to
+   the LO frequencies, and are used to identify the sideband pairs in the
+   fourfit control file (keywords "freqs", "pcal_phases", etc.).  They are
+   ordered the same way as the LO frequencies in the type 2400 record of the root.
+
+2. The L, A, U indicators for lower, dual and upper sideband data in the 
+   segmented amplitude plots on the lower page are replaced by -, * and +.
+   This avoids possible confusion with the alphabetic phase indicators, with
+   better visual separation of amplitude and phase.
+
+3. The T character in the all-channel segmented amplitude plot on the lower
+   page is replaced by 'A', to denote amplitude.  The 'P' remains, to denote
+   phase.
+
+4. The phasecal phase plots on the lower page are keyed by the frequency code
+   letter.  Upper case means reference station, lower case means remote
+   station.
+
+5. The FMGR file name on the 5th line of top and bottom pages is replaced by
+   the unix root extension code.
+
+6. The start and stop times are calculated slightly differently.  There is no
+   important consequence of this change, but see item 9 below.
+
+7. Counts of CRC errors, time discards, slip syncs and so on are slightly 
+   different, due to the order in which operations are done in fourfit versus
+   FRNGE.  None of these differences are thought to be of any consequence.
+   In fourfit, some of the records are discarded early, before errors other
+   than bad time tags can be detected.
+
+8. The MODE quantity (next to SNR on the upper page) has a completely different
+   meaning to the FRNGE number.  The pc mode indicators are a single character
+   for the reference station, followed by one for the remote station. The possible
+   characters are N (normal), A (ap_by_ap mode), and M (manual).
+
+9. On the segmented plots on the lower page, the time span of the data is defined
+   to be the interval between the first and last APs with valid time tags.  This
+   definition differs slightly from FRNGE, so that the segmenting is somewhat
+   different.  In particular, fourfit will tend to have more segments with no
+   gap at the beginning or end, compared to FRNGE, on a dataset that starts
+   producing good data late (or stops early).
+
+10. The fringe rate spectrum on the upper plot is gridded onto the page in a
+   slightly different fashion to FRNGE.  The changes are cosmetic only.  The logic
+   that dictates which points in other singleband delay boxes make it onto the
+   fringe rate plot also differs slightly from FRNGE.  The new algorithm is believed
+   to be more accurate.
+
+11. The horizontal axes of the plots on both pages are not yet labelled.
+
+12. When less than 14 channels are present, fourfit leaves blank space on the lower
+   page, below the segmented data plots.  FRNGE puts zeroes in this location.
+
+13. Quality factors A, C and F are not supported yet (and may never be, depending
+   on postprocessing strategy decisions to be taken).
+
+14. At the bottom of the lower page, fourfit places the names of the control file
+   used, and the full unix pathname of the output fringe file.  These replace the
+   HP-1000 specific equivalent information found at slightly different locations
+   on a FRNGE plot.
+
+15. Fourfit does not separately list the manual phasecal values if used.  They can
+   be found from the MODE value (item 8 above) and the channel PCALPH1 and 2
+   numbers below the plot on the lower page.
+
+16. When plotting the cross-power spectrum in the right-hand portion of the upper
+   plot, fourfit overwrites any existing characters (i.e. unlike FRNGE, the entire
+   cross-power spectrum is always visible).  Also, all phase points are plotted,
+   regardless of the amplitude at that point.  By default, cross-power spectra are
+   plotted when the scan SNR exceeds 100, rather than when the amplitude exceeds
+   1 percent as in FRNGE.  Forced plotting of the spectrum is available through
+   the -s option in fourfit.
+
+17. OPT and SG in the extreme bottom right of the lower page are not filled in by
+   fourfit (they are specific to FRNGE special modes).
+
+18. The special 'B' error code expanded fringe-rate plot is not supported by 
+   fourfit.
+
+19. The STAT field just above the SNR on the upper page is not filled in by fourfit.
+   There is a new field, "bc" just to the right of "me" on the right side of the
+   lower page.  This is a count of the number of AP's discarded due to a small
+   number of bits processed through the sine or cosine channels of the correlator,
+   normally a consequence of very low fringe rates (it stands for "bad count").
+
+20. For the most part, FRNGE and fourfit results agree numerically to high accuracy.
+   Phases are normally within 0.1 degrees, and overall fringe amplitudes agree
+   to typically 0.1 percent.  Algorithmic differences may produce larger discrepancies 
+   in cases dominated by noise.  

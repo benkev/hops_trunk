@@ -1,0 +1,74 @@
+#!/bin/csh -f
+#
+# This sub-script does the coherence time interpolation, filling
+# in coherence times for scans that have no coherent detection,
+# based on scans nearby in time which have been coherence-analyzed
+# by cofit in an earlier step.  Called from mmreduce.
+#
+# Written by CJL, 22 February 1996
+#################################################################
+
+					# Skip option
+if (-e $1.cmlist) then
+    echo "mmreduce: A coterp output file already exists.  If you want"
+    echo "mmreduce: to use it, you should skip this step.  If not, the existing"
+    echo "mmreduce: file will be overwritten"
+    skipask
+    if ($status == 1) exit (0)
+endif
+		
+while (1)
+    #Ask the user if graphical output is needed
+    echo "mmreduce: Would you like to examine or generate the "
+    echo "mmreduce: station-based coherence times? (y/n): \c"
+    set reply=$<
+    if ($reply == "y" || $reply == "Y") then
+	echo "mmreduce: Your options are:"
+	echo "mmreduce:     1. X-Window interactive graphics"
+	echo "mmreduce:     2. Postscript hardcopy graphics"
+	echo "mmreduce:     3. Generate the coherence time interpolated "
+	echo "mmreduce:        dataset without examination"
+	echo "mmreduce: Pick a number from 1 to 3: \c"
+	set reply=$<
+	if ($reply == 1) then
+	    echo "mmreduce: Generating the coherence time interpolated dataset"
+            coterp -x -o $1.cmlist $1.cofitf $1.mlistf
+	    if ($status != 0) then
+                echo "mmreduce: Error return from coterp!  "
+                echo "mmreduce: Sorry, but I have to stop here."
+                exit (1)
+            else
+		exit(0)
+	    endif
+        else if ($reply == 2) then
+	    echo "mmreduce: Generating the coherence time interpolated dataset"
+	    coterp -d $1.ps/ps -o $1.cmlist $1.cofitf $1.mlistf
+	    if ($status != 0) then
+                 echo "mmreduce: Error return from coterp!  "
+                 echo "mmreduce: Sorry, but I have to stop here."
+                 exit (1)
+            else
+                 echo "mmreduce: Printing coherence data on postscript printer"
+                 lpr $1.ps
+		 exit (0)
+            endif
+        else if ($reply == 3) then 
+            coterp -o $1.cmlist $1.cofitf $1.mlistf
+            if ($status != 0) then
+                echo "mmreduce: Error return from coterp!  "
+                echo "mmreduce: Sorry, but I have to stop here."
+                exit (1)
+	    else
+		exit (0)
+	    endif
+        else
+            echo "mmreduce: Invalid response, let's go over that again, shall we?"
+            continue
+        endif
+    else if ($reply == "n" || $reply == "N") exit (0)	
+    else
+	echo "mmreduce: Please answer 'y' or 'n'"
+        continue
+    endif
+end
+

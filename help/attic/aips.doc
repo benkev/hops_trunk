@@ -1,0 +1,5 @@
+To run AIPS, log in to card as user aips, and type "aips".
+
+All AIPS data files now reside on disks local to card.  Therefore it
+is not only politically incorrect to run AIPS on dopey, but also much
+slower.  

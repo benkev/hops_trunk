@@ -1,0 +1,74 @@
+Documentation for the program "Forclose", SSD, 11/06/96
+----------------------------------------------------
+
+COMMAND NAME:   Forclose
+
+SYNOPSIS: 	Determines Single Band Delay, Multi Band Delay and Rate for
+		scans on which no fringes are detected.  Uses closure on 
+		detected baselines.
+
+SYNTAX:  forclose [-tnfrc] list <snrmin>
+          
+		-t 	outputs all scans in each triangle with 1 weak baseline
+    		-n 	produces BLOCKN/SEARCH output, specifying closure sbd
+    		-f 	produces fourfit 'if' output, specifying closure sbd
+    		-r 	lists weak baseline scans for type 51 recall purposes
+    		-c 	outputs fourfit run lines with new windows in command line
+
+OPTION FLAGS:	-t 	For each non-detected baseline that can be constrained
+			by using closure on connecting detections, print out
+			all three A-file summary lines.
+			
+                -n      For each constrained non-detection, print out a BLOCKN
+			statement specifying a zero width SBD window.  This 
+			format is suitable for use in a FRINGE control file.
+
+                -f      For each constrained non-detection, print an 'if'
+			statement specifying a zero width SBD window.  This
+			format is suitable for use in a FOURFIT control file.
+
+                -r  	Lists all A-summary lines for non-detected scans that
+			can be constrained using closure.  This option used for
+			type 51 recall purposes.
+
+		-c  	For each constrained non-detection prints out a FOURFIT
+			run line with zero width SBD window specified in the
+			command line.  This format is useful for incorporation
+			into shell scripts.
+
+ARGUMENTS:	list
+			A-list of all scans to be processed.  They must be in 
+			time order with earlier scans first (this requirement
+			will be relaxed in later versions).
+
+		<snrmin>
+			This optional parameter marks the dividing line between
+			detections and non-detections.  The coherent SNR from
+			FRINGE or FOURFIT is compared to this value.  If snrmin
+			is a negative number the abs value is used as the snr
+			limit AND only scans with quality factor 1-9 are 
+			treated as detections.
+
+					
+ENVIRONMENT:	None.
+
+
+DESCRIPTION:	Forclose makes use of the fact that residual rate and delay
+		parameters found by the correlator, should add to zero around
+		closed loops of baselines.  This allows us to constrain the
+		fringe search for a low SNR scan.  Take, for example, the triangle
+		ABC for which we have firm detections on baselines
+		AB and BC.  No fringe is detected on baseline CA, but, using
+		closure constraints we can determine where to look in rate,
+		delay space.
+		Forclose reads in the A-file until it digests all scans for a
+		specific scan-time.  It then finds all triangles, determining
+		which ones contain two detected baselines and one non-detection.
+		For these, closure in enforced and the SBD is fixed and output
+		in the desired format.  After this first iteration, the program
+		attempts to constrain remaining non-detections by using the 
+		new information from the constrained scans.  This continues until
+		no more scans can be constrained.
+
+
+

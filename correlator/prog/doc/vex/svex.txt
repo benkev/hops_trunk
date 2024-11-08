@@ -1,0 +1,172 @@
+*Sample svex file
+*
+*Example of VEX task-specific SU configuation file (.svex).
+*The appropriate $SU_CONFIG key will be specified for every task in order to
+*properly set up each station unit.
+*
+*Notes:
+*  1. Parameters beginning with '~' are to be determined at setup time.
+*
+*ARW 981116
+*
+*-----------------------------------------------------------------------------------------------
+$SVEX_REV;
+*-----------------------------------------------------------------------------------------------
+*
+rev = 1.0
+*
+*-----------------------------------------------------------------------------------------------
+$SU_CONFIG;
+*-----------------------------------------------------------------------------------------------
+*
+    def std;
+	  ref $SU_CHAN_OUT = std;
+	  ref $PCM_CONFIG = 4x4;
+	enddef;
+*
+*-----------------------------------------------------------------------------------------------
+$SU_CHAN_OUT;             *key specified in evex file
+*-----------------------------------------------------------------------------------------------
+*
+*The 'channel_out_assignment =' statement assigns recorded channels to specific CRM output
+*channels. If 'channel_out_assignment=' statement not present, CRM output channels are assigned
+*in the order defined in the $FREQ section.
+*
+*If 'pcal freq-x' fields are left null, phase-cal frequencies specified in $PHASE_CAL_DETECT
+*section will be used by default.
+*
+   def std;
+  *                         SU-out  recorded      pcal        pcal
+  *                         Chan#   chan ID      freq_a      freq_b
+    channel_out_assignment =  0   : &CH1     :   10000 Hz :  1.01 MHz ;  *phase-cal freqs
+                                                                         *usually defaulted
+    channel_out_assignment =  1   : &CH2     :   10000 Hz :  1.01 MHz ;
+    channel_out_assignment =  2   : &CH3     :   10000 Hz :  1.01 MHz ;
+    channel_out_assignment =  3   : &CH4     :   10000 Hz :  1.01 MHz ;
+    channel_out_assignment =  4   : &CH5     :   10000 Hz :  1.01 MHz ;
+    channel_out_assignment =  5   : &CH6     :   10000 Hz :  1.01 MHz ;
+    channel_out_assignment =  6   : &CH7     :   10000 Hz :  1.01 MHz ;
+    channel_out_assignment =  7   : &CH8     :   10000 Hz :  1.01 MHz ;
+    channel_out_assignment =  8   : &CH9     :   10000 Hz :  1.01 MHz ;
+    channel_out_assignment =  9   : &CH10    :   10000 Hz :  1.01 MHz ;
+    channel_out_assignment = 10   : &CH11    :   10000 Hz :  1.01 MHz ;
+    channel_out_assignment = 11   : &CH12    :   10000 Hz :  1.01 MHz ;
+    channel_out_assignment = 12   : &CH13    :   10000 Hz :  1.01 MHz ;
+    channel_out_assignment = 13   : &CH14    :   10000 Hz :  1.01 MHz ;
+    channel_out_assignment = 14   : &CH15    :   10000 Hz :  1.01 MHz ;
+    channel_out_assignment = 15   : &CH16    :   10000 Hz :  1.01 MHz ;
+  enddef;
+*
+*-----------------------------------------------------------------------------------------------
+$PCM_CONFIG;            *key specified in evex file
+*-----------------------------------------------------------------------------------------------
+*
+*Specifies algorithm for digital tone extraction by PCM for one channel.
+*'~freq_x' are replaced by tone numbers specified in 'channel_out_assignment=' statement of
+*$CRM_CONFIG (or corresponding defaults).
+*The normalized correlation coefficients are computed as the (dot product of the specified
+*counter values and the corresponding coefficient vector) divided by the Vldty count.
+*The validity count is always in counter 8.
+*See Mark IV memo #133 for explanation of normalization coeficients.
+*
+  def 4x4;   *4-level data, 4-level rotator; 2 tones/channel
+  *       $PCM_TABLES                 MSB        LSB        Vldty
+  *             ref    freq           ctr# coef  ctr# coef   ctr    coef
+    phase_cal = 4x4 : ~freq_a :  sin : 1 : 1.96 : 0 : 0.98 :  8  : -1.47 ;
+    phase_cal = 4x4 : ~freq_a :  cos : 3 : 1.96 : 2 : 0.98 :  8  : -1.47 ;
+    phase_cal = 4x4 : ~freq_b :  sin : 5 : 1.96 : 4 : 0.98 :  8  : -1.47 ;
+    phase_cal = 4x4 : ~freq_b :  cos : 7 : 1.96 : 6 : 0.98 :  8  : -1.47 ;
+  enddef;
+*
+  def 2x4;   *2-level data, 4-level rotator; 2 tones/channel
+  *       $PCM_TABLES                 MSB        LSB        Vldty
+  *             ref    freq           ctr# coef  ctr# coef   ctr    coef
+    phase_cal = 2x4 : ~freq_a :  sin : 1 : 1.67 : 0 : 0.83 :  8  : -1.25 ;
+    phase_cal = 2x4 : ~freq_a :  cos : 3 : 1.67 : 2 : 0.83 :  8  : -1.25 ;
+    phase_cal = 2x4 : ~freq_b :  sin : 5 : 1.67 : 4 : 0.83 :  8  : -1.25 ;
+    phase_cal = 2x4 : ~freq_b :  cos : 7 : 1.67 : 6 : 0.83 :  8  : -1.25 ;
+enddef;
+*
+  def 2x2;   *2-level data, 2-level rotator; 4 tones/channel
+  *       $PCM_TABLES                 LSB        Vldty
+  *             ref    freq           ctr# coef   ctr    coef
+    phase_cal = 2x2 : ~freq_a :  sin : 0 : 0.83 :  8  : -1.25 ;
+    phase_cal = 2x2 : ~freq_a :  cos : 1 : 0.83 :  8  : -1.25 ;
+    phase_cal = 2x2 : ~freq_b :  sin : 2 : 0.83 :  8  : -1.25 ;
+    phase_cal = 2x2 : ~freq_b :  cos : 3 : 0.83 :  8  : -1.25 ;
+    phase_cal = 2x2 : ~freq_c :  sin : 4 : 0.83 :  8  : -1.25 ;
+    phase_cal = 2x2 : ~freq_c :  cos : 5 : 0.83 :  8  : -1.25 ;
+    phase_cal = 2x2 : ~freq_d :  sin : 6 : 0.83 :  8  : -1.25 ;
+    phase_cal = 2x2 : ~freq_d :  cos : 7 : 0.83 :  8  : -1.25 ;
+enddef;
+*
+  def 4x6;   *4-level data, 6-level rotator; 1 tone/channel
+  *       $PCM_TABLES              MSB                              LSB       Vldty
+  *             ref    freq        ctr# coef  ctr# coef  ctr# coef  ctr# coef  ctr#  coef
+    phase_cal = 4x6 :~freq_a : sin :3 : 3.64 : 2 : 1.82 : 1 : 0.91 : 0 : 0.45 : 8 : -3.41 ;
+    phase_cal = 4x6 :~freq_a : cos :7 : 3.64 : 6 : 1.82 : 5 : 0.91 : 4 : 0.45 : 8 : -3.41 ;
+  enddef;
+*
+*-----------------------------------------------------------------------------------------------
+$PCM_TABLES;
+*-----------------------------------------------------------------------------------------------
+*
+*Specifies contents of tables to be downloaded to PCM (see Mark IV memo 133).
+*One full period of must be specified in tabular form.
+*
+  def 4x4;
+*                sample
+*                 value        0   30  60 90  120 150 180 210 240 270 300 330 deg
+    table_values=   3 :  sin : 2 : 3 : 3 : 3 : 3 : 2 : 1 : 0 : 0 : 0 : 0 : 1 ;  *>200mv
+    table_values=   2 :  sin : 2 : 2 : 2 : 2 : 2 : 2 : 1 : 1 : 1 : 1 : 1 : 1 ;  *0 to 200mv
+    table_values=   1 :  sin : 1 : 1 : 1 : 1 : 1 : 1 : 2 : 2 : 2 : 2 : 2 : 2 ;  *0 to -200 mv
+    table_values=   0 :  sin : 1 : 0 : 0 : 0 : 0 : 1 : 2 : 3 : 3 : 3 : 3 : 2 ;  *<-200mv
+    table_values=   3 :  cos : 3 : 3 : 2 : 1 : 0 : 0 : 0 : 0 : 1 : 2 : 3 : 3 ;  *>200mv
+    table_values=   2 :  cos : 2 : 2 : 2 : 1 : 1 : 1 : 1 : 1 : 1 : 2 : 2 : 2 ;  *0 to 200mv
+    table_values=   1 :  cos : 1 : 1 : 1 : 2 : 2 : 2 : 2 : 2 : 2 : 1 : 1 : 1 ;  *0 to -200 mv
+    table_values=   0 :  cos : 0 : 0 : 1 : 2 : 3 : 3 : 3 : 3 : 2 : 1 : 0 : 0 ;  *<-200mv
+    tabular_delta_phase = 30 deg;
+  enddef;
+*
+  def 2x4;
+*                sample
+*                 value        0  30  60  90  120 150 180 210 240 270 300 330 deg
+    table_values=   3 :  sin : 2 : 3 : 3 : 3 : 3 : 2 : 1 : 0 : 0 : 0 : 0 : 1 ;  *>200mv
+    table_values=   2 :  sin : 2 : 3 : 3 : 3 : 3 : 2 : 1 : 0 : 0 : 0 : 0 : 1 ;  *0 to 200mv
+    table_values=   1 :  sin : 1 : 0 : 0 : 0 : 0 : 0 : 2 : 3 : 3 : 3 : 3 : 2 ;  *0 to -200 mv
+    table_values=   0 :  sin : 1 : 0 : 0 : 0 : 0 : 1 : 2 : 3 : 3:  3 : 3 : 2 ;  *<-200mv
+    table_values=   3 :  cos : 3 : 3 : 2 : 1 : 0 : 0 : 0 : 0 : 1 : 2 : 3 : 3 ;  *>200mv
+    table_values=   2 :  cos : 3 : 3 : 2 : 1 : 0 : 0 : 0 : 0 : 1 : 2 : 3 : 3 ;  *0 to 200mv
+    table_values=   1 :  cos : 0 : 0 : 1 : 2 : 3 : 3 : 3 : 3 : 2 : 1 : 0 : 0 ;  *0 to -200 mv
+    table_values=   0 :  cos : 0 : 0 : 1 : 2 : 3 : 3 : 3 : 3 : 2 : 1 : 0 : 0 ;  *<-200mv
+    tabular_delta_phase = 30 deg;
+  enddef;
+*
+  def 2x2;
+*                sample
+*                 value         0  30  60  90  120 150 180 210 240 270 300 330 deg
+    table_values=   3 :   sin : 1 : 1 : 1 : 1 : 1 : 1 : 0 : 0 : 0 : 0 : 0 : 0 ;  *>200mv
+    table_values=   2 :   sin : 1 : 1 : 1 : 1 : 1 : 1 : 0 : 0 : 0 : 0 : 0 : 0 ;  *0 to 200mv
+    table_values=   1 :   sin : 0 : 0 : 0 : 0 : 0 : 0 : 1 : 1 : 1 : 1 : 1 : 1 ;  *0 to -200 mv
+    table_values=   0 :   sin : 0 : 0 : 0 : 0 : 0 : 0 : 1 : 1 : 1 : 1 : 1 : 1 ;  *<-200mv
+    table_values=   3 :   cos : 1 : 1 : 1 : 0 : 0 : 0 : 0 : 0 : 0 : 1 : 1 : 1 ;  *>200mv
+    table_values=   2 :   cos : 1 : 1 : 1 : 0 : 0 : 0 : 0 : 0 : 0 : 1 : 1 : 1 ;  *0 to 200mv
+    table_values=   1 :   cos : 0 : 0 : 0 : 1 : 1 : 1 : 1 : 1 : 1 : 0 : 0 : 0 ;  *0 to -200 mv
+    table_values=   0 :   cos : 0 : 0 : 0 : 1 : 1 : 1 : 1 : 1 : 1 : 0 : 0 : 0 ;  *<-200mv
+    tabular_delta_phase = 30 deg;
+  enddef;
+*
+  def 4x6;
+*                sample
+*                 value         0  30  60  90 120 150 180 210 240 270 300  330 deg
+    table_values=   3 :   sin : 9 :13 :15 :15 :13 : 9 : 6 : 2 : 0 : 0 : 2 : 6 ;  *>200mv
+    table_values=   2 :   sin : 8 : 9 :10 :10 : 9 : 8 : 7 : 6 : 5 : 5 : 6 : 7 ;  *0 to 200mv
+    table_values=   1 :   sin : 7 : 6 : 5 : 5 : 6 : 7 : 8 : 9 :10 :10 : 9 : 8 ;  *0 to -200 mv
+    table_values=   0 :   sin : 6 : 2 : 0 : 0 : 2 : 6 : 9 :13 :15 :15 :13 : 9 ;  *<-200mv
+    table_values=   3 :   cos :15 :13 : 9 : 6 : 2 : 0 : 0 : 2 : 6 : 9 :13 :15 ;  *>200mv
+    table_values=   2 :   cos :10 : 9 : 8 : 7 : 6 : 5 : 5 : 6 : 7 : 8 : 9 :10 ;  *0 to 200mv
+    table_values=   1 :   cos : 5 : 6 : 7 : 8 : 9 :10 :10 : 9 : 8 : 7 : 6 : 5 ;  *0 to -200 mv
+    table_values=   0 :   cos : 0 : 2 : 6 : 9 :13 :15 :15 :13 : 9 : 6 : 2 : 0 ;  *<-200mv
+    tabular_delta_phase = 30 deg;
+  enddef;
+*

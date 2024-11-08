@@ -1,0 +1,56 @@
+Documentation for the program "stcodes" CJL, December 24 1998
+-------------------------------------------------------------
+
+COMMAND NAME:   stcodes
+
+SYNOPSIS:  Inserts mk4_site_ID statements in observe VEX files
+
+SYNTAX:  stcodes [-a] [-m msglev] [-o outfile] [-u] vexfile
+		where all arguments except the vexfile are optional
+
+OPTION FLAGS:	-a
+			Switches on execution-time accounting
+
+		-m msglev
+			Verbosity control.  -3=verbose, +3=silent,
+			default=1.
+
+		-o outfile
+			Specifies where to write the modified VEX file.
+			By default the program writes to stdout.
+
+		-u
+			Causes the program to obtain Mk4 codes for all
+			stations from the user, instead of using the
+			default alias list.
+
+ARGUMENTS:	vexfile
+			The input VEX file, which must contain a $SITE
+			section with 'site_name' and 'site_ID' values.
+
+ENVIRONMENT:	MK4TXTDIR, which points to the location of the text files
+		which support the VEX parser library, and the file which
+		specifies the default aliases between international
+		2-character station IDs, and 1-character Mk4 IDs.  The
+		default is /correlator/text.
+
+
+DESCRIPTION:
+
+Because of substantial legacy code, both at the Mk4 correlators and in the
+geodesy community, it is necessary to label stations with a single character
+code.  Normally, observe VEX files will have the 8-char station name and a
+2-char standard international ID.  This program inserts an additional VEX
+statement in the $SITE def for each station, which specifies its Mk4 single
+character ID.  This ID must be unique within the file.  In order to avoid
+random and confusing redefinitions of stations from file to file, stcodes by
+default looks up a standard mapping of 2-char to 1-char IDs, as described in
+the external file mk4codes.txt.  Sometimes, multiple stations will have the 
+same default Mk4 code, and sometimes unknown stations will be encountered.
+In those cases, stcodes prompts the user to supply the Mk4 1-char code which
+should be used.  When duplicate codes are found, the first one encountered is
+kept, and all others are changed.  The default codes can be overridden by use of
+the -u flag.
+
+The stcodes program MUST be run on incoming observe VEX files before correlation
+on a Mk4 correlator.

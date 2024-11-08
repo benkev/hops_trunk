@@ -1,0 +1,13 @@
+#!/bin/csh 
+# Schecule CorAsc2 to view tapeinfo tape $1 
+# Revised:  2000 September 28, JAB 
+if ( "$1" == "" ) then 
+  echo "$0:t Usage: " 
+  echo "     $0:t  VSN " 
+  echo "  where VSN is a tape volume-serial number in the tapeinfo database. " 
+  echo "  To see a list of these VSNs, try: " 
+  echo '     ls  $TAPEINFO ' 
+  exit ( -1 ) 
+endif 
+CorAsc2 TDB < $TAPEINFO/$1 | more 
+

@@ -1,0 +1,6 @@
+outver 1
+sort freq
+sort base
+sort time
+write alist.out.ver1
+exit

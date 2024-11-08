@@ -1,0 +1,49 @@
+Documentation for the program "unix_to_ci", CJL, January 19 1994
+----------------------------------------------------------------
+
+COMMAND NAME:   unix_to_ci
+
+SYNOPSIS:  Converts unix data files to CI naming convention
+
+SYNTAX:    unix_to_ci [-d output directory] [data file list]
+		Where all arguments except the data file list are optional.
+		Note: all option flags must appear before the data file list
+
+OPTION FLAGS:	-d output directory
+			If present, this overrides the default destination
+			for the CI-named files.  The default is
+			$CORDATA/transfer.
+
+ARGUMENTS:	data file list
+			A list of files to rename to CI conventions
+			(useless without roots).  unix_to_ci follows the
+			standard MkIV data file specification format.
+			You may specify individual filenames,
+			scan directories which contain data files,
+			experiment directories, or any combination of
+			these three.  In the latter two cases, unix_to_ci
+			will descend the directory tree looking for
+			data files to add to its internal list of files to
+			process.  Beware of trying to specify too many
+			files or scan directories, as it is possible to
+			overflow the Unix argument list buffer on large
+			experiments.  In such cases, specify the experiment
+			directory instead.
+
+ENVIRONMENT:	CORDATA
+
+DESCRIPTION:
+
+This program is provided for those circumstances (hopefully rare) when it
+is desired to ship data back to the HP-1000 systems from the unix systems.
+The program does not attempt to recreate the original CI filenames, but
+instead merely makes sure the names are unique in each execution of the
+program.  The sophistication of the program in this regard is commensurate
+with its anticipated frequency of use.  The user is expected to take
+responsibility for ensuring its meaningful application.
+
+Unix_to_ci does not make physical copies of the files in the destination
+directory, but instead makes symbolic links to the files which remain in
+the unix data directories.  Removing the symbolic links with the rm
+command will not harm the unix data files.  The program is fast on account
+of this symbolic link implementation.

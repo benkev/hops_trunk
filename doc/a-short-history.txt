@@ -1,0 +1,47 @@
+% an updated historical narrative for HOPS
+
+At the heart of the VLBI technique is the correlation of the raw
+station data using either dedicated hardware or software to find
+the correlated signal from the cosmic source.  The correlation is
+manifest as an interference fringe that changes in an expected way
+as the Earth rotates.  This is a simple, but (computationally)
+expensive process that requires good, but nevertheless approximate,
+models in order to obtain useful a useful fringe.  Thus some
+post-correlation processing software is required to analyze the
+fringes to obtain scientifically useful results.
+
+The current Haystack Observatory Postprocessing system (HOPS) was
+born from the efforts of Alan Rogers in the late 70's with a program
+called FRNGE which was written in Fortran and designed to be efficient
+on an HP-21MX (later renamed HP-1000) minicomputer.  With improvements
+in hardware and software, a rewrite of the toolset was launched in
+the early 90's by Colin Lonsdale, Roger Cappallo and Cris Niell as
+driven by the needs of the geodetic community.  The basic algorithms
+were adopted from FRNGE; but there was a complete rewrite of the code
+into (K&R) C and substantial revisions of the i/o, control and file
+structures resulting in the framework of the current HOPS system.
+This was followed by a substantial effort in the early-mid
+00's to develop tools for optimizing SNR and deriving correction factors
+for data with imperfect coherence, based on analysis of amplitude with
+coherent averaging time.  Further evolution in the late 00's was provoked
+by the re-emergence of software correlation (DiFX), and in the 10's by the
+needs of EHT-scale mm-VLBI which brings us to HOPS in its current form.
+
+Acknowledging its geodetic heritage, HOPS was optimized for precision
+on per-baseline delay and delay-rate measurements which are the raw
+material for the geodetic analysis programs.  Consequently, it is
+somewhat light on support for some routine calibration processes found
+in some other astronomical software packages (e.g. AIPS or CASA).
+Nevertheless, it provides a good framework for the reduction and
+analysis of mm-VLBI data, where the vagaries of atmospheric effects
+require ever more specialized processing to harvest significant
+astronomical results.
+
+For the needs of the EHT Campaigns of 2017 and subsequent years it
+was decided to augment the basic HOPS framework with python-based
+packages as described in the next sections.....
+
+Whitney, AR & Cappallo, R & Aldrich, W & Anderson, B & Bos, A & Casse, J & Goodman, J & Parsley, S & Pogrebenko, S & Schilizzi, R & Smythe, D. (2004). Mark 4 VLBI correlator: Architecture and algorithms. Radio Science - RADIO SCI. 39. 10.1029/2002RS002820. 
+
+
+% eof

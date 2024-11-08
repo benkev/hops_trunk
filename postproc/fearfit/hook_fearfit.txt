@@ -1,0 +1,63 @@
+Fearfit is a developmental version of fourfit which allows testing
+of new features and/or activation of special purpose features.
+All of its capabilities are activated by environment variables,
+and do not affect fearfit's ability to perform the same way that
+fourfit does.  All the code is (at present) in files hook_*.c
+which includes the corresponding C source code file.
+
+This is intended to be an experimental tool to allow the development
+of new features with some certainty of not breaking the existing tool.
+This functionality has only been tested to the extent that fourfit
+itself is not adversely affected.  And some of it is broken due to
+changes in fourfit that have not (yet) been re-implemented.
+
+hook_make_plotdata.c:
+    HOPS_FEARFIT_XPSPEC=<int>	dump the cross-power spectrum if nonzero
+    HOPS_FEARFIT_SDELAY=<int>	dump the single-band delay data if nonzero
+
+hook_norm.c:
+    Rotates the spectrum by
+	theta = 2*M_PI * factor * ( freq + ii * sign - freqlo ) * ap
+
+    HOPS_FEARFIT_BEFORE=<int>	dump the spectrum before rotation if nonzero
+    HOPS_FEARFIT_AFTER=<int>	dump the spectrum after rotation if nonzero
+    HOPS_FEARFIT_FACTOR=<float>	specifies the rotation factor
+    HOPS_FEARFIT_FREQLO=<float>
+    HOPS_FEARFIT_FREQLO="ref_freq"
+				specifies the LO freq offset
+
+hook_output.c:
+    HOPS_FEARFIT_PCPHASE_VERB
+    HOPS_FEARFIT_PCPHASE_NOMAST
+    HOPS_FEARFIT_PCPHASE_SWAP
+    HOPS_FEARFIT_PCPHASE_MEDFR
+    HOPS_FEARFIT_PCPHASE_POLICY
+    HOPS_FEARFIT_PCPHASE_NCHAN
+    HOPS_FEARFIT_PCPHASE_DERATE
+    HOPS_FEARFIT_PCPHASE_DELTA  variables related to setting manual pc phases
+             
+hook_search.c:
+hook_freq_spacing.c:
+    HOPS_FEARFIT_MBDGRID        trying harder on MBD grid
+
+To add new features, create a file hook_<fourfit_file.c> which should
+include the original fourfit source (with appropriate edits); add it to
+the repository.
+
+Use appropriate HOPS_FEARFIT_something environment variables, and
+document them appropriately in trunk/help/fearfit.doc.
+
+Update the hook_import.sh (see # FEARFIT#X comments) test to
+ 1. note the line count of the files you change
+ 2. verify that the source hasn't been changed, and to
+ 3. insert the appropriate hooks into the imported source.  Follow the
+    samples and use #ifdef something_HOOK to mark your your insertion.
+    Depending on what you are doing, you may just want to replace the
+    routine rather than using HOOKs into the original.
+ 4. update the build dependencies for the makefile in fearfit.mk
+ 5. update the help/fearfit.doc for the user.
+
+The automake machinery should then (in principal) build fearfit if you
+have made all the required changes to hook_import.sh.
+
+eof

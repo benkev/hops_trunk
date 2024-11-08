@@ -1,0 +1,110 @@
+Documentation for the program "fringex", CJL July 14 1995
+---------------------------------------------------------
+
+COMMAND NAME:  fringex
+
+SYNOPSIS:  Segments and rotates output of fourfit
+
+SYNTAX: fringex [-coq] [-i nsecs] [-f freq] [-d rate,delay]
+		[-p ra,dec] data file list
+	where all option flags are optional, and the data file
+	list is mandatory
+
+        -c mode makes rate,delay,ra,dec offsets relative
+           to corel - rather than relative to the fourfit peak 
+        -o shifts segments by half segment duration
+        -q nsecs is in millisecs (special mode - times are fictitious)
+        -i nsecs =coh.int sec=9999=default for full scan with corel epoch 
+             a value of nsecs=integral number of APs is recommended
+        -f freq (MHz) redefines the frequency 
+           freq=-1 for reference frequency equal to channel nearest mean
+           freq=-2 for reference frequency equal to mean 
+        -p ra,dec in arcsec are position offsets in all modes
+	-d rate,delay in ps/s and ns are offsets except in -c mode when
+	   they are values residual to corel.
+        
+OPTION FLAGS: 	-c
+			If specified, any rate or delay offsets
+			given by the -d flag are relative to corel,
+			not the fourfit peak.  This is useful for
+			steering the delay/rate window and generating
+			arrays of delay vs. rate for searching.
+
+		-o
+			If specified, segment boundaries will be offset
+			by 0.5 segments from the default.  This allows
+			subsequent processing to slightly improve SNR
+			when combined with data from a default run.
+
+		-q
+			For some special situations, 1-second resolution
+			is inadequate.  Fringex can segment finer than
+			this, but the output format does not have
+			enough resolution.  The -q mode allows the
+			segment length to be specified in milliseconds.
+			The segment time tags in this mode are
+			fictitious, incrementing by 1 second each
+			segment.
+
+		-i nsecs
+			This flag and its argument specifies the
+			requested segment length in seconds.  It is
+			recommended that this be a multiple of the
+			accumulation period of the data.  The default
+			value is 9999 seconds, which the program
+			interprets as the entire scan.
+
+		-f freq
+			This flag overrides the determination of a
+			suitable reference frequency for the segmenting.
+			This must be within a factor of 2 of the scan
+			reference frequency.  The default is to use the 
+			scan reference frequency.
+			A value of -1 uses the channel nearest to the 
+			channel mean, while -2 uses the channel mean itself.
+
+		-p ra,dec
+			This flag specifies position offsets in arcseconds.
+			These numbers must be separated by a comma, with
+			no spaces.  The output data are rotated in 
+			accordance with the position offsets.
+
+		-d rate,delay
+			This flag specifies rate and delay offsets in ps/s
+			and ns respectively.  These numbers must be
+			separated by a comma, with no spaces.  The output
+			data are rotated from the fourfit values of
+			rate and multiband delay in accordance with these
+			offsets, except in -c mode, when these offsets
+			are relative to corel.
+
+
+
+ARGUMENTS:	data file list
+			This mandatory argument specifies the type-2 files
+			to be segmented.  The format of the data
+                        file specification is the standard one for all MkIV
+                        software.  You may specify individual filenames,
+                        scan directories which contain data files,
+                        experiment directories, or any combination of
+                        these three.  In the latter two cases, fringex
+			will descend the directory tree looking for
+                        data files to add to its internal list of files to
+                        process.  Each file is processed sequentially,
+			and the output is concatenated.  All option flags
+			must precede the data file list.
+
+ENVIRONMENT:	None
+
+
+DESCRIPTION:
+
+Fringex is the program responsible for chopping the output data from 
+fourfit into short, coherently averaged segments.  Its most important
+job is to do this segmenting incorporating rate, delay and position
+offsets supplied by the user, thereby discarding the full-scan
+coherent fringe search solution found by fourfit, and permitting
+the implementation of different fringe search algorithms based on
+A-file data.  It is the starting point for the HOPS millimeter VLBI
+suite of analysis programs.
+

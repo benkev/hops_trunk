@@ -1,0 +1,45 @@
+#!/bin/csh -f
+######################################################################
+#
+# This is invoked by the correlator operator, and pops up a hpterm
+# window in front of him/her.  In that window is a monitor of the 
+# data transfer to the unix system, and the results of real time
+# test fourfitting of the data
+#
+# Written by CJL, Feb 7 1995
+#
+#######################################################################
+
+env_check monitor
+if ($status != 0) exit (1)
+
+if (`hostname` != $DATAHOST) then
+    echo "monitor: You must run this script from $DATAHOST"
+    echo "monitor: Rlogin to it if necessary"
+    exit (1)
+endif
+					# Check process table to
+					# look for existing invocation
+ps -ef | grep -v grep | grep dribble > /dev/null
+if ($status == 0) then
+    echo "monitor: There appears to be another monitor already"
+    echo "monitor: running.  You will need to remove it before starting"
+    echo "monitor: another one.  DO NOT interrupt (^C) the transfer monitor"
+    echo "monitor: in the middle of a file transfer.  If in doubt, consult"
+    echo "monitor: the local HOPS expert"
+    exit (1)
+else if ($status == 2) then
+    echo "monitor: Problem grepping ps output"
+    exit (1)
+endif
+					# Make unique log file name
+set datestring=`date '+%y%j-%H%M%S'`
+set monitorlog=$TRANSFER/`printf "monitor.%s" $datestring`
+					# Start up dribble in its owm
+					# scrollable hpterm window, and
+					# log everything.
+setenv DISPLAY $OPDISPLAY
+setenv DRIBBLEOK junk
+echo "monitor: Starting dribble, logging in file $monitorlog"
+    hpterm -title "Unix Transfer Monitor" -fn courR12 -geometry 90x50 -sl 20s \
+    -l -lf $monitorlog -e dribble &

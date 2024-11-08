@@ -1,0 +1,193 @@
+
+\textbf{Command line syntax:}
+
+\texttt{fourfit [-a] [-b BB:F] [-c controlfile] [-d display device]
+            [-f value] [-m value] [-n value] [-p] [-r afile] [-s naps]
+            [-tux] [-P polar\_pair] [-T trefoffs] [-X] data file list 
+            [set <control file syntax statements>]}
+
+         All arguments except the data file list are optional.
+         The data file list is required, unless the
+         [-r afile] option is used, when the afile replaces 
+         the data file list. If present,
+         the "set" argument and the commands which follow it must
+         come last.  All option flags must appear before the data file
+         list, though the flags can come in any order.
+
+    Here are two examples of command-line invocations of fourfit, with
+    an explanation of what they do:
+
+\texttt{fourfit -txas -m 1 -c control 018-234505 set mb\_win -0.0034 .004 freqs a b}
+
+        Test mode, xwindow display, accounting switched on, cross
+        power spectrum plot switched on, moderately verbose, use
+        control file named "control" in current working directory,
+        process all data in scan directory 018-234505, override
+        multiband delay search window and select channels 'a' and
+        'b' only.
+
+\texttt{fourfit -r refr\_list -c control -d hardcopy -b AT:S}
+
+        Process all data referenced by type 2 lines in the A-file
+        named "refr\_list", use control file "control", print the
+        fringe plot on the default printer, process only baseline
+        AT frequency subgroup S.
+
+\textbf{Option Flags:}
+
+\begin{itemize}
+\item [-a]
+If specified, this option switches on accounting
+of CPU time and wall-clock time used in the various
+parts of fourfit.  When the program finishes, it
+produces a summary of these timing statistics.
+\item [-b BB:F]
+Allows the user to override the control file
+with a specification of the baseline and/or
+frequency group to be processed.  The syntax is
+flexible.  0, 1 or 2 characters before the colon
+refer to the baseline (one character is interpreted
+as a station), and 0 or 1 character after the colon
+is interpreted as the frequency subgroup.  You can
+use the control file wildcard character '?' in
+the baseline, but remember to protect it from the
+C-shell either by escaping it with a backslash '\\'
+or enclosing the entire -b argument in single
+quotes.  If you wish only to specify the baseline,
+the colon may be omitted.  An error in the -b
+flag argument causes the flag to be ignored, and
+fourfit will continue execution.
+\item[-c controlfile]
+            Specifies the file which contains parameters
+            to control the operation of the program.  If
+            absent, fourfit will use only the file pointed to
+            by the environment variable DEF\_CONTROL, which
+            in turn defaults to \texttt{/dev/null} as defined
+            in the HOPS/setup.csh file.  Any parameters
+            set in a control file specified with the -c option
+            override the default file values.  A description
+            of the syntax of the control file, with an example,
+            can be found later in this document.
+
+\item[-d display\_device]
+            Upon completion of a fringe fit, fourfit can
+            optionally display the results using postscript.
+            The valid choices for "display\_device" are:
+                \begin{itemize}
+                \item[]\textbf{diskfile:file.ps} save the plot in "file.ps"
+                \item[]\textbf{hardcopy}         send the plot directly to lpr
+                \item[]\textbf{pshardcopy}       print the plot via pplot\_print
+                \item[]\textbf{xwindow}          show the plot in an X11 window
+                \item[]\textbf{psscreen}         the same, but allow GS\_* options
+                \end{itemize}
+
+\item[-f first\_channel]
+            overrides the default first channel (0) to facilitate
+            plotting when there are more than 16 channels (see -n)
+
+\item[-m value]
+            This flag controls the verbosity of the program via
+            the integer argument "value", which ranges from 3
+            (virtually silent except for major errors) to -3 
+            (incredibly verbose, of use only to the authors of 
+            the program).  The default is 2.
+
+\item[-n nchans]
+            When there are many channels (see also the -f flag)
+            this tells how many channels to put on the plot. Note
+            that neither -f nor -n affect the actual fringe fit,
+            just the plotting thereof.
+
+\item[-p]
+            Simplest way to pop up a fringe plot.
+            This is equivalent to "-d psscreen".
+
+\item[-r afile]
+            Puts fourfit into "refringe" mode.  Fourfit refringing
+            is driven by an A-file input, which overrides any 
+            correlator root files directly specified on the command
+            line (i.e. the latter are ignored when the -r flag
+            is specified).  The input A-file, of which there can
+            be only one, may contain root, corel or fringe lines,
+            but only the fringe lines are used to determine which
+            data to process, by baseline and frequency subgroup.
+            Obviously, the -r flag is inconsistent with the -u
+            flag, and specifying both is an error.  Note that for
+            afiles using HP-1000 (version 1) line formats, fourfit
+            has to pre-check the disk for the existence of the 
+            type 2 files.  The data area is controlled by the
+            DATADIR environment variable.  It defaults to the
+            value of \$CORDATA.
+
+\item[-s naps]
+            This parameter controls how many AP's are merged
+            together into each plotting segment. Thus the number
+            of time points shown in the phase, amplitude, and
+            validity plots is so controlled. Additionally, the
+            ph/seg and amp/seg statistics are calculated based
+            upon the stated number of AP's in each segment.
+
+\item[-t]
+            This flag places fourfit in test mode.  Everything
+            works as normal, except that the output file is not
+            written to disk, and the root file is not updated.
+            This is useful when experimenting with different
+            fringe-fitting strategies, in order to avoid cluttering
+            up the disk.
+
+\item[-u]
+            Normally, fourfit processes all data consistent with
+            the data file list and the control information.  When
+            this flag is specified, fourfit will also check the
+            information in the type-2100 record of the root to 
+            see if the data have already been processed by fourfit.
+            If so, the data in question are skipped.  The "u"
+            stands for update mode.
+
+\item[-x]
+            This is equivalent to "-d xwindow".
+
+\item[-P pq]
+            Controls polarization processing. If pq is a 2 character
+            string, then pq is one of sixteen cross-polarization 
+            products, formed by p and q each being one
+            of \{R, L, X, Y\}. Alternatively, pq can be a single
+            character, 'I', which forms the Stokes pseudo-I mode
+            combination of the products \{XX, YY, XY, YX\}.
+
+\item[-T trefoffs]
+            If this option is invoked, the fourfit reference
+            time will be calculated by taking the nominal scan
+            start time from the ovex file and adding trefoffs
+            (which is an integer number of seconds) to it.
+
+\item[-X]
+            Forces fourfit to write cross-power spectra into
+            type 230 records. This option is typically used for
+            import into AIPS.
+\end{itemize}
+
+\textbf{Arguments:}
+
+            data file list
+            This mandatory argument or arguments tells fourfit
+            which data files to process.  The format of the data
+            file specification is the standard one for all MkIV
+            software.  You may specify individual filenames, 
+            scan directories which contain data files, 
+            experiment directories, or any combination of
+            these three.  In the latter two cases,
+            fourfit will descend the directory tree looking for
+            data files to add to its internal list of files to
+            process.  Only root files need be specified.  The
+            data files actually fringe-searched are determined
+            by the combination of the root files specified and the
+            restrictions imposed by the control file or control
+            parameter list (see below).  In the absence of 
+            such restrictions, all data associated with the 
+            specified root files are processed.
+
+            Beware of trying to specify too many files or scan
+            directories, as it is possible to overflow the Unix
+            argument list buffer on large experiments.  In such
+            cases, specify the experiment directory instead.

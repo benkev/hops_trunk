@@ -1,0 +1,15 @@
+lvex_rev = 1.0
+*
+*The lvex file is experiment specific and contains a summary of correlator-relevant log information from each scan of each participating station.
+*lvex file names will normally carry the suffix '.lvex'
+*
+*ARW 981106
+*
+$A                  *station A
+	scan 185-2323;
+		VSN = RRL00700;
+		Source = M185-23;
+		head_pos = -271;
+		start_tape = 1998y185d23h42m15s : 4421 : for;
+		stop_tape = 1998y185d23h45m10s : 7821 ;
+	enddef

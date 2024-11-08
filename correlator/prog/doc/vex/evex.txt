@@ -1,0 +1,37 @@
+*Sample evex file
+*
+*The evex file contains one or more defs for each experiment to be processed, specifying a number
+*of default global processing parameters.
+*The appropriate evex key is specified as 'ekey <key>' in the tsf file to establish the
+*association of the specified tasks to a particular experiment and set of global processing
+*parameters.
+*evex filenames normally carry the suffix '.evex'.
+*
+*ARW 990303
+*
+*-----------------------------------------------------------------------------------------------
+$EVEX_REV;
+*-----------------------------------------------------------------------------------------------
+*
+rev=1.0
+*
+*-----------------------------------------------------------------------------------------------
+$EVEX;
+*-----------------------------------------------------------------------------------------------
+*
+	def 1147_std;
+		corr_exp# = 1147;					*defines correlator experiment number
+		ovex_file = exp1147.svex;			*ovex file
+		lvex_file = exp1147.lvex;			*lvex file
+		cvex_file = standard.cvex;			*cvex file
+        svex_file = standard.svex;          *svex file
+		AP_length = 5 sec;					*may be overriden in .task file
+		speedup_factor = 0.5;               *speedup factor
+		ref $SU_CONFIG = sp1: A: B: C;      *key to .svex file
+		                                    *may be qualified by station (in this case A,B,C)
+		ref $SU_CONFIG = std;               *for all other stations
+		tape_mode = random|sequential|synchronous|continuous;
+											*optional; default is 'random'
+		mirror = allocate|no_allocate : compare|no_compare : no_save|save_different|save_all;
+		                                	*optional; default is 'allocate:compare:no_save'
+	enddef;

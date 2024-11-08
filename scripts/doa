@@ -1,0 +1,263 @@
+#!/bin/ksh
+# $MK4_DIST_D/src/scripts/share/doa
+
+#-------------------------------------------------------------------------------
+host=$(hostname)
+
+
+#-------------------------------------------------------------------------------
+# aliases names for programs, message queues, and network connections
+
+# programs
+control_progs="conductor opera genaroot corrman suman sutrx mcb soloist
+ counts Log mlogger"
+crate_progs="rotman bos clkm clkmlink tspm"
+playback_progs="domino"
+mailer_progs="txm rxm"
+correlator_progs="$control_progs $crate_progs $playback_progs"
+all_progs="$correlator_progs $mailer_progs"
+any_progs="*"
+
+# message queues
+control_mqs="CON OPR GEN COR SUM TX0 TX1 TX2 TX3 TX4 TX5 TX6 MCB SOL LOG"
+crate_mqs="ROT BOS"
+playback_mqs="MK5"
+mailer_mqs="MAL"
+correlator_mqs="$control_mqs $crate_mqs $playback_mqs"
+all_mqs="$correlator_mqs $mailer_mqs"
+any_mqs="*"
+
+# network connections
+correlator_conns="m4crate tserv"
+mailer_conns="m4msgd"
+all_conns="m4crate m4msgd tserv"
+
+
+#-------------------------------------------------------------------------------
+# the functions and scripts use non-portable unix commands and options which
+# are parameterized here into shell variables
+
+ps_n_flds=3       # pid, uid, cmd
+ipcs_n_flds=5     # key, id, n_bytes, n_mesgs, owner
+netstat_n_flds=4  # proto, ladr, fadr, state
+mq_prefix="V"
+mq_prefix_ln=1
+
+case "$(uname -s)" in
+   HP-UX)
+      echo_c="echo"
+      grep_c="egrep" ; grep_or="|"
+      awk_c="awk"
+      # ps -el => 1=f 2=s 3=uid 4=pid 5=ppid 6=c 7=pro 8=ni 9=addr 10=sz
+      #  11=wchan 12=tty 13=time 14=cmd
+      ps_c="ps -el" ; ps_flds='$4, $3, $14'
+      # ipcs -qo => 1=type 2=id 3=key 4=perms 5=owner 6=grp 7=n_bytes 8=n_mesgs
+      ipcs_c="ipcs -qo" ; ipcs_flds='$3, $2, $7, $8, $5'
+      # netstat  => 1=proto 2=rq 3=sq 4=ladr 5=fadr 6=state
+      netstat_c="netstat" ; netstat_flds='$1, $4, $5, $6'
+      ;;
+   HP-RT)
+      echo_c="echo"
+      grep_c="egrep" ; grep_or="\|" ; grep_word="\>"
+      awk_c="/usr/contrib/bin/awk"
+      # ps -a    => 1=pid 2=ppid 3=pgrp 4=pri 5=text 6=stk 7=data 8=time
+      #  9=dev 10=uid 11=state 12=cmd"
+      ps_c="/bin/ps -a" ; ps_flds='$1, $10, $12'
+      # ipcs -qo => 1=type 2=id 3=key 4=perms 5=owner 6=grp 7=n_bytes 8=n_mesgs
+      ipcs_c="ipcs -qo" ; ipcs_flds='$3, $2, $7, $8, $5'
+      # netstat  => 1=proto 2=rq 3=sq 4=ladr 5=fadr 6=state
+      netstat_c="netstat" ; netstat_flds='$1, $4, $5, $6'
+      ;;
+   Linux)
+      echo_c="echo -e"
+      grep_c="egrep" ; grep_or="|"
+      awk_c="awk"
+      # ps -el => 1=f 2=s 3=uid 4=pid 5=ppid 6=c 7=pro 8=ni 9=addr 10=sz
+      #  11=wchan 12=tty 13=time 14=cmd
+      ps_c="ps -el" ; ps_flds='$4, $3, $14'
+      # ipcs -q  => 1=key 2=id 3=owner 4=perms 5=n_bytes 6=n_mesgs
+      ipcs_c="ipcs -q" ; ipcs_flds='$1, $2, $5, $6, $3'
+      # netstat  => 1=proto 2=rq 3=sq 4=ladr 5=fadr 6=state
+      netstat_c="netstat" ; netstat_flds='$1, $4, $5, $6'
+      ;;
+   *    )
+      :
+      ;;
+esac
+
+#-------------------------------------------------------------------------------
+# function to do action(s) on program(s)
+# actions: lp = list program, kp = kill program
+
+do_on_prog() {
+   typeset action_list="$1" prog_list="$2"
+   typeset prog_list_re="" exclude_re prog action
+
+   exclude_re="grep${grep_or}doa"
+   for prog in $prog_list ; do
+      if [ -z "$prog_list_re" ] ; then
+         prog_list_re="$prog$grep_word"
+      else
+         prog_list_re="$prog_list_re$grep_or$prog$grep_word"
+      fi
+   done
+   set -- $($ps_c | $grep_c "$prog_list_re" | $grep_c -v "$exclude_re" \
+    | $awk_c "{print $ps_flds}")
+   while [ $# -gt 0 ] ; do
+      # pid=$1, uid=$2, cmd=$3
+      for action in $action_list ; do
+         case "$action" in
+            lp ) $echo_c "$host\tprog\t${3##*/}      \t$1\t\t\t$2" ;;
+            kp ) kill "$1"                                         ;;
+            *  ) :                                                ;;
+         esac
+      done
+      shift $ps_n_flds
+   done
+}
+
+#-------------------------------------------------------------------------------
+# function to do action(s) on message queue(s)
+# actions: lq = list queue, mq = mimic queue , rq = remove queue
+
+do_on_mq() {
+   typeset action_list="$1" mq_list="$2"
+   typeset mq_list_re="" exclude_re mq mq_hex action
+
+   exclude_re="grep${grep_or}doa"
+   for mq in $mq_list ; do
+      mq_hex=`ascii2q ${mq_prefix}${mq}`
+      if [ -z "$mq_list_re" ] ; then
+         mq_list_re="$mq_hex" 
+      else 
+         mq_list_re="${mq_list_re}${grep_or}${mq_hex}"
+      fi
+   done
+
+   set -- $($ipcs_c | $grep_c "$mq_list_re" | $grep_c -v "$exclude_re" \
+    | $awk_c "{print $ipcs_flds}")
+   while [ $# -gt 0 ]; do
+      # key=$1, id=$2,  n_bytes=$3, n_mesgs=$4, owner=$5
+      ascii_key=`q2ascii $1`
+      ascii_mq=`qtrim $ascii_key $mq_prefix_ln`
+      for action in $action_list ; do
+         case "$action" in
+            lq ) $echo_c "$host\tmq\t$ascii_key\t\t$2\t$3\t$4\t$5" ;;
+            mq ) mimic "$ascii_mq"                                 ;;
+            rq ) ipcrm -q "$2"                                     ;; 
+            *  ) :                                                 ;;
+         esac
+      done
+      shift $ipcs_n_flds
+   done
+}
+
+#-------------------------------------------------------------------------------
+# function to do actions(s) on network connection(s) 
+# actions: lc = list connections
+
+do_on_conn() {
+   typeset action_list="$1" conn_list="$2"
+   typeset conn_list_re="" exclude_re conn action state l_host l_adr \
+    r_host r_adr
+   typeset -i n_flds
+
+   exclude_re="grep${grep_or}doa"
+   for conn in $conn_list ; do
+      if [ -z "$conn_list_re" ] ; then
+         conn_list_re="$conn" 
+      else 
+         conn_list_re="${conn_list_re}${grep_or}${conn}"
+      fi
+   done
+
+   set -- $($netstat_c | $grep_c "$conn_list_re" | $grep_c -v "$exclude_re" \
+    | $awk_c "{print $netstat_flds}")
+   while [ $# -gt 0 ]; do
+      # proto=$1, ladr=$2, fadr=$3, state=$4
+      l_host=${2%%.*}
+      l_adr=${2##*:}
+      if [ "$l_adr" = "$2" ] ; then
+         l_adr=${2##*.}
+      fi
+      r_host=${3%%.*}
+      r_adr=${3##*:}
+      if [ "$r_adr" = "$3" ] ; then
+         r_adr=${3##*.}
+      fi
+      if [ "$4" = "tcp" ] ; then
+         state=""
+         n_flds=$(($netstat_n_flds - 1))
+      else 
+         state="$4"
+         n_flds=$netstat_n_flds
+      fi
+      for action in $action_list ; do
+         case "$action" in
+            lc ) $echo_c "$host\tconn\t$l_host:$l_adr\t$r_host:$r_adr\t$state"
+                 ;;
+            *  ) : ;;
+         esac
+      done
+      shift $n_flds
+   done
+}
+
+#-------------------------------------------------------------------------------
+# script
+
+while [ $# -gt 0 ] ; do
+   action_list="$1"
+   object_list="$2"
+   case "$action_list" in
+      # program cases
+      ?p* )
+         case "$object_list" in
+            control    ) object_list="$control_progs"    ;;
+            crate      ) object_list="$crate_progs"      ;;
+            playback   ) object_list="$playback_progs"   ;; 
+            mailer     ) object_list="$mailer_progs"     ;;
+            correlator ) object_list="$correlator_progs" ;;
+            all        ) object_list="$all_progs"        ;;
+            any        ) object_list="$any_progs"        ;;
+            *          ) :                               ;;
+         esac
+         do_on_prog "$action_list" "$object_list"
+         ;;
+
+      # queue cases
+      ?q* )
+         case "$object_list" in
+            control    ) object_list="$control_mqs"      ;;
+            crate      ) object_list="$crate_mqs"        ;;
+            playback   ) object_list="$playback_mqs"     ;;
+            mailer     ) object_list="$mailer_mqs"       ;;
+            correlator ) object_list="$correlator_mqs"   ;;
+            all        ) object_list="$all_mqs"          ;;
+            any        ) object_list="$any_mqs"          ;;
+            *          ) :                               ;;
+         esac
+         do_on_mq "$action_list" "$object_list"
+         ;;
+
+      # net connection cases
+      ?c* )
+         case "$object_list" in
+            correlator ) object_list="$correlator_conns" ;;
+            mailer     ) object_list="$mailer_conns"     ;;
+            all        ) object_list="$all_conns"        ;;
+            *          ) :                               ;;
+         esac
+         do_on_conn "$action_list" "$object_list"
+         ;;
+
+      # sleep case
+      s   )
+         sleep "$object_list"
+         ;;
+
+      # default
+      *   ) :                          ;;
+   esac
+   shift 2 
+done

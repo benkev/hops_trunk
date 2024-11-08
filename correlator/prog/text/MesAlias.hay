@@ -1,0 +1,63 @@
+# This file contains aliases for the Mark-4 messaging system 
+# in a format similar to the mail-alias file.  A typical entry 
+# might be: 
+#     alias : name1@computer1, name2@, name3 
+# (without the #, of course).  name1 and name2 should be the 
+# 3-character abbreviated names of the addressee programs.  name2 
+# is presumed to be on this computer.  name3 (without the @) causes 
+# a recursive search in this file.  If not found, then name3 is 
+# interpreted as a 3-character name on this machine just as name2. 
+# If name1 or name2 comprises more than 3 characters, an error 
+# statement is sent to stderr.  Lines can be up to 256 characters 
+# long, but there are no continuation lines.  Use a secondary name
+# (example name3 above) if, for example, you need to keep lines 
+# printable in 80 columns.  Computer names can be up to 16 characters 
+# (this is NCOMP in mess.h).  Alias names can be up to 16 characters 
+# (this is NALS in mess.h).  Both aliases and names are now case 
+# sensitive.  Revised:  2000 February 1, JAB 
+
+# 
+tstmsgs   : TSS@ccc 
+tstmsgr   : TSR@ccc 
+opera     : OPR@lcc
+opr       : OPR@lcc
+conductor : CON@lcc 
+con       : CON@lcc 
+gen       : GEN@ccc 
+genaroot  : GEN@ccc 
+cor       : COR@ccc 
+corrman   : COR@ccc 
+sum       : SUM@ccc 
+suman     : SUM@ccc 
+soloist   : SOL@ccc
+rot       : ROT@cu0 
+rotman    : ROT@cu0 
+mcb       : MCB@ccc 
+tx0       : TX0@ccc
+tx1       : TX1@ccc
+tx2       : TX2@ccc
+tx3       : TX3@ccc
+tx4       : TX4@ccc
+tx5       : TX5@ccc
+tx6       : TX6@ccc
+dm7       : MK5@muc07
+dm8       : MK5@muc08
+dm9       : MK5@muc09
+dma       : MK5@muc10
+dmb       : MK5@tortuga
+#
+boss0     : BOS@cu0 
+boss1     : BOS@cu1 
+#
+bosses    : boss0, boss1
+sutrxs    : tx0, tx1, tx2, tx3, tx4, tx5, tx6
+#
+control   : opr, con, gen, cor, sum, mcb, soloist
+crate     : boss0, boss1, rot
+doms      : dm7, dm8, dm9, dma, dmb
+#
+playback  : sutrxs, doms
+testprogs : control, crate, playback
+all       : control, crate, playback
+allwop    : control, playback
+dummy     : 

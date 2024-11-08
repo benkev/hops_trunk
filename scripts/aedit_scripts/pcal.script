@@ -1,0 +1,27 @@
+freq SX
+ed in
+param 1 2 6 7
+prange 1 >.002
+ed in
+prange 2 >.002
+ed in
+prange 3 >.002
+ed in
+prange 4 >.002
+ed in
+prange 5 >.002
+ed in
+prange 6 >.002
+ed in
+prange 17 >.002
+ed in
+prange 18 >.002
+ed in
+prange 19 >.002
+ed in
+prange 20 >.002
+ed in
+prange 21 >.002
+ed in
+prange 22 >.002
+ed in

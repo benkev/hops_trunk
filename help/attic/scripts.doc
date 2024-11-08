@@ -1,0 +1,11 @@
+Summary of available scripts which are not documented
+by the standard methods (i.e. still beta) MAT, May 19, 1994
+----------------------------------------------------------
+
+goddard.export   - generates standard export file for goddard experiments
+
+goddard.plots    - generates standard plots for goddard experiments
+
+*transfer (A990) - transfer data on A990 disk to dopey for use with aedit
+                   (see also "vhelp restore")
+

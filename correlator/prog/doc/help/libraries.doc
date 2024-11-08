@@ -1,0 +1,56 @@
+Documentation of software libraries in HOPS
+-------------------------------------------
+
+Documentor:  CJL, 29 March 1995
+
+Much of the software in HOPS is of a generic nature, and is
+designed to be used by more than one program.  Almost without
+exception, any routine which is used by two or more programs
+has been placed in one of the several libraries.  This practise
+minimises total code volume and the associated maintenance
+burden.
+
+As far as possible, the libraries have been designed to present
+a simple and convenient interface to the application
+programmer.  The general principle has been to do as much
+low-level, application-independent work as possible behind
+the scenes in the library.  The programmer is given tools
+to manipulate the behaviour of the library, in the form of
+a small number of parameters passed to the library functions.
+These parameters, and the calling sequences for the library
+routines, are intended to be very stable, thus facilitating
+the development of robust, stable application code.
+
+Libraries are hard to use unless their interfaces are
+adequately documented.  To access the HOPS library documentation
+files, type "vhelp lib????", where "????" is the name of the
+library you are interested in.  Below is a list and brief
+description of all current HOPS libraries.
+
+Library Name		Function
+------------            --------
+afio			A-file IO library
+			Handles a variety of operations
+			concerning the A-file format.
+			All A-file IO should go through
+			this library.
+
+bfio			Binary file IO library
+			Handles all IO to and from binary
+			correlator and associated files.
+			
+ccfio			Correlator control file IO library
+			Handles reading and writing of
+			correlator control files.
+
+x_fplot			X-window fringe-plot popup library
+			Displays fringe plots on X-displays.
+
+util			HOPS utility library
+			A diverse collection of commonly
+			used routines.  This library should
+			be used to promote a standard
+			"look and feel" among HOPS programs.
+
+The source code for these libraries can be found in $????,
+where "????" is the library name converted to upper case.

@@ -1,0 +1,2 @@
+gcc -O3 mainv_2.c vlbiv4_2.c four.c -lm -D_FILE_OFFSET_BITS=64
+mv a.out ~/bin/vlbi2

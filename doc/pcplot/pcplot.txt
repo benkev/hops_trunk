@@ -1,0 +1,38 @@
+Hello all,
+
+My work on converting fourfit to use the plplot library rather than pgplot was put on hiatus a month or so ago due to a variety of practical factors, with the final code residing in a fourfit branch in the repository. Since that time I’ve been working on tools to help with the management of the rather complex pcal operation that we now have with vgos. In particular, I’ve developed a program called pcplot, which plots phase cal tone information for every tone, based upon the result of fourfit running on a scan and removing the best-fit single channel delay from each channel. The hope is to facilitate the identification of corrupted tones within channels, even when they are transient.
+
+I’ve attached half a dozen sample plots, which are admittedly still in a crude state. Since getting the graphics exactly right is a fiddly and painstaking process, I wanted to get feedback on the actual utility of the plots prior to polishing them and/or adding more and different plots. Here is the current help printout, and a typical command line I used to generate the plots.
+
+smm-pc:~/prog/pi$ pcplot.py -h
+usage: 
+ pcplot [options] <baseline> <root_filename>
+ e.g.: pcplot  -p XY TV:X 3C279.xyzzys
+
+options:
+  -h, --help            show this help message and exit
+  -p POLPROD, --polarization=POLPROD
+                        polarization product (1)
+  -t PLOT_TYPE, --type=PLOT_TYPE
+                        type <1:amp&ph vs tone  2:amp vs ph  3:phasors> (1)
+  -v, --verbose         verbose mode (false)
+
+pcplot.py GE -t 3 -p RR /swc/sops/trunk/data/ff_testdata/testdata/3413/278-1758/0552+398.wmtukg
+
+There are 3 pairs of plots attached, each pair consisting of reference and remote pcal for one type of plot. For brevity, I have only captured the plots for the RR polarization product. A short description of the plots is:
+
+ Plot type 1: amplitude (blue) and phase (red) by tone number within each channel. Perhaps the most straightforward to interpret for non-conforming tones.
+
+Plot type 2: 2-D plot of phase vs amplitude, by channel. Gives a quick visual signature of each channel’s tones.
+
+Plot type 3: plot of the pcal phasors, for the first 8 channels only, for clarity’s sake. Probably doesn’t add too much to the picture already magnified in the type 2 plot.
+
+I realize that the time behavior (over hours) of the tones is important, but this effort wasn’t targeted at studying that behavior. Instead, the idea is to enable a close examination of single scans, either to determine the preliminary set of tone masks, or possibly to diagnose individual group-delay data points that are outliers. 
+
+Your comments are welcome,
+Roger
+
+
+
+
+!DSPAM:5a3aaf2643691473221349!

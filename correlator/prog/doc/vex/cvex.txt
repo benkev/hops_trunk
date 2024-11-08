@@ -1,0 +1,489 @@
+*Sample cvex file
+*
+*Example of VEX task-specific correlator configuation file (.cvex).
+*The appropriate $CORR_CONFIG key will be specified for every task in order to
+*properly set up the correlator.
+*
+*Notes:
+*  1. Parameters beginning with '~' are pseudo-parameters to replaced by integers at setup.
+*
+*ARW 990907
+*
+*-----------------------------------------------------------------------------------------------
+$CVEX_REV;
+*-----------------------------------------------------------------------------------------------
+*
+rev = 1.0;
+*
+*-----------------------------------------------------------------------------------------------
+$CORR_CONFIG;
+*-----------------------------------------------------------------------------------------------
+*
+  def B32-16;                    *2 slices, 32 complex lags, 16 chans/stn, 11 stns max
+	ref $CORR_MODE = B32-16;
+    ignore_chan_names = off ;    *if 'on', assign virtual chan by SU output position
+                                 *instead of by chan name	
+  enddef;
+*
+  def C32-1;                    *1 board, 32 complex lags, 1 chan/stn, 8 stns max
+	ref $CORR_MODE = C32-1;
+    ignore_chan_names = off ;    *if 'on', assign virtual chan by SU output position
+                                 *instead of by chan name	
+  enddef;
+  def C32-4;                    *1 board, 32 complex lags, 4 chans/stn, 8 stns max
+	ref $CORR_MODE = C32-4;
+    ignore_chan_names = off ;    *if 'on', assign virtual chan by SU output position
+                                 *instead of by chan name	
+  enddef;
+*
+  def C32-16;                    *1 slice, 32 complex lags, 16 chans/stn, 8 stns max
+	ref $CORR_MODE = C32-16;
+    ignore_chan_names = off ;    *if 'on', assign virtual chan by SU output position
+                                 *instead of by chan name	
+  enddef;
+*-----------------------------------------------------------------------------------------------
+$CORR_MODE;
+*-----------------------------------------------------------------------------------------------
+*
+*The CORR_MODE block defines the setup of each of the correlator boards participating in the
+*correlation.
+*
+*Notes:
+*  1. Each line defines the configuration of a single correlator board.
+*  2. The 'board parms' in the 'board=' statement is a reference to the appropriate
+*     $CORR_BD_PARMS keyword.
+*  3. The 'sect mode' in the 'board=' statement is a reference to the appropriate
+*     $CORR_SECT_MODE keyword.
+*
+  def A32-8CP;              *11 stations max, 32 lags, 8 LCP/RCP chan-pairs/stn
+  *        ------board-----    bd   sect  strt   SU       SU     sect  strt   SU       SU
+  *        segment   slice   parms  mode  chip  chan     chan    mode  chip  chan     chan
+  *                                             (ref)    (rem)               (ref)    (rem)
+    board = ~seg0 : ~slice0 : std1 : B32 :  0 : ~chn0  : ~chn0  : B32 : 16 : ~chn1  : ~chn1  ;
+    board = ~seg0 : ~slice1 : std1 : B32 :  0 : ~chn0  : ~chn1  : B32 : 16 : ~chn1  : ~chn0  ;
+    board = ~seg0 : ~slice2 : std1 : B32 :  0 : ~chn2  : ~chn2  : B32 : 16 : ~chn3  : ~chn3  ;
+    board = ~seg0 : ~slice3 : std1 : B32 :  0 : ~chn2  : ~chn3  : B32 : 16 : ~chn3  : ~chn2  ;
+    board = ~seg1 : ~slice0 : std1 : B32 :  0 : ~chn4  : ~chn4  : B32 : 16 : ~chn5  : ~chn5  ;
+    board = ~seg1 : ~slice1 : std1 : B32 :  0 : ~chn4  : ~chn5  : B32 : 16 : ~chn5  : ~chn4  ;
+    board = ~seg1 : ~slice2 : std1 : B32 :  0 : ~chn6  : ~chn6  : B32 : 16 : ~chn7  : ~chn7  ;
+    board = ~seg1 : ~slice3 : std1 : B32 :  0 : ~chn6  : ~chn7  : B32 : 16 : ~chn7  : ~chn6  ;
+    board = ~seg2 : ~slice0 : std1 : B32 :  0 : ~chn8  : ~chn8  : B32 : 16 : ~chn9  : ~chn9  ;
+    board = ~seg2 : ~slice1 : std1 : B32 :  0 : ~chn8  : ~chn9  : B32 : 16 : ~chn9  : ~chn8  ;
+    board = ~seg2 : ~slice2 : std1 : B32 :  0 : ~chn10 : ~chn10 : B32 : 16 : ~chn11 : ~chn11 ;
+    board = ~seg2 : ~slice3 : std1 : B32 :  0 : ~chn10 : ~chn11 : B32 : 16 : ~chn11 : ~chn10 ;
+    board = ~seg3 : ~slice0 : std1 : B32 :  0 : ~chn12 : ~chn12 : B32 : 16 : ~chn13 : ~chn13 ;
+    board = ~seg3 : ~slice1 : std1 : B32 :  0 : ~chn12 : ~chn13 : B32 : 16 : ~chn13 : ~chn12 ;
+    board = ~seg3 : ~slice2 : std1 : B32 :  0 : ~chn14 : ~chn14 : B32 : 16 : ~chn15 : ~chn15 ;
+    board = ~seg3 : ~slice3 : std1 : B32 :  0 : ~chn14 : ~chn15 : B32 : 16 : ~chn15 : ~chn14 ;
+    cross_pol_chan_pair = ~chn0  : ~chn1  ;
+    cross_pol_chan_pair = ~chn2  : ~chn3  ;
+    cross_pol_chan_pair = ~chn4  : ~chn5  ;
+    cross_pol_chan_pair = ~chn6  : ~chn7  ;
+    cross_pol_chan_pair = ~chn8  : ~chn9  ;
+    cross_pol_chan_pair = ~chn10 : ~chn11 ;
+    cross_pol_chan_pair = ~chn12 : ~chn13 ;
+    cross_pol_chan_pair = ~chn14 : ~chn15 ;
+  enddef;
+*
+  def A64-8CP;               *8 stations max, 64 labs, 8 LCP/RCP chan-pairs/stn
+  *        ------board-----    bd   sect  strt   SU       SU     sect  strt   SU       SU
+  *        segment   slice   parms  mode  chip  chan     chan    mode  chip  chan     chan
+  *                                             (ref)    (rem)               (ref)    (rem)
+    board = ~seg0 : ~slice0 : std1 : B64 :  0 : ~chn0  : ~chn0  : B64 : 16 : ~chn1  : ~chn1  ;
+    board = ~seg0 : ~slice1 : std1 : B64 :  0 : ~chn0  : ~chn1  : B64 : 16 : ~chn1  : ~chn0  ;
+    board = ~seg0 : ~slice2 : std1 : B64 :  0 : ~chn2  : ~chn2  : B64 : 16 : ~chn3  : ~chn3  ;
+    board = ~seg0 : ~slice3 : std1 : B64 :  0 : ~chn2  : ~chn3  : B64 : 16 : ~chn3  : ~chn2  ;
+    board = ~seg1 : ~slice0 : std1 : B64 :  0 : ~chn4  : ~chn4  : B64 : 16 : ~chn5  : ~chn5  ;
+    board = ~seg1 : ~slice1 : std1 : B64 :  0 : ~chn4  : ~chn5  : B64 : 16 : ~chn5  : ~chn4  ;
+    board = ~seg1 : ~slice2 : std1 : B64 :  0 : ~chn6  : ~chn6  : B64 : 16 : ~chn7  : ~chn7  ;
+    board = ~seg1 : ~slice3 : std1 : B64 :  0 : ~chn6  : ~chn7  : B64 : 16 : ~chn7  : ~chn6  ;
+    board = ~seg2 : ~slice0 : std1 : B64 :  0 : ~chn8  : ~chn8  : B64 : 16 : ~chn9  : ~chn9  ;
+    board = ~seg2 : ~slice1 : std1 : B64 :  0 : ~chn8  : ~chn9  : B64 : 16 : ~chn9  : ~chn8  ;
+    board = ~seg2 : ~slice2 : std1 : B64 :  0 : ~chn10 : ~chn10 : B64 : 16 : ~chn11 : ~chn11 ;
+    board = ~seg2 : ~slice3 : std1 : B64 :  0 : ~chn10 : ~chn11 : B64 : 16 : ~chn11 : ~chn10 ;
+    board = ~seg3 : ~slice0 : std1 : B64 :  0 : ~chn12 : ~chn12 : B64 : 16 : ~chn13 : ~chn13 ;
+    board = ~seg3 : ~slice1 : std1 : B64 :  0 : ~chn12 : ~chn13 : B64 : 16 : ~chn13 : ~chn12 ;
+    board = ~seg3 : ~slice2 : std1 : B64 :  0 : ~chn14 : ~chn14 : B64 : 16 : ~chn15 : ~chn15 ;
+    board = ~seg3 : ~slice3 : std1 : B64 :  0 : ~chn14 : ~chn15 : B64 : 16 : ~chn15 : ~chn14 ;
+    cross_pol_chan_pair = ~chn0  : ~chn1  ;
+    cross_pol_chan_pair = ~chn2  : ~chn3  ;
+    cross_pol_chan_pair = ~chn4  : ~chn5  ;
+    cross_pol_chan_pair = ~chn6  : ~chn7  ;
+    cross_pol_chan_pair = ~chn8  : ~chn9  ;
+    cross_pol_chan_pair = ~chn10 : ~chn11 ;
+    cross_pol_chan_pair = ~chn12 : ~chn13 ;
+    cross_pol_chan_pair = ~chn14 : ~chn15 ;
+  enddef;
+*
+  def B32-4CP;              *11 stations max, 32 lags, 4 LCP/RCP chan-pairs/stn
+  *        ------board-----    bd   sect  strt   SU       SU     sect  strt   SU       SU
+  *        segment   slice   parms  mode  chip  chan     chan    mode  chip  chan     chan
+  *                                             (ref)    (rem)               (ref)    (rem)
+    board = ~seg0 : ~slice0 : std1 : B32 :  0 : ~chn0  : ~chn0  : B32 : 16 : ~chn1  : ~chn1  ;
+    board = ~seg0 : ~slice1 : std1 : B32 :  0 : ~chn0  : ~chn1  : B32 : 16 : ~chn1  : ~chn0  ;
+    board = ~seg1 : ~slice0 : std1 : B32 :  0 : ~chn4  : ~chn4  : B32 : 16 : ~chn5  : ~chn5  ;
+    board = ~seg1 : ~slice1 : std1 : B32 :  0 : ~chn4  : ~chn5  : B32 : 16 : ~chn5  : ~chn4  ;
+    board = ~seg2 : ~slice0 : std1 : B32 :  0 : ~chn8  : ~chn8  : B32 : 16 : ~chn9  : ~chn9  ;
+    board = ~seg2 : ~slice1 : std1 : B32 :  0 : ~chn8  : ~chn9  : B32 : 16 : ~chn9  : ~chn8  ;
+    board = ~seg3 : ~slice0 : std1 : B32 :  0 : ~chn12 : ~chn12 : B32 : 16 : ~chn13 : ~chn13 ;
+    board = ~seg3 : ~slice1 : std1 : B32 :  0 : ~chn12 : ~chn13 : B32 : 16 : ~chn13 : ~chn12 ;
+    cross_pol_chan_pair = ~chn0  : ~chn1  ;           *defines cross-polarized channel pairs
+    cross_pol_chan_pair = ~chn4  : ~chn5  ;
+    cross_pol_chan_pair = ~chn8  : ~chn9  ;
+    cross_pol_chan_pair = ~chn12 : ~chn13 ;
+  enddef;
+*
+  def B32-16;               *11 stations max, 32 lags, 16 chans/stn
+  *        ------board-----    bd   sect  strt   SU       SU     sect  strt   SU       SU
+  *        segment   slice   parms  mode  chip  chan     chan    mode  chip  chan     chan
+  *                                             (ref)    (rem)               (ref)    (rem)
+    board = ~seg0 : ~slice0 : std1 : B32 :  0 : ~chn0  : ~chn0  : B32 : 16 : ~chn1  : ~chn1  ;
+    board = ~seg0 : ~slice1 : std1 : B32 :  0 : ~chn2  : ~chn2  : B32 : 16 : ~chn3  : ~chn3  ;
+    board = ~seg1 : ~slice0 : std1 : B32 :  0 : ~chn4  : ~chn4  : B32 : 16 : ~chn5  : ~chn5  ;
+    board = ~seg1 : ~slice1 : std1 : B32 :  0 : ~chn6  : ~chn6  : B32 : 16 : ~chn7  : ~chn7  ;
+    board = ~seg2 : ~slice0 : std1 : B32 :  0 : ~chn8  : ~chn8  : B32 : 16 : ~chn9  : ~chn9  ;
+    board = ~seg2 : ~slice1 : std1 : B32 :  0 : ~chn10 : ~chn10 : B32 : 16 : ~chn11 : ~chn11 ;
+    board = ~seg3 : ~slice0 : std1 : B32 :  0 : ~chn12 : ~chn12 : B32 : 16 : ~chn13 : ~chn13 ; 
+    board = ~seg3 : ~slice1 : std1 : B32 :  0 : ~chn14 : ~chn14 : B32 : 16 : ~chn15 : ~chn15 ; 
+  enddef;
+*
+
+  def B64-4CP;               *8 stations max, 64 lags, 4 LCP/RCP chan-pairs/stn
+  *        ------board-----    bd   sect  strt   SU       SU     sect  strt   SU       SU
+  *        segment   slice   parms  mode  chip  chan     chan    mode  chip  chan     chan
+  *                                             (ref)    (rem)               (ref)    (rem)
+    board = ~seg0 : ~slice0 : std1 : B64 :  0 : ~chn0  : ~chn0  : B64 : 16 : ~chn1  : ~chn1  ;
+    board = ~seg0 : ~slice1 : std1 : B64 :  0 : ~chn0  : ~chn1  : B64 : 16 : ~chn1  : ~chn0  ;
+    board = ~seg1 : ~slice0 : std1 : B64 :  0 : ~chn4  : ~chn4  : B64 : 16 : ~chn5  : ~chn5  ;
+    board = ~seg1 : ~slice1 : std1 : B64 :  0 : ~chn4  : ~chn5  : B64 : 16 : ~chn5  : ~chn4  ;
+    board = ~seg2 : ~slice0 : std1 : B64 :  0 : ~chn8  : ~chn8  : B64 : 16 : ~chn9  : ~chn9  ;
+    board = ~seg2 : ~slice1 : std1 : B64 :  0 : ~chn8  : ~chn9  : B64 : 16 : ~chn9  : ~chn8  ;
+    board = ~seg3 : ~slice0 : std1 : B64 :  0 : ~chn12 : ~chn12 : B64 : 16 : ~chn13 : ~chn13 ;
+    board = ~seg3 : ~slice1 : std1 : B64 :  0 : ~chn12 : ~chn13 : B64 : 16 : ~chn13 : ~chn12 ;
+    cross_pol_chan_pair = ~chn0  : ~chn1  ;
+    cross_pol_chan_pair = ~chn4  : ~chn5  ;
+    cross_pol_chan_pair = ~chn8  : ~chn9  ;
+    cross_pol_chan_pair = ~chn12 : ~chn13 ;
+  enddef;
+*
+  def B64-16;                *8 stations max, 64 lags, 16 chans/stn
+  *        ------board-----    bd   sect  strt   SU       SU     sect  strt   SU       SU
+  *        segment   slice   parms  mode  chip  chan     chan    mode  chip  chan     chan
+  *                                             (ref)    (rem)               (ref)    (rem)
+    board = ~seg0 : ~slice0 : std1 : B64 :  0 : ~chn0  : ~chn0  : B64 : 16 : ~chn1  : ~chn1  ;
+    board = ~seg0 : ~slice1 : std1 : B64 :  0 : ~chn2  : ~chn2  : B64 : 16 : ~chn3  : ~chn3  ;
+    board = ~seg1 : ~slice0 : std1 : B64 :  0 : ~chn4  : ~chn4  : B64 : 16 : ~chn5  : ~chn5  ;
+    board = ~seg1 : ~slice1 : std1 : B64 :  0 : ~chn6  : ~chn6  : B64 : 16 : ~chn7  : ~chn7  ;
+    board = ~seg2 : ~slice0 : std1 : B64 :  0 : ~chn8  : ~chn8  : B64 : 16 : ~chn9  : ~chn9  ;
+    board = ~seg2 : ~slice1 : std1 : B64 :  0 : ~chn10 : ~chn10 : B64 : 16 : ~chn11 : ~chn11 ;
+    board = ~seg3 : ~slice0 : std1 : B64 :  0 : ~chn12 : ~chn12 : B64 : 16 : ~chn13 : ~chn13 ;
+    board = ~seg3 : ~slice1 : std1 : B64 :  0 : ~chn14 : ~chn14 : B64 : 16 : ~chn15 : ~chn15 ;
+  enddef;
+*
+  def C32-1;                *8 stations max, 32 lags, 1 chan/stn
+  *        ------board-----    bd   sect  strt   SU       SU    
+  *        segment   slice   parms  mode  chip  chan     chan   
+  *                                             (ref)    (rem)      
+    board = ~seg0 : ~slice0 : std1 : C32A:  0 : ~chn0  : ~chn0  ;
+  enddef;
+*  
+  def C32-4;                *8 stations max, 32 lags, 4 chans/stn
+  *        ------board-----    bd   sect  strt   SU       SU     sect  strt   SU       SU
+  *        segment   slice   parms  mode  chip  chan     chan    mode  chip  chan     chan
+  *                                             (ref)    (rem)               (ref)    (rem)
+    board = ~seg0 : ~slice0 : std1 : C32 :  0 : ~chn0  : ~chn0  : C32 :  8 : ~chn1  : ~chn1  :
+                                     C32 : 16 : ~chn2  : ~chn2  : C32 : 24 : ~chn3  : ~chn3  ;
+  enddef;
+*
+  def C32-16;               *8 stations max, 32 lags, 16 chans/stn
+  *        ------board-----    bd   sect  strt   SU       SU     sect  strt   SU       SU
+  *        segment   slice   parms  mode  chip  chan     chan    mode  chip  chan     chan
+  *                                             (ref)    (rem)               (ref)    (rem)
+    board = ~seg0 : ~slice0 : std1 : C32 :  0 : ~chn0  : ~chn0  : C32 :  8 : ~chn1  : ~chn1  :
+                                     C32 : 16 : ~chn2  : ~chn2  : C32 : 24 : ~chn3  : ~chn3  ;
+    board = ~seg1 : ~slice0 : std1 : C32 :  0 : ~chn4  : ~chn4  : C32 :  8 : ~chn5  : ~chn5  :
+                                     C32 : 16 : ~chn6  : ~chn6  : C32 : 24 : ~chn7  : ~chn7  ;
+    board = ~seg2 : ~slice0 : std1 : C32 :  0 : ~chn8  : ~chn8  : C32 : 15 : ~chn9  : ~chn9  :
+                                     C32 : 16 : ~chn10 : ~chn10 : C32 : 24 : ~chn11 : ~chn11 ;
+    board = ~seg3 : ~slice0 : std1 : C32 :  0 : ~chn12 : ~chn12 : C32 : 15 : ~chn13 : ~chn13 : 
+                                     C32 : 16 : ~chn14 : ~chn14 : C32 : 24 : ~chn15 : ~chn15 ; 
+  enddef;
+*
+*-----------------------------------------------------------------------------------------------
+$CORR_BD_PARMS;
+*-----------------------------------------------------------------------------------------------
+*
+*Specifies board-wide correlation parameters
+*
+  def std1;
+  *
+    accum_divide_ratio =   1   ;            *wrt SU data rate
+  *
+  *                       Over   Over
+  *                       BOCF   Data
+    shsmp_divide_ratio =   1   :  1  ;      *wrt SU data rate
+  *
+    sample_count_per_lag_enable = on  ;
+  *
+  enddef;
+*
+*-----------------------------------------------------------------------------------------------
+$CORR_SECTION_MODE;
+*-----------------------------------------------------------------------------------------------
+*
+*Notes:
+* 1. Null fields in 'chip input' parameters indicate unused input or cascade to/from
+*    adjacent chip.
+* 2. The first field in the 'chip=' statement is a reference to the appropriate
+*    $CORR_CHIP_MODE keyword.
+*
+  def B64;
+*                rel   -----------chip inputs-----------
+*               chip#  --X0--   --X1--   --X2--   --X3--
+*   Chip mode B9 : X0/X3, X1/X2 cross
+    chip = B9  :  0  : ~stn0  : ~stn1  : ~stn2  : ~stn1  ;
+    chip = B9  :  1  : ~stn0  : ~stn1  : ~stn3  : ~stn2  ;
+    chip = B9  :  2  : ~stn0  : ~stn1  : ~stn4  : ~stn3  ;
+    chip = B9  :  3  : ~stn0  : ~stn1  : ~stn5  : ~stn4  ;
+    chip = B9  :  4  : ~stn0  : ~stn1  : ~stn6  : ~stn5  ;
+    chip = B9  :  5  : ~stn0  : ~stn1  : ~stn7  : ~stn6  ;
+    chip = B9  :  6  : ~stn2  : ~stn3  : ~stn4  : ~stn3  ;
+    chip = B9  :  7  : ~stn2  : ~stn3  : ~stn5  : ~stn4  ;
+    chip = B9  :  8  : ~stn2  : ~stn3  : ~stn6  : ~stn5  ;
+    chip = B9  :  9  : ~stn2  : ~stn3  : ~stn7  : ~stn6  ;
+    chip = B9  : 10  : ~stn4  : ~stn5  : ~stn6  : ~stn5  ;
+    chip = B9  : 11  : ~stn4  : ~stn5  : ~stn7  : ~stn6  ;
+*   Chip mode B15: X0/X3 cross; X1,X2 auto
+    chip = B15 : 12  : ~stn0  : ~stn0  : ~stn1  : ~stn7  ;
+    chip = B15 : 13  : ~stn2  : ~stn2  : ~stn3  : ~stn7  ;
+    chip = B15 : 14  : ~stn4  : ~stn4  : ~stn5  : ~stn7  ;
+    chip = B15 : 15  : ~stn6  : ~stn6  : ~stn7  : ~stn7  ;
+  enddef;
+*
+  def B32;
+*                rel   -----------chip inputs-----------
+*               chip#  --X0--   --X1--   --X2--   --X3--
+*   Chip mode B7: X0/X2, X0/X3, X1/X2, X1/X3 cross
+    chip = B7  :  0  : ~stn0  : ~stn1  : ~stn3  : ~stn4  ;
+    chip = B7  :  1  : ~stn0  : ~stn1  : ~stn5  : ~stn6  ;
+    chip = B7  :  2  : ~stn0  : ~stn1  : ~stn7  : ~stn8  ;
+    chip = B7  :  3  : ~stn0  : ~stn1  : ~stn9  : ~stn10 ;
+    chip = B7  :  4  : ~stn2  : ~stn3  : ~stn5  : ~stn6  ;
+    chip = B7  :  5  : ~stn2  : ~stn3  : ~stn7  : ~stn8  ;
+    chip = B7  :  6  : ~stn2  : ~stn3  : ~stn9  : ~stn10 ;
+    chip = B7  :  7  : ~stn4  : ~stn5  : ~stn7  : ~stn8  ;
+    chip = B7  :  8  : ~stn4  : ~stn5  : ~stn9  : ~stn10 ;
+    chip = B7  :  9  : ~stn6  : ~stn7  : ~stn9  : ~stn10 ;
+*   Chip mode H1: X0/X1, X0/X2, X1/X2 cross; X1,X3 auto
+    chip = H1  : 10  : ~stn0  : ~stn1  : ~stn2  : ~stn0  ;
+    chip = H1  : 11  : ~stn2  : ~stn3  : ~stn4  : ~stn2  ;
+    chip = H1  : 12  : ~stn4  : ~stn5  : ~stn6  : ~stn4  ;
+    chip = H1  : 13  : ~stn6  : ~stn7  : ~stn8  : ~stn6  ;
+    chip = H1  : 14  : ~stn8  : ~stn9  : ~stn10 : ~stn8  ;
+    chip = H1  : 15  :        :        :        : ~stn10 ;
+  enddef;
+*
+  def C32;
+*                rel   -----------chip inputs-----------
+*               chip#  --X0--   --X1--   --X2--   --X3--
+*   Chip mode B7: X0/X2, X0/X3, X1/X2, X1/X3 cross
+    chip = B7  :  0  : ~stn0  : ~stn1  : ~stn2  : ~stn3  ;
+    chip = B7  :  1  : ~stn0  : ~stn1  : ~stn4  : ~stn5  ;
+    chip = B7  :  2  : ~stn0  : ~stn1  : ~stn6  : ~stn7  ;
+    chip = B7  :  3  : ~stn2  : ~stn3  : ~stn4  : ~stn5  ;
+    chip = B7  :  4  : ~stn2  : ~stn3  : ~stn6  : ~stn7  ;
+    chip = B7  :  5  : ~stn4  : ~stn5  : ~stn6  : ~stn7  ;
+*   Chip mode B13: X0/X3, X1/X2 cross; X0,X1,X2,X3 auto
+    chip = B13 :  6  : ~stn0  : ~stn2  : ~stn3  : ~stn1  ;
+    chip = B13 :  7  : ~stn4  : ~stn6  : ~stn7  : ~stn5  ;
+  enddef;
+*
+  def C32A;
+*   Chip mode B13: X0/X3, X1/X2 cross; X0,X1,X2,X3 auto
+    chip = B13A:  6  : ~stn0  :        :        : ~stn1  ;
+  enddef;
+*
+*-----------------------------------------------------------------------------------------------
+$CORR_CHIP_MODE;
+*-----------------------------------------------------------------------------------------------
+*
+*Note: The first field in the 'block=' statement is a reference to the relevant 
+*      $CORR_BLOCK_MODE keyword.
+*
+  def B7;
+  *                     -mux settings-
+  *                blk  M0  M1  M2  M3
+    block = CHEAD : A0 : 0 : 3 : 0 : 3 ;
+    block = CHEAD : A1 : 0 : 3 : 0 : 4 ;
+    block = CHEAD : A2 : 0 : 3 : 0 : 3 ;
+    block = CHEAD : A3 : 0 : 3 : 0 : 4 ;
+    block = CTAIL : B0 : 0 : 3 : 0 : 3 ;
+    block = CTAIL : B1 : 0 : 5 : 0 : 4 ;
+    block = CTAIL : B2 : 0 : 3 : 0 : 3 ;
+    block = CTAIL : B3 : 0 : 5 : 0 : 4 ;
+  *
+  *          type     ref  rem ----snake----------------
+    snake = complex : X0 : X3 : A0l-: B2l;
+    snake = complex : X0 : X2 : A1l-: B3l;
+    snake = complex : X1 : X2 : A2l-: B0l;
+    snake = complex : X1 : X3 : A3l-: B1l;
+  enddef;
+  *
+    def B9 ;
+  *                     -mux settings-
+  *                blk  M0  M1  M2  M3
+    block = CHEAD : A0 : 0 : 4 : 0 : 2 ;
+    block = CMID  : A1 : 1 : 3 : 2 : 4 ;
+    block = CHEAD : A2 : 0 : 4 : 0 : 2 ;
+    block = CMID  : A3 : 1 : 3 : 2 : 4 ;
+    block = CTAIL : B0 : 0 : 4 : 0 : 2 ;
+    block = CMID  : B1 : 1 : 5 : 2 : 4 ;
+    block = CTAIL : B2 : 0 : 4 : 0 : 2 ;
+    block = CMID  : B3 : 1 : 5 : 2 : 4 ;
+  *
+  *          type     ref  rem ----snake----------------
+    snake = complex : X0 : X3 : A0l-: A1r-: B3r: B2l;
+    snake = complex : X1 : X2 : A2l-: A3r-: B1r: B0l;
+  enddef;
+  *
+  def B9_cascade;  *for cascade example only - not a useful mode
+  *                     -mux settings-
+  *                blk  M0  M1  M2  M3
+    block = CHEAD : A0 : 0 : 4 : 0 : 2 ;
+    block = CMID  : A1 : 1 : 3 : 2 : 4 ;
+    block = CHEAD : A2 : 0 : 4 : 0 : 2 ;
+    block = CMID  : A3 : 1 : 3 : 2 : 4 ;
+    block = CTAIL : B0 : 0 : 4 : 0 : 2 ;
+    block = CMID  : B1 : 1 : 3 : 2 : 4 ;
+    block = CTAIL : B2 : 0 : 4 : 0 : 2 ;
+    block = CMID  : B3 : 1 : 5 : 2 : 4 ;
+  *
+  *          type     ref  rem ----snake----------------
+    snake = complex : X0 :    : A0l: A1r: B3r: B2l:+A0l; *cascade to A0 on next chip
+    snake = complex :    : X2 :+B2r: A2l: A3r: B1r: B0l; *cascade from B2 on previous chip
+  enddef;
+*
+  def B13;
+  *                     -mux settings-
+  *                blk  M0  M1  M2  M3
+    block = CHEAD : A0 : 0 : 3 : 0 : 3 ;
+    block = AUTO  : A1 : 0 : 2 : 1 : 1 ;
+    block = CHEAD : A2 : 0 : 3 : 0 : 3 ;
+    block = AUTO  : A3 : 0 : 2 : 1 : 1 ;
+    block = CTAIL : B0 : 0 : 3 : 0 : 3 ;
+    block = AUTO  : B1 : 0 : 2 : 1 : 1 ;
+    block = CTAIL : B2 : 0 : 3 : 0 : 3 ;
+    block = AUTO  : B3 : 0 : 2 : 1 : 1 ;
+  *
+  *          type     ref  rem  ----snake----------------
+    snake = complex : X0 : X3 : A0l-: B2l;
+    snake = complex : X1 : X2 : A2l-: B0l;
+    snake = auto    : X0 :    : A1r : A1l;
+    snake = auto    : X1 :    : A3r : A3l;
+    snake = auto    : X2 :    : B3r : B3l;
+    snake = auto    : X3 :    : B1r : B1l;
+   enddef;
+*
+  def B13A;
+  *                     -mux settings-
+  *                blk  M0  M1  M2  M3
+    block = CHEAD : A0 : 0 : 3 : 0 : 3 ;
+    block = AUTO  : A1 : 0 : 2 : 1 : 1 ;
+    block = CHEAD : A2 : 0 : 3 : 0 : 3 ;
+    block = AUTO  : A3 : 0 : 2 : 1 : 1 ;
+    block = CTAIL : B0 : 0 : 3 : 0 : 3 ;
+    block = AUTO  : B1 : 0 : 2 : 1 : 1 ;
+    block = CTAIL : B2 : 0 : 3 : 0 : 3 ;
+    block = AUTO  : B3 : 0 : 2 : 1 : 1 ;
+  *
+  *          type     ref  rem  ----snake----------------
+    snake = complex : X0 : X3 : A0l-: B2l;
+  enddef;
+*
+  def B15;
+  *                     -mux settings-
+  *                blk  M0  M1  M2  M3
+    block = CHEAD : A0 : 0 : 4 : 0 : 2 ;
+    block = CMID  : A1 : 1 : 3 : 2 : 4 ;
+    block = AUTO  : A2 : 0 : 2 : 1 : 2 ;
+    block = AUTO  : A3 : 1 : 2 : 1 : 1 ;
+    block = AUTO  : B0 : 0 : 2 : 1 : 2 ;
+    block = AUTO  : B1 : 1 : 2 : 1 : 1 ;
+    block = CTAIL : B2 : 0 : 4 : 0 : 2 ;
+    block = CMID  : B3 : 1 : 5 : 2 : 4 ;
+ *
+  *          type     ref  rem  ----snake----------------
+    snake = complex : X0 : X3 : A0l-: A1r-: B3r: B2l;
+    snake = auto    : X1 :    : A3r : A3l : A2r: A2l;
+    snake = auto    : X2 :    : B1r : B1l : B0r: B0l;  
+  enddef;
+  *
+  def H1;
+  *                     -mux settings-
+  *                blk  M0  M1  M2  M3
+    block = CHEAD : A0 : 0 : 3 : 0 : 3 ;
+    block = CHEAD : A1 : 0 : 3 : 0 : 4 ;
+    block = CHEAD : A2 : 0 : 3 : 0 : 3 ;
+    block = AUTO  : A3 : 0 : 2 : 1 : 1 ;
+    block = CTAIL : B0 : 0 : 3 : 0 : 3 ;
+    block = AUTO  : B1 : 0 : 2 : 1 : 1 ;
+    block = CTAIL : B2 : 3 : 3 : 0 : 3 ;
+    block = CTAIL : B3 : 0 : 5 : 0 : 4 ;
+  *
+  *          type     ref  rem ----snake----------------
+    snake = complex : X0 : X1 : A0l-: B2l;
+    snake = complex : X0 : X2 : A1l-: B3l;
+    snake = complex : X1 : X2 : A2l-: B0l;
+    snake = auto    : X1 :    : A3r : A3l;
+    snake = auto    : X3 :    : B1r : B1l;
+  enddef;
+*
+*-----------------------------------------------------------------------------------------------
+$CORR_BLOCK_MODE;
+*-----------------------------------------------------------------------------------------------
+*
+  def CHEAD;
+  *                l_cell r_cell
+    rotator_mode =    3  :  3  ;        *multiply data by sinusoid
+    xdelay =          0  :  0  ;        *xdelay=0
+    ydelay =          0  :  0  ;        *ydelay=0
+    tap_motion_enable =     0  ;        *disable tap motion; lock to zero delay
+    header_mode =           1  ;        *force sample data invalid during header
+    invalid_on_tap_motion = 1  ;        *invalidate data on tap motion
+  enddef;
+*
+  def CMID;
+  *                  l_cell r_cell
+    rotator_mode =     0   :  0   ;
+    xdelay =           0   :  0   ;
+    ydelay =           0   :  0   ;
+    tap_motion_enable =       0   ;
+    header_mode =             0   ; 
+    invalid_on_tap_motion =   0   ;
+   *rotator_mode = 0|1|2|3 : 0|1|2|3 ;
+   *xdelay =           0|1 : 0|1  ;
+   *ydelay =           0|1 : 0|1  ;
+   *tap_motion_enable =       0|1 ;
+   *header_mode =         0|1|2|3 ; 
+   *invalid_on_tap_motion =   0|1 ;
+enddef;
+*
+  def CTAIL;
+  *               l_cell r_cell
+    rotator_mode =   0  :   0  ;        *pass data samples thru unchanged
+    xdelay =         0  :   0  ;        *xdelay=0
+    ydelay =         1  :   1  ;        *ydelay=1
+    tap_motion_enable =     1  ;        *enable tap motion
+    header_mode =           1  ;        *force sample data invalid during header
+    invalid_on_tap_motion = 1  ;        *invalidate data on tap motion
+  enddef;
+*
+  def AUTO;
+  *                l_cell r_cell
+    rotator_mode =   0   :  0  ;        *pass data samples thru unchanged
+    xdelay =         0   :  0  ;        *xdelay=0
+    ydelay =         0   :  1  ;        *ydelay=0 on left; ydelay=0 on right
+    tap_motion_enable =     0  ;        *disable tap motion; lock to zero delay
+    header_mode =           1  ;        *force sample data invalid during header
+    invalid_on_tap_motion = 0  ;        *irrelevant (no tap motion)
+  enddef;

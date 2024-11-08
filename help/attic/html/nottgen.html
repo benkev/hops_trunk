@@ -1,0 +1,112 @@
+<HTML>
+<HEAD>
+<META NAME="Generator" CONTENT="Corel WordPerfect 8">
+<TITLE></TITLE>
+</HEAD>
+<BODY TEXT="#000000" LINK="#0000FF" VLINK="#551A8B" ALINK="#FF0000" BGCOLOR="#C0C0C0">
+
+<P><CENTER><STRONG>Composer</STRONG></CENTER>
+</P>
+
+<BR WP="BR1"><BR WP="BR2">
+<P>	<STRONG>Composer</STRONG> is a shell script that calls <STRONG>tgen</STRONG>, described below. 
+Operation of <STRONG>composer</STRONG> is intended to be self-explanatory.  It
+asks questions about the parameters needed to run <STRONG>tgen</STRONG> and puts
+the answers on the command line to <STRONG>tgen</STRONG>.  Here is an example of a
+typical <STRONG>composer</STRONG> dialog.  Answers typed by the user are
+<U>underlined</U>: </P>
+
+<BR WP="BR1"><BR WP="BR2">
+<P>This composer script runs tgen to read vex files and write a task </P>
+
+<P>(tsf) file for opera to send to conductor.  For each question, </P>
+
+<P>just Enter or Return to keep defaults. </P>
+
+<P>Experiment code (in global.evex) is 2611_std, change to: <U>2600_std</U></P>
+
+<P>Correlator mode key defaults from evex, change to:  </P>
+
+<P>Number of useable tape drives is 6, change to:  </P>
+
+<P>Station list is a string of one-letter station codes with no spaces.</P>
+
+<P>Station list defaults to all in ovex, change to: <U>CXDBF</U></P>
+
+<P>Following times are in the format ddd-hh:mm:ss. </P>
+
+<P>Start time defaults to start of ovex, change to: <U>303-19:40:00</U></P>
+
+<P>End time defaults to end of ovex, change to: <U>303-20:21:00</U></P>
+
+<P>Use Lvex (Y or N) is Y, change to:  </P>
+
+<P>The output file will be created or, if it exists, appended. </P>
+
+<P>Output file (in directory $TASK) is mytask, change to: <U>2600_proc</U></P>
+
+<P>  I changed that to 2600_proc.tsf </P>
+
+<P>If this is all OK, just Enter or Return.  Or to fix (correct) </P>
+
+<P>  any of your entries, type F; to abort, type ^C (Ctrl C): </P>
+
+<P>Tgen will write to file $TASK/2600_proc.tsf = 
+
+	/correlator/task/2600_proc.tsf </P>
+
+<P>composer starting tgen, be patient ... </P>
+
+<BR WP="BR1"><BR WP="BR2">
+<P><CENTER><STRONG>Tgen</STRONG></CENTER>
+</P>
+
+<BR WP="BR1"><BR WP="BR2">
+<P>	<STRONG>Tgen</STRONG> is ready for alpha testing.  <STRONG>Tgen</STRONG>, normally called from
+<STRONG>composer</STRONG>, reads ovex and lvex files and generates task files to
+be sent to <STRONG>conductor</STRONG> for correlation.  <STRONG>Tgen</STRONG> has some known
+inefficiencies (e.g., it's sometimes very slow, and it doesn't
+always minimize tape changes) but no known obvious errors.  It
+does not yet know how to do subnetting.  (Later versions will
+read also reprocess lists (a-file format) to make reprocess task
+files.  Meanwhile, see <STRONG>a2t</STRONG> for reprocessing.)</P>
+
+<BR WP="BR1"><BR WP="BR2">
+<P>	Please try <STRONG>tgen</STRONG> and tell us about errors or shortcomings. 
+To run <STRONG>tgen</STRONG> without <STRONG>composer</STRONG>, try: </P>
+
+<BR WP="BR1"><BR WP="BR2">
+<P>	<STRONG>tgen</STRONG>	<EM>experiment_name (from $SYSVEX/global.evex)</EM>  \</P>
+
+<P>		<EM>mode_key (from evex)</EM>  \</P>
+
+<P>		<EM>number_of_active_SUs</EM>  \</P>
+
+<P>		<EM>station_list</EM>  \</P>
+
+<P>		<EM>start_time(ddd-hh:mm:ss)</EM>  \</P>
+
+<P>		<EM>end_time(ddd-hh:mm:ss)</EM>  \</P>
+
+<P>		<EM>use_lvex (Y or N)</EM>  \</P>
+
+<P>		&gt;  <EM>output_file_name</EM> </P>
+
+<BR WP="BR1"><BR WP="BR2">
+<P>All the arguments are optional: <EM>experiment_file_name</EM> defaults to
+2611_std; <EM>mode_key</EM>, the correlator mode, defaults to just a
+comment in the task file, which tells conductor to read the
+default from evex; <EM>number_of_active_SUs</EM> (number of usable tape
+drives) defaults to 6, <EM>station_list</EM> (no spaces, order is
+significant) defaults to all stations, <EM>start_time</EM> defaults to
+zero, <EM>end_time</EM> defaults to end of the year, and <EM>use_lvex</EM> defaults
+to Y (yes).  A dot (.) acts as a placeholder, if necessary, to
+preserve the defaults for any previous arguments.  The
+<EM>output_file_name</EM> should end in .tsf and be put into $TASK.</P>
+
+<BR WP="BR1"><BR WP="BR2">
+<BR WP="BR1"><BR WP="BR2">
+<P>	Revised:  2001 January 26, JAB</P>
+
+</BODY>
+</HTML>

@@ -1,0 +1,252 @@
+                           -------- Opera Help --------
+
+---- General ---- 
+
+     In most cases, gray and other colored areas show information 
+for the operator, white areas allow operator interaction and 
+commands.  Click on any traffic light to get a frame with more 
+information.  Right click on any extra frame to make it go away.
+
+
+---- "Initialize" ---- 
+
+     The "Initialize" button makes a frame showing a list of 
+available ivex key names to be used to initialize the correlator 
+hardware.  Left click on the appropriate key name to transfer it
+to the active (white) box at the top.  Or double left click on 
+the appropriate key name to transfer it and also send it, with 
+default correlator and station-unit initialization, to Conductor.
+Or left click in this top box and type an ivex key name.  
+
+     The buttons down the left side of this frame refer to 
+the correlator (C) and station units to be initialized:  Colored 
+and depressed means to initialize.  Left click on any button to 
+change its state.  Return or Enter in the top white box to send 
+all this to Conductor.
+
+     Right click in this "Initialize Ivex" frame to close it.  
+Click again on "Initialize" to resurrect it.
+
+
+---- "Station Units" ---- 
+
+     The traffic lights under "Station Units" show the status of
+the numbered station units and their tape drives.  All dark means
+that the tape drive is powered off, disconnected, nonexistent, or
+not initialized.  A red light means some error such as unable to 
+carry out the last command.  Yellow means no tape mounted or no 
+vacuum, which prevents tape motion.  Green means that the tape 
+is moving or able to move.  On the green light, > means moving 
+forward, < means moving in reverse, and | means stopped.  This 
+information is updated periodically.
+
+     Click on a "Station Units" traffic light, regardless of its
+color, to see a frame with more information about the
+corresponding tape drive.  This frame, labeled "Station Unit #"
+with # a number, also permits commanding the tape drive to
+perform certain operations.
+
+     In the "Station Unit #" frame, light-gray areas show
+information; white areas contain potential commands to the tape
+drive.  Values in boxes with ridges are periodically updated from
+the station unit.  Yellow areas show quantities that are
+temporarily in non-standard states.  Red shows errors.
+
+     The top lines of a "Station Unit #" frame contain error
+messages, if any, for this tape drive.  If a valid bar code is
+known, it will be in the box labeled "VSN:" for volume serial 
+number.  The same is true for the feet of tape on the upper and 
+lower reels, the commanded tape speed in inches/second (ips), 
+the tape footage counter, the pass number, the head position in 
+microns, and the response, if any, to the last manual command.
+
+     Command the tape speed within the permitted range (0 to 330
+ips) by typing into the "SetSpeed:" box.  A left mouse click in
+this box enables typing therein, and Return or Enter activates
+the command.  "Go to" works the same way to position the tape to
+a prescribed footage.
+
+     Control tape motion by left clicking the buttons in the next
+row.  Fast reverse ("<< FR") and fast forward ("FF >>") operate
+at maximum speed, 330 ips.  Play (either "< Play" or "Play >")
+operates at 135 ips or at whatever speed was last commanded in
+the "SetSpeed:" box.  "Unload" causes the tape to fast reverse to 
+the load position and spin off onto the source reel to allow the 
+operator to mount a different tape.  "Release" causes the tape 
+drive to drop vacuum at its present position.  Details about 
+tape-drive operation are documented elsewhere.
+
+     The slider offsets the head position with respect to its
+initial position, which was read when the traffic light was
+clicked to produce this "Station Unit #" frame.  Use the left
+mouse button to click and drag the slider, or left click in the
+gray area to move the slider by one micron per click, or click the
+center mouse button in the gray area to jump the slider to that 
+spot.  The "HeadPosition:" box is yellow while head motion is in
+progress or red if the head servo failed to position as commanded.
+
+     To try to recover from a problem, the "Refind" button sends a 
+reposition request to the station unit:  A single click on "Refind" 
+means reposition with respect to the original position; a double 
+click means with respect to the current position.  The "Peak" 
+button asks the tape drive to find the strongest signal within 
++|- 25.6 microns of the current head position. 
+
+     "Remove" causes this tape to be removed from processing 
+perhaps because it's faulty.  "Dismount" means a logical dismount, 
+which tells the Station Unit not to use this tape for the present. 
+Neither of these commands causes tape motion.  Do not confuse 
+these with "Unload" or "Release" above. 
+
+     Use the "Command:" box on the bottom line to send raw
+commands to the tape drive and observe the responses, if any. 
+These commands are documented elsewhere.
+
+     Right click in a "Station Unit #" frame to close it.  
+(If, instead, you ask your window manager to kill it, then it 
+will probably come back from the dead.)  Click again on the 
+corresponding traffic light to resurrect it.
+
+
+---- "Streams" ---- 
+
+     The traffic lights under "Streams" show the status of the
+corresponding correlator task-streams or streams of tasks.  All
+dark means that this stream is nonexistent or inactive.  A red
+light means some error such as unable to carry out the last
+command.  Yellow means holding or waiting for resources. 
+Green means everything is OK as far as Opera can tell.
+
+     Click on a "Streams" traffic light, regardless of its color,
+to show a frame with more information about the corresponding
+stream.
+
+     Under the "Streams" traffic lights, the first row shows a 
+numerical status, which is translated into words in the bottom 
+box of each stream's frame.  The second row shows the stream's 
+priority with 1 highest.  Double click on a stream's traffic 
+light to promote this stream to first priority.
+
+     The frames for streams 1, 2, and 3 start with lists of
+available task-stream files (tsf) that could be used to start the 
+stream.  To do this, first left click on the appropriate file 
+name to transfer it, with its path, to the top (white) box in 
+this frame.  Alternatively, type a file name into this box.
+Then click "Open" to see the contents of this file, or click 
+"Start" to send this file name and this command to Conductor 
+with a starting line number, if any, set in advance by a left
+mouse click and emphasized in darker gray.
+
+     As the stream starts, in either case, this box shows a 
+listing of the active task-stream file with the currently 
+executing line emphasized in yellow.  The "Open" and "Start" 
+buttons are replaced by a "Details" button, which brings up 
+a Details frame (described below) showing only the SUs active 
+for this stream.  The "Hold," "Break," "Resume," and "End" 
+buttons send these commands to Conductor.  The "Resume" 
+command includes also a line number, if any, set in advance 
+by a left mouse click. 
+
+     Right click in a "Stream #" frame to close it.  Click
+again on the corresponding traffic light to resurrect it.
+
+     The "Operator Stream" frame for stream 0 is a special case: 
+It contains a mini-editor for a task file, opera.tsf, which can be 
+edited and then submitted to Conductor with the "Save & Start"
+button.  Left mouse click in this text box to enable typing and
+editing therein.  This mini-editor does not save automatically: 
+If you close the program or this frame without saving, you'll 
+lose your work.  Right click in this "Operator Stream" frame to 
+iconify it without losing your work; click again on the "O" 
+traffic light to resuscitate it.
+
+
+---- "Details" ---- 
+
+     A single click on the "Details" button makes a frame showing 
+additional information about each station unit and data channels 
+to the correlator including their validity and status.  The column 
+headings are: 
+      SU = Station unit or tape-drive number, 0 to 15 
+      SA = Station letter code 
+      SR = Stream number, 0 to 3 
+      CH = Channel number, 0 to 15 
+      CN = Channel name 
+      VA = Validity of channel coded as a color 
+Below the SU, SA, and SR numbers is an SU status that is one of: 
+Initialized, Configured, TapeMounted, Pos'ingTape, PeakingHeads, 
+ValidVSN, FindingTOT, NoGoodTOT, FoundTOT, Syncing, 
+Synced, and ScanDone.  Under these is the pass, the station unit's 
+TOT and a recent ROT, and the stream's ROT, all converted to 
+ddd|hh:mm:ss format for easy comparison. 
+
+     The channel validity (VA) is color coded as follows:  Dark 
+means inactive, not in use, or no data available, yellow means not 
+synced, green means synced, red means under repair (i.e., broken) 
+or delay buffer overrun, and blue means mixed track status.  These 
+data are all updated periodically.
+
+     Right click in a "Details" frame to close it.
+
+     A double left click on the "Details" button that is between 
+the traffic lights brings up also a "Status at Correlator" frame, 
+which summarizes errors detected at the correlator.  Each row 
+in this tabulation represents a single baseline channel or snake 
+labeled by the two station units and the channel.  From left to right, 
+the colored boxes represent errors detected in:  the station-unit 
+identification, the channel identification, the correlator-frame 
+number, the check sum, the input board link, and the input board 
+synchronization.  (These last two will be common among the four 
+channels of a channel group.)  Following the boxes for the second 
+station unit of the baseline are four more colored boxes showing 
+head tap past end, head tap three carries, tail tap past end, and 
+tail tap three carries.  These last four are actual correlation 
+errors.  These errors are color coded as follows:  Dark means 
+unknown or not in use, green means less than 1% error rate, yellow 
+means 1% to 10% error rate, and red means more than 10% errors.  
+When the correlator is actually in use, these data are all updated 
+periodically. 
+
+     Right click in the "Status at Correlator" frame to close it.
+
+
+---- "ERRORS!" ---- 
+
+     Whenever Opera receives an error message, a frame labeled 
+"ERRORS!" appears or reappears.  Each line of text in this frame 
+represents one received error message with its error number, the
+program that sent the message, and the message text.  Left click
+on a line in this frame to spawn netscape, if necessary, with a 
+multiline description with more details about the error. 
+
+     Click "Bummer!" or right click in this frame to iconify it. 
+
+
+---- Logging ---- 
+
+     A separate program, not actually part of Opera, provides 
+message logging.  From your window manager, get an xterm or 
+hpterm to be used only for logging.  In this term, run the csh 
+script largo.  This script first edits the message alias file, 
+MesAlias, to append LOG@ to all active lines, which causes a 
+copy to be sent to LOG of all messages that are sent to aliases
+in this alias file.  Then largo starts the Log (LOG) program, 
+which sends a one-line note to the screen and to the log file 
+$TMP/mlog for each message that it receives.  Log also sends
+a copy of the whole message (binary) to the binary log file 
+$TMP/blog.  The last (hex) number on each line in the mlog 
+file is the byte offset from the start of the blog file to the 
+start of the corresponding binary message therein.
+
+     Note that Log does not receive and cannot log any messages 
+that are sent directly, that is without using an alias.
+
+     To terminate logging, ^C (Ctrl-C) or whatever your term uses 
+for interrupt in the log window.  The largo script then terminates 
+Log and restores the alias file.  Whenever you restart the largo 
+script, any previous contents of mlog and blog are saved in 
+mlog.bak and blog.bak, but only once.
+
+
+                                    Revised:  1999 November 22, JAB
+

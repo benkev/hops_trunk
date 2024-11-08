@@ -1,0 +1,123 @@
+#!/usr/local/bin/tcsh
+#
+# This script semi-automates the updating of the "export" version
+# of hops from the "development" version in /correlator/prog.
+# It must reflect the current state of HOPS, so will have to be
+# edited for each new version.  This is less work than doing it
+# all manually, though!
+#
+
+set sources=("correlator/age"\
+	   "correlator/ddstat"\
+	   "correlator/mk4root"\
+	   "progutil/modformat"\
+	   "postproc/adump"\
+	   "postproc/aedit"\
+	   "postproc/alist"\
+	   "postproc/atofits"\
+	   "postproc/average"\
+	   "postproc/bispec"\
+	   "postproc/calamp"\
+	   "postproc/cdump"\
+	   "postproc/cofit"\
+	   "postproc/coterp"\
+	   "postproc/fixvlba"\
+	   "postproc/fold"\
+	   "postproc/fourfit"\
+	   "postproc/fplot"\
+	   "postproc/fringex"\
+	   "postproc/linkdata"\
+	   "postproc/pratio"\
+	   "postproc/rename"\
+	   "postproc/root_crunch"\
+	   "postproc/search"\
+	   "postproc/unix_to_ci"\
+           "sub/afio"\
+	   "sub/bfio"\
+	   "sub/ccfio"\
+	   "sub/util"\
+	   "postproc/sub/x_fplot"\
+	   "include")
+
+set shscripts=("archive" "dribble" "drool" "efind" "env_check"\
+               "goddard_export" "goddard_plots" "mod" "monitor"\
+               "rdplot" "regplot" "retrieve" "vhelp" "vlbaplot"\
+               "wideplot" "fplot_print" "aedit_plot")
+set awkscripts=("vhelp1.awk" "vhelp2.awk")
+set aedit_scripts=("aedit.rb" "aedit.rb4" "aedit.rd" "aedit.sb"\
+                   "aedit.vl" "aedit.wb" "aedit.wb4" "goddard.export")
+set docdirs=("modifications" "unix_software" "file_formats")
+
+hops
+set srcsrc=$SRC
+export
+set destsrc=$SRC
+foreach src ($sources)
+    set srcdir=$srcsrc/$src
+    set destdir=$destsrc/$src
+
+    echo "copying from $srcdir to $destdir"
+
+    /bin/cd $destdir
+    rm $destdir/*.c $destdir/*.h $destdir/Makefile
+    cp $srcdir/*.c $srcdir/*.h $srcdir/Makefile $destdir
+end
+
+# Special for aedit docs
+echo "Copying aedit help files"
+cd $destsrc/postproc/aedit
+cp -r $srcsrc/postproc/aedit/help $destsrc/postproc/aedit
+
+hops
+set srcdir=$SHSCRIPTS
+export
+set destdir=$SHSCRIPTS
+rm $destdir/*
+foreach shscript ($shscripts)
+
+    echo "copying $srcdir/$shscript to $destdir/$shscript"
+
+    cp $srcdir/$shscript $destdir
+end
+
+hops
+set srcdir=$SRC/awk_scripts
+export
+set destdir=$SRC/awk_scripts
+rm $destdir/*
+foreach awkscript ($awkscripts)
+
+    echo "copying $srcdir/$awkscript to $destdir/$awkscript"
+
+    cp $srcdir/$awkscript $destdir
+end
+
+hops
+set srcdir=$AESCRIPTS
+export
+set destdir=$AESCRIPTS
+rm $destdir/*
+foreach aedit_script ($aedit_scripts)
+
+    echo "copying $srcdir/$aedit_script to $destdir/$aedit_script"
+
+    cp $srcdir/$aedit_script $destdir
+end
+
+hops
+set srcdir=$DOC
+export
+set destdir=$DOC
+foreach docdir ($docdirs)
+
+    echo "copying $srcdir/$docdir to $destdir/$docdir"
+
+    rm $destdir/$docdir/*
+    cp -r $srcdir/$docdir $destdir
+end
+
+echo "Remember to update the pgplot directory of the export area"
+echo "Remember to update the master makefile in the export area"
+echo "Remember to check and update the setup.csh file in the export area"
+echo "Remember to check and update the install.txt file in the export area"
+echo "FINALLY, remember to make sure this update script was up to date\!\!"

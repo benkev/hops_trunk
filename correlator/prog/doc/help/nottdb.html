@@ -1,0 +1,107 @@
+<HTML> <HEAD> 
+<TITLE> Tape Head Offset Database </TITLE> 
+<CENTER> <H1> Tape Head Offset Database </H1> </CENTER> 
+</HEAD> <BODY> 
+<P> 
+The tapehead() function incorporated into suman provides a
+tape-head-offset database for each pass on each tape.  This
+augmentation of suman is now in beta testing at Haystack. 
+<P> 
+This database is in $TAPEINFO = /correlator/tapelib/tapeinfo, one
+file per tape, labeled by its volume-serial number, VSN.  (This
+directory must exist and be readable, writable, and executable by
+group vlbi.)  When a tape is erased and checked out of the
+library by tuba, the corresponding file gets a .01, .02, and so
+forth suffix on its name.  A new empty file is created
+automatically by suman when a tape returns with new data. 
+<P> 
+The format of these database files is defined in $INC/tapeDB.h. 
+These files can be read and listed by CorAsc2, and a script,
+tapit, simplifies this, 
+<PRE> 
+     tapit  VSN 
+</PRE>
+where <I>VSN</I> is the volume serial number of the tape and 
+also the database file name as shown by 
+<PRE> 
+     ls  $TAPEINFO 
+</PRE> 
+Here is an example of a listing from tapit (CorAsc2): 
+<PRE WIDTH = 80> 
+CorAsc2 got type TDB  record_id = TDB  version_no = 01 
+ sus[] = 0 4 5 2  vsn = VLBA1153  station = K  site_id = Kk 
+ exper_num = 2836  exper_name = CORRT  start_time = 2000 075 
+ index  0  F  head 1  headpos     0 microns 
+  --   --   -20  -20  -20  -20  -20  -20  -20  -20  -20  -20  -20 
+  -25  -25  -22  -22  -22  -22  -24  -24  -24  -24  -24  -24  -24 
+  -24  -24  -24  -24  -24  --   --   --   --   --   --   --  
+ index  0  R  head 1  headpos     0 microns 
+  --   --   --   --   --   --    -8   -8   -8  -17  -12  -14  -15 
+  -15  -15  --   --   --   -16  -16  -16  -20  -10  -12  -10  -10 
+  -10  --   --   --   --   --   --   --   --   --   --   --  
+ index  1  F  head 1  headpos  -319 microns 
+  --   -20  -20  -20  -20  -20  -20  -20  -20  -20  -20  -20  -20 
+  -20  -25  -22   -4   -1   -4  -24   -8  -24  -24  -24  -24  -24 
+  -24  -24  -24  -24  -24  -24  --   --   --   --   --   --  
+ index  1  R  head 1  headpos  -319 microns 
+  --   --   --   --   --    -8   -8   -8   -8  -17  -12  -14  -15 
+  -15  -15  -15  --   -16  -16  -16  -16  -20  -10  -12  -10  -10 
+  -10  -10  --   --   --   --   --   --   --   --   --   --  
+ index  2  F  head 1  headpos    31 microns 
+  --   --   --   --   -20  -20  -20  -20  -20  -20  -20  -20  -20 
+  -25  -25  -22  -22  -22  -22  -24  -24  -24  -24  -24  -24  -24 
+  -24  -24  -24  --   --   --   --   --   --   --   --   --  
+ index  2  R  head 1  headpos    31 microns 
+  --   --   --   --   --   --   --   --    -8  -17  -12  -14  -15 
+  --   --   --   --   --   --   --   -16  -20  -10  -12  -10  --  
+  --   --   --   --   --   --   --   --   --   --   --   --  
+CorAsc2:  fread() on stdin returned 0 
+CorAsc2 End 
+</PRE> 
+The heading of this listing shows the station letter code, the
+experiment number, the experiment name, and the starting year and
+day of the recording.  This heading also shows the last five SUs
+on which this tape was mounted and read--this to help disentangle
+problems that might be due to either the station's or the SU's
+tape drive.  This SU list is in time sequence left to right. 
+<P> 
+Each pass is labeled by an index number, by F or R for forward or
+reverse, and by headpos, its nominal head offset (in microns)
+from ovex or lvex.  The pass index numbers in this listing are
+reference numbers and not the same as conventional pass numbers. 
+These index numbers are in the order that the passes were
+encountered in processing, not necessarily the order recorded. 
+<P> 
+The tape-head offsets are in microns for each 500 feet of tape
+(13 numbers per line, 3 lines, 38 numbers for 19000 feet) in
+order from beginning to end on the tape.  A -- entry means
+initialized but not set. 
+<P> 
+This tape in this example, VLBA1153, has been up on four
+different SUs, 0 4 5 2, in this order, most recently on SU 2. 
+Not all the head-offset numbers in this listing are independent
+because on starting each new pass, tapehead() in suman copies 
+what it can from a nearby pass in the same direction and also
+extrapolates to nearby footages to give hints to help peak the
+tape heads.  Beginning with version_number 02, tapehead() still
+calculates such hints but never writes them into the tape
+database, so they do not appear in this listing. 
+<P> 
+A new program, edtap, to edit these database files is also
+available for beta testing.  Try: 
+<PRE> 
+     edtap  VSN 
+</PRE> 
+Edtap begins by listing the contents of the selected database
+file in the same format as CorAsc2 above.  Then edtap permits
+changing all the numbers in a prescribed pass to a prescribed
+constant in microns.  This is usually satisfactory at least to
+find a pass since the offsets vary little through a pass.  Edtap
+is intended to be self-explanatory.  Edtap can edit a file even
+if suman is using it simultaneously.  Enter or Return to end
+edtap. 
+<P> 
+Revised:  2001 November 2, JAB
+<P> 
+</BODY> </HTML> 
+

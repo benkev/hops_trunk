@@ -1,0 +1,77 @@
+account.h : 1 2
+adata.h : 10 53
+cf_header.h : 3 0 head-only
+cpgplot.h : 0 29 code-only
+cvex.h : 1 0 head-only
+data.h : 1 11
+evex.h : 1 0 head-only
+fileset.h : 1 4
+fringe_records.h : 1 0 head-only
+fstruct.h : 2 24
+general.h : 3 9
+ivex.h : 1 0 head-only
+lvex.h : 1 0 head-only
+mk4_afio.h : 0 32 code-only
+mk4_data.h : 6 88
+mk4_dfio.h : 0 106 code-only
+mk4_records.h : 1 1
+mk4_sizes.h : 10 20
+mk4_typedefs.h : 28 7
+mk4_util.h : 0 212 code-only
+mk4_vex.h : 0 74 code-only
+ovex.h : 1 4
+polynomial.h : 3 0 head-only
+print_page.h : 0 8 code-only
+root_records.h : 1 0 head-only
+svex.h : 1 0 head-only
+T1.h : 1 1
+tapeDB.h : 0 1 code-only
+type_000.h : 2 2
+type_1000.h : 1 0 head-only
+type_100.h : 2 4
+type_101.h : 2 4
+type_110.h : 1 3
+type_120.h : 3 4
+type_2000.h : 1 0 head-only
+type_200.h : 2 4
+type_201.h : 2 4
+type_202.h : 2 4
+type_203.h : 2 4
+type_204.h : 2 4
+type_205.h : 2 4
+type_206.h : 2 4
+type_207.h : 2 4
+type_208.h : 2 4
+type_2100.h : 1 0 head-only
+type_210.h : 2 4
+type_212.h : 2 4
+type_2200.h : 1 0 head-only
+type_220.h : 2 4
+type_221.h : 2 4
+type_2300.h : 1 0 head-only
+type_230.h : 2 4
+type_2400.h : 1 0 head-only
+type_2500.h : 1 0 head-only
+type_2600.h : 1 0 head-only
+type_2700.h : 1 0 head-only
+type_2800.h : 1 0 head-only
+type_300.h : 2 4
+type_301.h : 2 4
+type_302.h : 2 4
+type_303.h : 2 3
+type_304.h : 2 4
+type_305.h : 2 3
+type_306.h : 2 4
+type_307.h : 2 4
+type_308.h : 2 4
+type_309.h : 2 4
+type_4000.h : 2 0 head-only
+type_4100.h : 2 0 head-only
+type_4200.h : 2 0 head-only
+type_4300.h : 2 0 head-only
+type_4400.h : 2 0 head-only
+type_4500.h : 2 0 head-only
+type_5000.h : 1 0 head-only
+type_comp.h : 4 6
+type_corel.h : 1 0 head-only
+vex.h : 1 89

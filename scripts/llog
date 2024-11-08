@@ -1,0 +1,37 @@
+#!/bin/csh -f 
+# llog 
+# Set up to log all Mark-4 messages that go through the ALIAS file 
+# This version no longer works only on ccc. 
+# Revised:  1999 December 10, JAB 
+# modified by kad to work in Linux environment 2007.4
+
+#
+if ( ! $?BIN   ) setenv BIN   /correlator/bin/linux64-a2 
+if ( ! $?TEXT  ) setenv TEXT  /correlator/prog/text 
+if ( ! $?ALIAS ) setenv ALIAS $TEXT/MesAlias # Mark-4 message alias file 
+if ( ! $?TMP   ) setenv TMP   /correlator/tmp 
+if ( ! $?COPY  ) setenv COPY  $TMP/MesAlias # Temporary copy of ALIAS 
+if ( ! $?MLOG  ) setenv MLOG  $TMP/mlog # Message log, ASCII 
+if ( ! $?BLOG  ) setenv BLOG  $TMP/blog # Message log, binary 
+
+# If MLOG and BLOG exist, we make backups (but only one): 
+if ( -e $MLOG ) mv $MLOG $MLOG.bak 
+if ( -e $BLOG ) mv $BLOG $BLOG.bak 
+
+# Save a copy of $ALIAS 
+cp -f $ALIAS $COPY 
+
+# Append LOG@ccc to all non-comment lines: 
+awk ' $1 ~ /#/ ; $1 !~ /#/ { print $0, "LOG@lcc" } ' $COPY | tee $ALIAS 
+onintr restore # ^C interrupt to end, then restore ALIAS 
+# Receive messages to LOG; log header to MLOG, binary contents to BLOG: 
+Log $BLOG | tee $MLOG 
+# (Delete $BLOG in line above for no binary log): 
+# ~jball/bin/Log | tee $MLOG 
+restore: # After Log has been terminated with ^C: 
+# cp -f $COPY $ALIAS 
+# But this loses any changes made to ALIAS while logging was in effect;
+# so, instead, use sed to delete LOG@ from ALIAS: 
+cp -f $ALIAS $COPY 
+sed 's/ LOG@lcc//g' $COPY > $ALIAS 
+# (Yes, that space before LOG@ is needed) 

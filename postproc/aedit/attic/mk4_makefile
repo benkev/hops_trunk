@@ -1,0 +1,1842 @@
+# Makefile for aedit                      CJL 10/24/89
+# Modified to be architecture-independent CJL  4/18/91
+# Modified to use cmake			  CJL  1/08/92
+# Modified to use AFIO library            CJL  2/01/93
+# Added CCFIO library                     CJL  2/16/93
+#
+ 
+# Instructions for C compilation: system-dependencies
+# should be taken care of by the setup.csh script with ARCH
+# properly set.
+
+EXEC=aedit
+
+LIBS=$(PGPLOT_DIR)/libcpgplot.a $(PGPLOT_DIR)/libpgplot.a\
+$(SVLIB) $(LIB)/libbfio.a\
+$(LIB)/libafio.a $(LIB)/libx_fplot.a\
+$(LIB)/libdfio.a $(LIB)/libutil.a $(LIB)/libccfio.a $(LIB)/libvex.a
+
+.c.o:
+	$(CCOMPL) -c $(CFLAGC) -I$(INC) $<
+
+SOURCES=\
+active_filter.c		aeclr_corel.c		aeclr_fringe.c		aeclr_root.c\
+aedit.c			allocate_parms.c	axis.c			axis_scale.c\
+calc_close.c		cfilter.c		check_env.c		cleanup.c\
+cleanup_psplot.c	clear.c			clear_pstruct.c		clear_source.c\
+triangle_value.c	command_id.c		cursor_select.c		datum_value.c\
+display_psdata.c	dup_check.c		dup_flag.c		edit.c\
+erase_point.c		esdesp_check.c		execute.c		extract_parms.c\
+ffilter.c		fill_closure.c		fill_parms.c\
+fplot.c			get_axis.c		get_param.c\
+get_param_list.c	get_plot_data.c		get_plot_datum.c	get_ps_indices.c\
+help.c			init_inputs.c		psfile.c\
+locate_pscurs.c		make_psarray.c		make_tri.c		makekey.c\
+param_list.c		parse_commands.c	plot.c			plot_fqex.c\
+plot_header.c		plot_points.c		plot_quality.c		pr_allsumm.c\
+pr_csumm.c		pr_fsumm.c		pr_inputs.c		pr_rsumm.c\
+pr_source.c		pr_ssumm.c		pr_summary.c		print_data.c\
+ps_baselabel.c		ps_fplot.c		ps_free.c		ps_inside.c\
+ps_proc_datum.c		ps_scanlabel.c		ps_selbase.c		ps_selqual.c\
+ps_selscan.c		psplot.c		psplot_defaults.c	pstag_process.c\
+read_cursor.c		read_data.c		rfilter.c		run_com_file.c\
+run_pscursor.c		ccread.c		set_baselines.c\
+set_fraction.c		set_frequencies.c	set_mode.c		set_nfreq.c\
+set_prange.c		set_procrange.c		set_pscodes.c		set_psparam.c\
+set_qcodes.c		set_sources.c		set_stations.c		set_timerange.c\
+set_type.c		set_year.c		setup_plot.c\
+setup_psarray.c		setup_psplot.c		smatch.c		sorter.c\
+summ_corel.c		summ_data.c		summ_fringe.c		summ_root.c\
+symbol_key.c		trngl_present.c		unflag.c		update_fqex.c\
+update_sinfo.c		write_data.c		write_param.c		write_prmline.c\
+write_psfile.c		zoom.c			time_axis.c		set_device.c\
+auto_hardcopy.c		edit_families.c		cross_link.c		test1.c\
+write_families.c	station_reduce.c	aeclr_triangle.c	aeclr_quad.c\
+tarray_index.c		qarray_index.c		write_tdata.c		clear_summ.c\
+alloc_btq.c		fill_tdata.c		clear_fqex.c		summ_triangle.c\
+summ_quad.c		init_summ.c		pr_tsumm.c		set_triangles.c\
+set_quads.c		tfilter.c		qfilter.c		save.c\
+tricheck.c		edit_close.c		parse_cmdline.c		ps_freq_group.c\
+write_pshdr.c		add_station.c   mk3_qf.c fill4_parms.c\
+psfile4.c       write_reproc.c      get_ps_indices4.c   mk3mk4.c\
+psplot_defaults4.c  make_psarray4.c psplot4.c    set_pols.c
+
+OBJECTS=\
+active_filter.o		aeclr_corel.o		aeclr_fringe.o		aeclr_root.o\
+aedit.o			allocate_parms.o	axis.o			axis_scale.o\
+calc_close.o		cfilter.o		check_env.o		cleanup.o\
+cleanup_psplot.o	clear.o			clear_pstruct.o		clear_source.o\
+triangle_value.o	command_id.o		cursor_select.o		datum_value.o\
+display_psdata.o	dup_check.o		dup_flag.o		edit.o\
+erase_point.o		esdesp_check.o		execute.o		extract_parms.o\
+ffilter.o		fill_closure.o		fill_parms.o\
+fplot.o			get_axis.o		get_param.o\
+get_param_list.o	get_plot_data.o		get_plot_datum.o	get_ps_indices.o\
+help.o			init_inputs.o		psfile.o\
+locate_pscurs.o		make_psarray.o		make_tri.o		makekey.o\
+param_list.o		parse_commands.o	plot.o			plot_fqex.o\
+plot_header.o		plot_points.o		plot_quality.o		pr_allsumm.o\
+pr_csumm.o		pr_fsumm.o		pr_inputs.o		pr_rsumm.o\
+pr_source.o		pr_ssumm.o		pr_summary.o		print_data.o\
+ps_baselabel.o		ps_fplot.o		ps_free.o		ps_inside.o\
+ps_proc_datum.o		ps_scanlabel.o		ps_selbase.o		ps_selqual.o\
+ps_selscan.o		psplot.o		psplot_defaults.o	pstag_process.o\
+read_cursor.o		read_data.o		rfilter.o		run_com_file.o\
+run_pscursor.o		ccread.o		set_baselines.o\
+set_fraction.o		set_frequencies.o	set_mode.o		set_nfreq.o\
+set_prange.o		set_procrange.o		set_pscodes.o		set_psparam.o\
+set_qcodes.o		set_sources.o		set_stations.o		set_timerange.o\
+set_type.o		set_year.o		setup_plot.o\
+setup_psarray.o		setup_psplot.o		smatch.o		sorter.o\
+summ_corel.o		summ_data.o		summ_fringe.o		summ_root.o\
+symbol_key.o		trngl_present.o		unflag.o		update_fqex.o\
+update_sinfo.o		write_data.o		write_param.o		write_prmline.o\
+write_psfile.o		zoom.o			time_axis.o		set_device.o\
+auto_hardcopy.o		edit_families.o		cross_link.o		test1.o\
+write_families.o	station_reduce.o	aeclr_triangle.o	aeclr_quad.o\
+tarray_index.o		qarray_index.o		write_tdata.o		clear_summ.o\
+alloc_btq.o		fill_tdata.o		clear_fqex.o		summ_triangle.o\
+summ_quad.o		init_summ.o		pr_tsumm.o		set_triangles.o\
+set_quads.o		tfilter.o		qfilter.o		save.o\
+tricheck.o		edit_close.o		parse_cmdline.o		ps_freq_group.o\
+write_pshdr.o		add_station.o   mk3_qf.o fill4_parms.o\
+psfile4.o       write_reproc.o      get_ps_indices4.o   mk3mk4.o\
+psplot_defaults4.o  make_psarray4.o psplot4.o    set_pols.o
+
+aedit: $(OBJECTS) $(LIBS)
+	$(FCOMPL) -o aedit $(CFLAGL) $(OBJECTS) $(LIBDIR) $(PGPLOT_PNG) $(LIBS) -lm -lX11
+
+
+depend:
+	makedepend -f mk4_makefile -I$(INC) $(SOURCES)
+
+install:
+	cp $(EXEC) $(BIN)
+
+# DO NOT DELETE
+
+active_filter.o: /usr/include/string.h /usr/include/features.h
+active_filter.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+active_filter.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+active_filter.o: aedit.h sizelimits.h flags.h
+aeclr_corel.o: aedata.h /correlator/prog/src/include/adata.h
+aeclr_fringe.o: /usr/include/stdio.h /usr/include/features.h
+aeclr_fringe.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+aeclr_fringe.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+aeclr_fringe.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+aeclr_fringe.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+aeclr_fringe.o: /usr/include/_G_config.h /usr/include/wchar.h
+aeclr_fringe.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+aeclr_fringe.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+aeclr_fringe.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+aeclr_fringe.o: aedata.h /correlator/prog/src/include/adata.h
+aeclr_root.o: aedata.h /correlator/prog/src/include/adata.h
+aedit.o: /usr/include/stdio.h /usr/include/features.h
+aedit.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+aedit.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+aedit.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+aedit.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+aedit.o: /usr/include/_G_config.h /usr/include/wchar.h
+aedit.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+aedit.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+aedit.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+aedit.o: /usr/include/string.h /usr/include/stdlib.h aedit.h sizelimits.h
+aedit.o: /correlator/prog/src/include/ccfile.h aedata.h
+aedit.o: /correlator/prog/src/include/adata.h usearray.h summary.h
+allocate_parms.o: /usr/include/stdio.h /usr/include/features.h
+allocate_parms.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+allocate_parms.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+allocate_parms.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+allocate_parms.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+allocate_parms.o: /usr/include/_G_config.h /usr/include/wchar.h
+allocate_parms.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+allocate_parms.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+allocate_parms.o: /usr/include/bits/stdio_lim.h
+allocate_parms.o: /usr/include/bits/sys_errlist.h /usr/include/string.h
+allocate_parms.o: usearray.h
+axis.o: /usr/include/stdio.h /usr/include/features.h /usr/include/sys/cdefs.h
+axis.o: /usr/include/gnu/stubs.h
+axis.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+axis.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+axis.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+axis.o: /usr/include/_G_config.h /usr/include/wchar.h
+axis.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+axis.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+axis.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+axis.o: /usr/include/string.h aedit.h sizelimits.h pstruct.h
+axis_scale.o: /usr/include/math.h /usr/include/features.h
+axis_scale.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+axis_scale.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h
+axis_scale.o: /usr/include/bits/mathcalls.h pstruct.h
+calc_close.o: aedata.h /correlator/prog/src/include/adata.h summary.h
+calc_close.o: sizelimits.h /usr/include/stdio.h /usr/include/features.h
+calc_close.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+calc_close.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+calc_close.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+calc_close.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+calc_close.o: /usr/include/_G_config.h /usr/include/wchar.h
+calc_close.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+calc_close.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+calc_close.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+calc_close.o: /usr/include/string.h
+cfilter.o: /usr/include/stdio.h /usr/include/features.h
+cfilter.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+cfilter.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+cfilter.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+cfilter.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+cfilter.o: /usr/include/_G_config.h /usr/include/wchar.h
+cfilter.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+cfilter.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+cfilter.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+cfilter.o: /usr/include/string.h aedata.h
+cfilter.o: /correlator/prog/src/include/adata.h aedit.h sizelimits.h flags.h
+check_env.o: /usr/include/stdlib.h /usr/include/features.h
+check_env.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+check_env.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+check_env.o: /usr/include/stdio.h /usr/include/bits/types.h
+check_env.o: /usr/include/bits/wordsize.h /usr/include/bits/typesizes.h
+check_env.o: /usr/include/libio.h /usr/include/_G_config.h
+check_env.o: /usr/include/wchar.h /usr/include/bits/wchar.h
+check_env.o: /usr/include/gconv.h
+check_env.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+check_env.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+check_env.o: /usr/include/string.h
+cleanup.o: cpgplot.h
+cleanup_psplot.o: cpgplot.h psplot.h sizelimits.h
+clear.o: /usr/include/string.h /usr/include/features.h
+clear.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+clear.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+clear.o: /usr/include/stdio.h /usr/include/bits/types.h
+clear.o: /usr/include/bits/wordsize.h /usr/include/bits/typesizes.h
+clear.o: /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h
+clear.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+clear.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+clear.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+clear.o: /usr/include/ctype.h /usr/include/endian.h
+clear.o: /usr/include/bits/endian.h cpgplot.h aedit.h sizelimits.h aedata.h
+clear.o: /correlator/prog/src/include/adata.h pstruct.h
+clear_pstruct.o: pstruct.h
+clear_source.o: /usr/include/stdio.h /usr/include/features.h
+clear_source.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+clear_source.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+clear_source.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+clear_source.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+clear_source.o: /usr/include/_G_config.h /usr/include/wchar.h
+clear_source.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+clear_source.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+clear_source.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+clear_source.o: summary.h sizelimits.h
+triangle_value.o: aedata.h /correlator/prog/src/include/adata.h pstruct.h
+command_id.o: /usr/include/string.h /usr/include/features.h
+command_id.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+command_id.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+command_id.o: /usr/include/stdio.h /usr/include/bits/types.h
+command_id.o: /usr/include/bits/wordsize.h /usr/include/bits/typesizes.h
+command_id.o: /usr/include/libio.h /usr/include/_G_config.h
+command_id.o: /usr/include/wchar.h /usr/include/bits/wchar.h
+command_id.o: /usr/include/gconv.h
+command_id.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+command_id.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+command_id.o: /usr/include/ctype.h /usr/include/endian.h
+command_id.o: /usr/include/bits/endian.h
+cursor_select.o: /usr/include/stdio.h /usr/include/features.h
+cursor_select.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+cursor_select.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+cursor_select.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+cursor_select.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+cursor_select.o: /usr/include/_G_config.h /usr/include/wchar.h
+cursor_select.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+cursor_select.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+cursor_select.o: /usr/include/bits/stdio_lim.h
+cursor_select.o: /usr/include/bits/sys_errlist.h aedata.h
+cursor_select.o: /correlator/prog/src/include/adata.h aedit.h sizelimits.h
+cursor_select.o: pstruct.h flags.h
+datum_value.o: /usr/include/stdio.h /usr/include/features.h
+datum_value.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+datum_value.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+datum_value.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+datum_value.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+datum_value.o: /usr/include/_G_config.h /usr/include/wchar.h
+datum_value.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+datum_value.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+datum_value.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+datum_value.o: /usr/include/math.h /usr/include/bits/huge_val.h
+datum_value.o: /usr/include/bits/mathdef.h /usr/include/bits/mathcalls.h
+datum_value.o: aedata.h /correlator/prog/src/include/adata.h aedit.h
+datum_value.o: sizelimits.h pstruct.h usearray.h
+display_psdata.o: cpgplot.h psplot.h sizelimits.h
+dup_check.o: aedata.h /correlator/prog/src/include/adata.h
+dup_flag.o: /usr/include/stdio.h /usr/include/features.h
+dup_flag.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+dup_flag.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+dup_flag.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+dup_flag.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+dup_flag.o: /usr/include/_G_config.h /usr/include/wchar.h
+dup_flag.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+dup_flag.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+dup_flag.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+dup_flag.o: aedata.h /correlator/prog/src/include/adata.h flags.h summary.h
+dup_flag.o: sizelimits.h
+edit.o: /usr/include/string.h /usr/include/features.h
+edit.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+edit.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+edit.o: /usr/include/stdio.h /usr/include/bits/types.h
+edit.o: /usr/include/bits/wordsize.h /usr/include/bits/typesizes.h
+edit.o: /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h
+edit.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+edit.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+edit.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+edit.o: /usr/include/ctype.h /usr/include/endian.h /usr/include/bits/endian.h
+edit.o: aedata.h /correlator/prog/src/include/adata.h aedit.h sizelimits.h
+edit.o: pstruct.h flags.h
+erase_point.o: cpgplot.h
+execute.o: /usr/include/string.h /usr/include/features.h
+execute.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+execute.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+execute.o: /usr/include/stdlib.h /usr/include/stdio.h
+execute.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+execute.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+execute.o: /usr/include/_G_config.h /usr/include/wchar.h
+execute.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+execute.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+execute.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+execute.o: aedata.h /correlator/prog/src/include/adata.h aedit.h sizelimits.h
+execute.o: pstruct.h summary.h
+extract_parms.o: /usr/include/stdio.h /usr/include/features.h
+extract_parms.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+extract_parms.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+extract_parms.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+extract_parms.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+extract_parms.o: /usr/include/_G_config.h /usr/include/wchar.h
+extract_parms.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+extract_parms.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+extract_parms.o: /usr/include/bits/stdio_lim.h
+extract_parms.o: /usr/include/bits/sys_errlist.h
+extract_parms.o: /correlator/prog/src/include/data.h
+extract_parms.o: /correlator/prog/src/include/root_records.h
+extract_parms.o: /correlator/prog/src/include/general.h
+extract_parms.o: /correlator/prog/src/include/type_1000.h
+extract_parms.o: /correlator/prog/src/include/type_2000.h
+extract_parms.o: /correlator/prog/src/include/type_2100.h
+extract_parms.o: /correlator/prog/src/include/type_2200.h
+extract_parms.o: /correlator/prog/src/include/type_2300.h
+extract_parms.o: /correlator/prog/src/include/type_2400.h
+extract_parms.o: /correlator/prog/src/include/type_2500.h
+extract_parms.o: /correlator/prog/src/include/type_2600.h
+extract_parms.o: /correlator/prog/src/include/type_2700.h
+extract_parms.o: /correlator/prog/src/include/type_2800.h
+extract_parms.o: /correlator/prog/src/include/fringe_records.h
+extract_parms.o: /correlator/prog/src/include/type_4000.h
+extract_parms.o: /correlator/prog/src/include/type_4100.h
+extract_parms.o: /correlator/prog/src/include/type_4200.h
+extract_parms.o: /correlator/prog/src/include/type_4300.h
+extract_parms.o: /correlator/prog/src/include/type_4400.h
+extract_parms.o: /correlator/prog/src/include/type_4500.h
+extract_parms.o: /correlator/prog/src/include/type_5000.h
+extract_parms.o: /correlator/prog/src/include/type_corel.h
+extract_parms.o: /correlator/prog/src/include/type_comp.h
+extract_parms.o: /correlator/prog/src/include/mk4_data.h
+extract_parms.o: /correlator/prog/src/include/mk4_sizes.h
+extract_parms.o: /correlator/prog/src/include/mk4_records.h
+extract_parms.o: /correlator/prog/src/include/type_000.h
+extract_parms.o: /correlator/prog/src/include/type_100.h
+extract_parms.o: /correlator/prog/src/include/mk4_typedefs.h
+extract_parms.o: /correlator/prog/src/include/type_101.h
+extract_parms.o: /correlator/prog/src/include/type_120.h
+extract_parms.o: /correlator/prog/src/include/type_200.h
+extract_parms.o: /correlator/prog/src/include/type_201.h
+extract_parms.o: /correlator/prog/src/include/type_202.h
+extract_parms.o: /correlator/prog/src/include/type_203.h
+extract_parms.o: /correlator/prog/src/include/type_204.h
+extract_parms.o: /correlator/prog/src/include/type_205.h
+extract_parms.o: /correlator/prog/src/include/type_206.h
+extract_parms.o: /correlator/prog/src/include/type_207.h
+extract_parms.o: /correlator/prog/src/include/type_208.h
+extract_parms.o: /correlator/prog/src/include/type_210.h
+extract_parms.o: /correlator/prog/src/include/type_212.h
+extract_parms.o: /correlator/prog/src/include/type_220.h
+extract_parms.o: /correlator/prog/src/include/type_221.h
+extract_parms.o: /correlator/prog/src/include/type_230.h
+extract_parms.o: /correlator/prog/src/include/type_300.h
+extract_parms.o: /correlator/prog/src/include/type_301.h
+extract_parms.o: /correlator/prog/src/include/type_302.h
+extract_parms.o: /correlator/prog/src/include/type_303.h
+extract_parms.o: /correlator/prog/src/include/type_304.h
+extract_parms.o: /correlator/prog/src/include/type_305.h
+extract_parms.o: /correlator/prog/src/include/type_306.h
+extract_parms.o: /correlator/prog/src/include/type_307.h
+extract_parms.o: /correlator/prog/src/include/type_308.h
+extract_parms.o: /correlator/prog/src/include/type_309.h
+extract_parms.o: /usr/include/sys/types.h /usr/include/time.h
+extract_parms.o: /correlator/prog/src/include/T1.h aedata.h
+extract_parms.o: /correlator/prog/src/include/adata.h summary.h sizelimits.h
+extract_parms.o: usearray.h
+ffilter.o: /usr/include/stdio.h /usr/include/features.h
+ffilter.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+ffilter.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+ffilter.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+ffilter.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+ffilter.o: /usr/include/_G_config.h /usr/include/wchar.h
+ffilter.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+ffilter.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+ffilter.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+ffilter.o: /usr/include/string.h aedata.h
+ffilter.o: /correlator/prog/src/include/adata.h aedit.h sizelimits.h flags.h
+ffilter.o: usearray.h
+fill_closure.o: aedata.h /correlator/prog/src/include/adata.h close_flags.h
+fill_closure.o: aedit.h sizelimits.h /usr/include/math.h
+fill_closure.o: /usr/include/features.h /usr/include/sys/cdefs.h
+fill_closure.o: /usr/include/gnu/stubs.h /usr/include/bits/huge_val.h
+fill_closure.o: /usr/include/bits/mathdef.h /usr/include/bits/mathcalls.h
+fill_closure.o: /usr/include/stdio.h
+fill_closure.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+fill_closure.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+fill_closure.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+fill_closure.o: /usr/include/_G_config.h /usr/include/wchar.h
+fill_closure.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+fill_closure.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+fill_closure.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+fill_closure.o: /usr/include/string.h
+fill_parms.o: /usr/include/math.h /usr/include/features.h
+fill_parms.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+fill_parms.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h
+fill_parms.o: /usr/include/bits/mathcalls.h summary.h sizelimits.h aedata.h
+fill_parms.o: /correlator/prog/src/include/adata.h
+fill_parms.o: /correlator/prog/src/include/data.h
+fill_parms.o: /correlator/prog/src/include/root_records.h
+fill_parms.o: /correlator/prog/src/include/general.h
+fill_parms.o: /correlator/prog/src/include/type_1000.h
+fill_parms.o: /correlator/prog/src/include/type_2000.h
+fill_parms.o: /correlator/prog/src/include/type_2100.h
+fill_parms.o: /correlator/prog/src/include/type_2200.h
+fill_parms.o: /correlator/prog/src/include/type_2300.h
+fill_parms.o: /correlator/prog/src/include/type_2400.h
+fill_parms.o: /correlator/prog/src/include/type_2500.h
+fill_parms.o: /correlator/prog/src/include/type_2600.h
+fill_parms.o: /correlator/prog/src/include/type_2700.h
+fill_parms.o: /correlator/prog/src/include/type_2800.h
+fill_parms.o: /correlator/prog/src/include/fringe_records.h
+fill_parms.o: /correlator/prog/src/include/type_4000.h
+fill_parms.o: /correlator/prog/src/include/type_4100.h
+fill_parms.o: /correlator/prog/src/include/type_4200.h
+fill_parms.o: /correlator/prog/src/include/type_4300.h
+fill_parms.o: /correlator/prog/src/include/type_4400.h
+fill_parms.o: /correlator/prog/src/include/type_4500.h
+fill_parms.o: /correlator/prog/src/include/type_5000.h
+fill_parms.o: /correlator/prog/src/include/type_corel.h
+fill_parms.o: /correlator/prog/src/include/type_comp.h usearray.h
+fplot.o: /usr/include/stdio.h /usr/include/features.h
+fplot.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+fplot.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+fplot.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+fplot.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+fplot.o: /usr/include/_G_config.h /usr/include/wchar.h
+fplot.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+fplot.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+fplot.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+fplot.o: aedit.h sizelimits.h /correlator/prog/src/include/data.h
+fplot.o: /correlator/prog/src/include/root_records.h
+fplot.o: /correlator/prog/src/include/general.h
+fplot.o: /correlator/prog/src/include/type_1000.h
+fplot.o: /correlator/prog/src/include/type_2000.h
+fplot.o: /correlator/prog/src/include/type_2100.h
+fplot.o: /correlator/prog/src/include/type_2200.h
+fplot.o: /correlator/prog/src/include/type_2300.h
+fplot.o: /correlator/prog/src/include/type_2400.h
+fplot.o: /correlator/prog/src/include/type_2500.h
+fplot.o: /correlator/prog/src/include/type_2600.h
+fplot.o: /correlator/prog/src/include/type_2700.h
+fplot.o: /correlator/prog/src/include/type_2800.h
+fplot.o: /correlator/prog/src/include/fringe_records.h
+fplot.o: /correlator/prog/src/include/type_4000.h
+fplot.o: /correlator/prog/src/include/type_4100.h
+fplot.o: /correlator/prog/src/include/type_4200.h
+fplot.o: /correlator/prog/src/include/type_4300.h
+fplot.o: /correlator/prog/src/include/type_4400.h
+fplot.o: /correlator/prog/src/include/type_4500.h
+fplot.o: /correlator/prog/src/include/type_5000.h
+fplot.o: /correlator/prog/src/include/type_corel.h
+fplot.o: /correlator/prog/src/include/type_comp.h
+fplot.o: /correlator/prog/src/include/mk4_data.h
+fplot.o: /correlator/prog/src/include/mk4_sizes.h
+fplot.o: /correlator/prog/src/include/mk4_records.h
+fplot.o: /correlator/prog/src/include/type_000.h
+fplot.o: /correlator/prog/src/include/type_100.h
+fplot.o: /correlator/prog/src/include/mk4_typedefs.h
+fplot.o: /correlator/prog/src/include/type_101.h
+fplot.o: /correlator/prog/src/include/type_120.h
+fplot.o: /correlator/prog/src/include/type_200.h
+fplot.o: /correlator/prog/src/include/type_201.h
+fplot.o: /correlator/prog/src/include/type_202.h
+fplot.o: /correlator/prog/src/include/type_203.h
+fplot.o: /correlator/prog/src/include/type_204.h
+fplot.o: /correlator/prog/src/include/type_205.h
+fplot.o: /correlator/prog/src/include/type_206.h
+fplot.o: /correlator/prog/src/include/type_207.h
+fplot.o: /correlator/prog/src/include/type_208.h
+fplot.o: /correlator/prog/src/include/type_210.h
+fplot.o: /correlator/prog/src/include/type_212.h
+fplot.o: /correlator/prog/src/include/type_220.h
+fplot.o: /correlator/prog/src/include/type_221.h
+fplot.o: /correlator/prog/src/include/type_230.h
+fplot.o: /correlator/prog/src/include/type_300.h
+fplot.o: /correlator/prog/src/include/type_301.h
+fplot.o: /correlator/prog/src/include/type_302.h
+fplot.o: /correlator/prog/src/include/type_303.h
+fplot.o: /correlator/prog/src/include/type_304.h
+fplot.o: /correlator/prog/src/include/type_305.h
+fplot.o: /correlator/prog/src/include/type_306.h
+fplot.o: /correlator/prog/src/include/type_307.h
+fplot.o: /correlator/prog/src/include/type_308.h
+fplot.o: /correlator/prog/src/include/type_309.h /usr/include/sys/types.h
+fplot.o: /usr/include/time.h /correlator/prog/src/include/T1.h aedata.h
+fplot.o: /correlator/prog/src/include/adata.h pstruct.h
+get_axis.o: /usr/include/stdio.h /usr/include/features.h
+get_axis.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+get_axis.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+get_axis.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+get_axis.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+get_axis.o: /usr/include/_G_config.h /usr/include/wchar.h
+get_axis.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+get_axis.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+get_axis.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+get_axis.o: /usr/include/string.h /usr/include/ctype.h /usr/include/endian.h
+get_axis.o: /usr/include/bits/endian.h pstruct.h usearray.h
+get_param.o: /usr/include/stdio.h /usr/include/features.h
+get_param.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+get_param.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+get_param.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+get_param.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+get_param.o: /usr/include/_G_config.h /usr/include/wchar.h
+get_param.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+get_param.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+get_param.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+get_param.o: aedata.h /correlator/prog/src/include/adata.h
+get_param.o: /correlator/prog/src/include/data.h
+get_param.o: /correlator/prog/src/include/root_records.h
+get_param.o: /correlator/prog/src/include/general.h
+get_param.o: /correlator/prog/src/include/type_1000.h
+get_param.o: /correlator/prog/src/include/type_2000.h
+get_param.o: /correlator/prog/src/include/type_2100.h
+get_param.o: /correlator/prog/src/include/type_2200.h
+get_param.o: /correlator/prog/src/include/type_2300.h
+get_param.o: /correlator/prog/src/include/type_2400.h
+get_param.o: /correlator/prog/src/include/type_2500.h
+get_param.o: /correlator/prog/src/include/type_2600.h
+get_param.o: /correlator/prog/src/include/type_2700.h
+get_param.o: /correlator/prog/src/include/type_2800.h
+get_param.o: /correlator/prog/src/include/fringe_records.h
+get_param.o: /correlator/prog/src/include/type_4000.h
+get_param.o: /correlator/prog/src/include/type_4100.h
+get_param.o: /correlator/prog/src/include/type_4200.h
+get_param.o: /correlator/prog/src/include/type_4300.h
+get_param.o: /correlator/prog/src/include/type_4400.h
+get_param.o: /correlator/prog/src/include/type_4500.h
+get_param.o: /correlator/prog/src/include/type_5000.h
+get_param.o: /correlator/prog/src/include/type_corel.h
+get_param.o: /correlator/prog/src/include/type_comp.h aedit.h sizelimits.h
+get_param.o: param_list.h usearray.h
+get_param_list.o: /usr/include/stdio.h /usr/include/features.h
+get_param_list.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+get_param_list.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+get_param_list.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+get_param_list.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+get_param_list.o: /usr/include/_G_config.h /usr/include/wchar.h
+get_param_list.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+get_param_list.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+get_param_list.o: /usr/include/bits/stdio_lim.h
+get_param_list.o: /usr/include/bits/sys_errlist.h /usr/include/string.h
+get_param_list.o: /usr/include/ctype.h /usr/include/endian.h
+get_param_list.o: /usr/include/bits/endian.h usearray.h
+get_plot_data.o: /usr/include/string.h /usr/include/features.h
+get_plot_data.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+get_plot_data.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+get_plot_data.o: /usr/include/stdio.h /usr/include/bits/types.h
+get_plot_data.o: /usr/include/bits/wordsize.h /usr/include/bits/typesizes.h
+get_plot_data.o: /usr/include/libio.h /usr/include/_G_config.h
+get_plot_data.o: /usr/include/wchar.h /usr/include/bits/wchar.h
+get_plot_data.o: /usr/include/gconv.h
+get_plot_data.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+get_plot_data.o: /usr/include/bits/stdio_lim.h
+get_plot_data.o: /usr/include/bits/sys_errlist.h aedata.h
+get_plot_data.o: /correlator/prog/src/include/adata.h aedit.h sizelimits.h
+get_plot_data.o: pstruct.h flags.h summary.h
+get_plot_datum.o: /usr/include/stdio.h /usr/include/features.h
+get_plot_datum.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+get_plot_datum.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+get_plot_datum.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+get_plot_datum.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+get_plot_datum.o: /usr/include/_G_config.h /usr/include/wchar.h
+get_plot_datum.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+get_plot_datum.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+get_plot_datum.o: /usr/include/bits/stdio_lim.h
+get_plot_datum.o: /usr/include/bits/sys_errlist.h aedata.h
+get_plot_datum.o: /correlator/prog/src/include/adata.h aedit.h sizelimits.h
+get_plot_datum.o: pstruct.h summary.h
+get_ps_indices.o: /usr/include/stdio.h /usr/include/features.h
+get_ps_indices.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+get_ps_indices.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+get_ps_indices.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+get_ps_indices.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+get_ps_indices.o: /usr/include/_G_config.h /usr/include/wchar.h
+get_ps_indices.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+get_ps_indices.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+get_ps_indices.o: /usr/include/bits/stdio_lim.h
+get_ps_indices.o: /usr/include/bits/sys_errlist.h /usr/include/string.h
+get_ps_indices.o: psplot.h sizelimits.h aedata.h
+get_ps_indices.o: /correlator/prog/src/include/adata.h summary.h
+help.o: /usr/include/string.h /usr/include/features.h
+help.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+help.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+help.o: /usr/include/stdio.h /usr/include/bits/types.h
+help.o: /usr/include/bits/wordsize.h /usr/include/bits/typesizes.h
+help.o: /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h
+help.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+help.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+help.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+help.o: /usr/include/ctype.h /usr/include/endian.h /usr/include/bits/endian.h
+help.o: /usr/include/sys/stat.h /usr/include/bits/stat.h /usr/include/errno.h
+help.o: /usr/include/bits/errno.h /usr/include/linux/errno.h
+help.o: /usr/include/asm/errno.h /usr/include/sys/types.h /usr/include/time.h
+init_inputs.o: /usr/include/string.h /usr/include/features.h
+init_inputs.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+init_inputs.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+init_inputs.o: aedit.h sizelimits.h pstruct.h
+psfile.o: /usr/include/stdio.h /usr/include/features.h
+psfile.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+psfile.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+psfile.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+psfile.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+psfile.o: /usr/include/_G_config.h /usr/include/wchar.h
+psfile.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+psfile.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+psfile.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+psfile.o: aedata.h /correlator/prog/src/include/adata.h
+psfile.o: /correlator/prog/src/include/ccfile.h psplot.h sizelimits.h
+psfile.o: summary.h
+locate_pscurs.o: /usr/include/string.h /usr/include/features.h
+locate_pscurs.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+locate_pscurs.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+locate_pscurs.o: /usr/include/math.h /usr/include/bits/huge_val.h
+locate_pscurs.o: /usr/include/bits/mathdef.h /usr/include/bits/mathcalls.h
+locate_pscurs.o: psplot.h sizelimits.h
+make_psarray.o: /usr/include/stdio.h /usr/include/features.h
+make_psarray.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+make_psarray.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+make_psarray.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+make_psarray.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+make_psarray.o: /usr/include/_G_config.h /usr/include/wchar.h
+make_psarray.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+make_psarray.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+make_psarray.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+make_psarray.o: /usr/include/string.h /correlator/prog/src/include/ccfile.h
+make_psarray.o: psplot.h sizelimits.h
+make_tri.o: /usr/include/stdio.h /usr/include/features.h
+make_tri.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+make_tri.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+make_tri.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+make_tri.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+make_tri.o: /usr/include/_G_config.h /usr/include/wchar.h
+make_tri.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+make_tri.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+make_tri.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+make_tri.o: /usr/include/string.h summary.h sizelimits.h
+makekey.o: /usr/include/stdio.h /usr/include/features.h
+makekey.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+makekey.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+makekey.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+makekey.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+makekey.o: /usr/include/_G_config.h /usr/include/wchar.h
+makekey.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+makekey.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+makekey.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+makekey.o: /usr/include/string.h aedata.h
+makekey.o: /correlator/prog/src/include/adata.h summary.h sizelimits.h sort.h
+param_list.o: /usr/include/stdio.h /usr/include/features.h
+param_list.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+param_list.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+param_list.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+param_list.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+param_list.o: /usr/include/_G_config.h /usr/include/wchar.h
+param_list.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+param_list.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+param_list.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+param_list.o: aedata.h /correlator/prog/src/include/adata.h usearray.h
+parse_commands.o: /usr/include/string.h /usr/include/features.h
+parse_commands.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+parse_commands.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+parse_commands.o: /usr/include/stdio.h /usr/include/bits/types.h
+parse_commands.o: /usr/include/bits/wordsize.h /usr/include/bits/typesizes.h
+parse_commands.o: /usr/include/libio.h /usr/include/_G_config.h
+parse_commands.o: /usr/include/wchar.h /usr/include/bits/wchar.h
+parse_commands.o: /usr/include/gconv.h
+parse_commands.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+parse_commands.o: /usr/include/bits/stdio_lim.h
+parse_commands.o: /usr/include/bits/sys_errlist.h aedit.h sizelimits.h
+plot.o: /usr/include/stdio.h /usr/include/features.h /usr/include/sys/cdefs.h
+plot.o: /usr/include/gnu/stubs.h
+plot.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+plot.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+plot.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+plot.o: /usr/include/_G_config.h /usr/include/wchar.h
+plot.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+plot.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+plot.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+plot.o: cpgplot.h aedata.h /correlator/prog/src/include/adata.h aedit.h
+plot.o: sizelimits.h pstruct.h summary.h
+plot_fqex.o: /usr/include/stdio.h /usr/include/features.h
+plot_fqex.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+plot_fqex.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+plot_fqex.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+plot_fqex.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+plot_fqex.o: /usr/include/_G_config.h /usr/include/wchar.h
+plot_fqex.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+plot_fqex.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+plot_fqex.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+plot_fqex.o: /usr/include/string.h cpgplot.h aedata.h
+plot_fqex.o: /correlator/prog/src/include/adata.h aedit.h sizelimits.h
+plot_fqex.o: summary.h pstruct.h
+plot_header.o: /usr/include/stdio.h /usr/include/features.h
+plot_header.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+plot_header.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+plot_header.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+plot_header.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+plot_header.o: /usr/include/_G_config.h /usr/include/wchar.h
+plot_header.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+plot_header.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+plot_header.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+plot_header.o: cpgplot.h summary.h sizelimits.h
+plot_points.o: /usr/include/stdio.h /usr/include/features.h
+plot_points.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+plot_points.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+plot_points.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+plot_points.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+plot_points.o: /usr/include/_G_config.h /usr/include/wchar.h
+plot_points.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+plot_points.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+plot_points.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+plot_points.o: cpgplot.h pstruct.h
+plot_quality.o: /usr/include/stdio.h /usr/include/features.h
+plot_quality.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+plot_quality.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+plot_quality.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+plot_quality.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+plot_quality.o: /usr/include/_G_config.h /usr/include/wchar.h
+plot_quality.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+plot_quality.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+plot_quality.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+plot_quality.o: /usr/include/string.h aedit.h sizelimits.h aedata.h
+plot_quality.o: /correlator/prog/src/include/adata.h pstruct.h close_flags.h
+pr_allsumm.o: /usr/include/stdio.h /usr/include/features.h
+pr_allsumm.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+pr_allsumm.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+pr_allsumm.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+pr_allsumm.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+pr_allsumm.o: /usr/include/_G_config.h /usr/include/wchar.h
+pr_allsumm.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+pr_allsumm.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+pr_allsumm.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+pr_allsumm.o: summary.h sizelimits.h
+pr_csumm.o: /usr/include/stdio.h /usr/include/features.h
+pr_csumm.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+pr_csumm.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+pr_csumm.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+pr_csumm.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+pr_csumm.o: /usr/include/_G_config.h /usr/include/wchar.h
+pr_csumm.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+pr_csumm.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+pr_csumm.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+pr_csumm.o: summary.h sizelimits.h
+pr_fsumm.o: /usr/include/stdio.h /usr/include/features.h
+pr_fsumm.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+pr_fsumm.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+pr_fsumm.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+pr_fsumm.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+pr_fsumm.o: /usr/include/_G_config.h /usr/include/wchar.h
+pr_fsumm.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+pr_fsumm.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+pr_fsumm.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+pr_fsumm.o: summary.h sizelimits.h
+pr_inputs.o: /usr/include/string.h /usr/include/features.h
+pr_inputs.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+pr_inputs.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+pr_inputs.o: /usr/include/stdio.h /usr/include/bits/types.h
+pr_inputs.o: /usr/include/bits/wordsize.h /usr/include/bits/typesizes.h
+pr_inputs.o: /usr/include/libio.h /usr/include/_G_config.h
+pr_inputs.o: /usr/include/wchar.h /usr/include/bits/wchar.h
+pr_inputs.o: /usr/include/gconv.h
+pr_inputs.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+pr_inputs.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+pr_inputs.o: /usr/include/ctype.h /usr/include/endian.h
+pr_inputs.o: /usr/include/bits/endian.h aedit.h sizelimits.h pstruct.h
+pr_inputs.o: usearray.h
+pr_rsumm.o: /usr/include/stdio.h /usr/include/features.h
+pr_rsumm.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+pr_rsumm.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+pr_rsumm.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+pr_rsumm.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+pr_rsumm.o: /usr/include/_G_config.h /usr/include/wchar.h
+pr_rsumm.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+pr_rsumm.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+pr_rsumm.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+pr_rsumm.o: summary.h sizelimits.h
+pr_source.o: /usr/include/stdio.h /usr/include/features.h
+pr_source.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+pr_source.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+pr_source.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+pr_source.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+pr_source.o: /usr/include/_G_config.h /usr/include/wchar.h
+pr_source.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+pr_source.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+pr_source.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+pr_source.o: summary.h sizelimits.h
+pr_ssumm.o: /usr/include/stdio.h /usr/include/features.h
+pr_ssumm.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+pr_ssumm.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+pr_ssumm.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+pr_ssumm.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+pr_ssumm.o: /usr/include/_G_config.h /usr/include/wchar.h
+pr_ssumm.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+pr_ssumm.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+pr_ssumm.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+pr_ssumm.o: summary.h sizelimits.h
+pr_summary.o: /usr/include/stdio.h /usr/include/features.h
+pr_summary.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+pr_summary.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+pr_summary.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+pr_summary.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+pr_summary.o: /usr/include/_G_config.h /usr/include/wchar.h
+pr_summary.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+pr_summary.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+pr_summary.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+pr_summary.o: /usr/include/string.h aedata.h
+pr_summary.o: /correlator/prog/src/include/adata.h summary.h sizelimits.h
+print_data.o: /usr/include/stdio.h /usr/include/features.h
+print_data.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+print_data.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+print_data.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+print_data.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+print_data.o: /usr/include/_G_config.h /usr/include/wchar.h
+print_data.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+print_data.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+print_data.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+print_data.o: aedata.h /correlator/prog/src/include/adata.h
+ps_baselabel.o: cpgplot.h psplot.h sizelimits.h
+ps_fplot.o: /usr/include/stdio.h /usr/include/features.h
+ps_fplot.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+ps_fplot.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+ps_fplot.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+ps_fplot.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+ps_fplot.o: /usr/include/_G_config.h /usr/include/wchar.h
+ps_fplot.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+ps_fplot.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+ps_fplot.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+ps_fplot.o: /correlator/prog/src/include/data.h
+ps_fplot.o: /correlator/prog/src/include/root_records.h
+ps_fplot.o: /correlator/prog/src/include/general.h
+ps_fplot.o: /correlator/prog/src/include/type_1000.h
+ps_fplot.o: /correlator/prog/src/include/type_2000.h
+ps_fplot.o: /correlator/prog/src/include/type_2100.h
+ps_fplot.o: /correlator/prog/src/include/type_2200.h
+ps_fplot.o: /correlator/prog/src/include/type_2300.h
+ps_fplot.o: /correlator/prog/src/include/type_2400.h
+ps_fplot.o: /correlator/prog/src/include/type_2500.h
+ps_fplot.o: /correlator/prog/src/include/type_2600.h
+ps_fplot.o: /correlator/prog/src/include/type_2700.h
+ps_fplot.o: /correlator/prog/src/include/type_2800.h
+ps_fplot.o: /correlator/prog/src/include/fringe_records.h
+ps_fplot.o: /correlator/prog/src/include/type_4000.h
+ps_fplot.o: /correlator/prog/src/include/type_4100.h
+ps_fplot.o: /correlator/prog/src/include/type_4200.h
+ps_fplot.o: /correlator/prog/src/include/type_4300.h
+ps_fplot.o: /correlator/prog/src/include/type_4400.h
+ps_fplot.o: /correlator/prog/src/include/type_4500.h
+ps_fplot.o: /correlator/prog/src/include/type_5000.h
+ps_fplot.o: /correlator/prog/src/include/type_corel.h
+ps_fplot.o: /correlator/prog/src/include/type_comp.h
+ps_fplot.o: /correlator/prog/src/include/mk4_data.h
+ps_fplot.o: /correlator/prog/src/include/mk4_sizes.h
+ps_fplot.o: /correlator/prog/src/include/mk4_records.h
+ps_fplot.o: /correlator/prog/src/include/type_000.h
+ps_fplot.o: /correlator/prog/src/include/type_100.h
+ps_fplot.o: /correlator/prog/src/include/mk4_typedefs.h
+ps_fplot.o: /correlator/prog/src/include/type_101.h
+ps_fplot.o: /correlator/prog/src/include/type_120.h
+ps_fplot.o: /correlator/prog/src/include/type_200.h
+ps_fplot.o: /correlator/prog/src/include/type_201.h
+ps_fplot.o: /correlator/prog/src/include/type_202.h
+ps_fplot.o: /correlator/prog/src/include/type_203.h
+ps_fplot.o: /correlator/prog/src/include/type_204.h
+ps_fplot.o: /correlator/prog/src/include/type_205.h
+ps_fplot.o: /correlator/prog/src/include/type_206.h
+ps_fplot.o: /correlator/prog/src/include/type_207.h
+ps_fplot.o: /correlator/prog/src/include/type_208.h
+ps_fplot.o: /correlator/prog/src/include/type_210.h
+ps_fplot.o: /correlator/prog/src/include/type_212.h
+ps_fplot.o: /correlator/prog/src/include/type_220.h
+ps_fplot.o: /correlator/prog/src/include/type_221.h
+ps_fplot.o: /correlator/prog/src/include/type_230.h
+ps_fplot.o: /correlator/prog/src/include/type_300.h
+ps_fplot.o: /correlator/prog/src/include/type_301.h
+ps_fplot.o: /correlator/prog/src/include/type_302.h
+ps_fplot.o: /correlator/prog/src/include/type_303.h
+ps_fplot.o: /correlator/prog/src/include/type_304.h
+ps_fplot.o: /correlator/prog/src/include/type_305.h
+ps_fplot.o: /correlator/prog/src/include/type_306.h
+ps_fplot.o: /correlator/prog/src/include/type_307.h
+ps_fplot.o: /correlator/prog/src/include/type_308.h
+ps_fplot.o: /correlator/prog/src/include/type_309.h /usr/include/sys/types.h
+ps_fplot.o: /usr/include/time.h /correlator/prog/src/include/T1.h aedata.h
+ps_fplot.o: /correlator/prog/src/include/adata.h psplot.h sizelimits.h
+ps_free.o: psplot.h sizelimits.h
+ps_proc_datum.o: /usr/include/string.h /usr/include/features.h
+ps_proc_datum.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+ps_proc_datum.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+ps_proc_datum.o: /usr/include/stdio.h /usr/include/bits/types.h
+ps_proc_datum.o: /usr/include/bits/wordsize.h /usr/include/bits/typesizes.h
+ps_proc_datum.o: /usr/include/libio.h /usr/include/_G_config.h
+ps_proc_datum.o: /usr/include/wchar.h /usr/include/bits/wchar.h
+ps_proc_datum.o: /usr/include/gconv.h
+ps_proc_datum.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+ps_proc_datum.o: /usr/include/bits/stdio_lim.h
+ps_proc_datum.o: /usr/include/bits/sys_errlist.h cpgplot.h aedata.h
+ps_proc_datum.o: /correlator/prog/src/include/adata.h flags.h psplot.h
+ps_proc_datum.o: sizelimits.h
+ps_scanlabel.o: /usr/include/string.h /usr/include/features.h
+ps_scanlabel.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+ps_scanlabel.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+ps_scanlabel.o: /usr/include/stdio.h /usr/include/bits/types.h
+ps_scanlabel.o: /usr/include/bits/wordsize.h /usr/include/bits/typesizes.h
+ps_scanlabel.o: /usr/include/libio.h /usr/include/_G_config.h
+ps_scanlabel.o: /usr/include/wchar.h /usr/include/bits/wchar.h
+ps_scanlabel.o: /usr/include/gconv.h
+ps_scanlabel.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+ps_scanlabel.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+ps_scanlabel.o: cpgplot.h psplot.h sizelimits.h
+ps_selbase.o: cpgplot.h psplot.h sizelimits.h
+ps_selqual.o: cpgplot.h psplot.h sizelimits.h
+ps_selscan.o: cpgplot.h psplot.h sizelimits.h
+psplot.o: /usr/include/stdio.h /usr/include/features.h
+psplot.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+psplot.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+psplot.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+psplot.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+psplot.o: /usr/include/_G_config.h /usr/include/wchar.h
+psplot.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+psplot.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+psplot.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+psplot.o: psplot.h sizelimits.h aedata.h /correlator/prog/src/include/adata.h
+psplot.o: /correlator/prog/src/include/ccfile.h summary.h
+psplot_defaults.o: /usr/include/stdio.h /usr/include/features.h
+psplot_defaults.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+psplot_defaults.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+psplot_defaults.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+psplot_defaults.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+psplot_defaults.o: /usr/include/_G_config.h /usr/include/wchar.h
+psplot_defaults.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+psplot_defaults.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+psplot_defaults.o: /usr/include/bits/stdio_lim.h
+psplot_defaults.o: /usr/include/bits/sys_errlist.h /usr/include/string.h
+psplot_defaults.o: /correlator/prog/src/include/ccfile.h psplot.h
+psplot_defaults.o: sizelimits.h
+pstag_process.o: /usr/include/stdio.h /usr/include/features.h
+pstag_process.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+pstag_process.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+pstag_process.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+pstag_process.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+pstag_process.o: /usr/include/_G_config.h /usr/include/wchar.h
+pstag_process.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+pstag_process.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+pstag_process.o: /usr/include/bits/stdio_lim.h
+pstag_process.o: /usr/include/bits/sys_errlist.h /usr/include/string.h
+pstag_process.o: aedata.h /correlator/prog/src/include/adata.h flags.h
+pstag_process.o: psplot.h sizelimits.h
+read_cursor.o: cpgplot.h /usr/include/stdio.h /usr/include/features.h
+read_cursor.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+read_cursor.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+read_cursor.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+read_cursor.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+read_cursor.o: /usr/include/_G_config.h /usr/include/wchar.h
+read_cursor.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+read_cursor.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+read_cursor.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+read_data.o: /usr/include/stdlib.h /usr/include/features.h
+read_data.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+read_data.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+read_data.o: /usr/include/string.h /usr/include/stdio.h
+read_data.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+read_data.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+read_data.o: /usr/include/_G_config.h /usr/include/wchar.h
+read_data.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+read_data.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+read_data.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+read_data.o: /usr/include/sys/types.h /usr/include/time.h
+read_data.o: /usr/include/sys/stat.h /usr/include/bits/stat.h
+read_data.o: /usr/include/errno.h /usr/include/bits/errno.h
+read_data.o: /usr/include/linux/errno.h /usr/include/asm/errno.h aedata.h
+read_data.o: /correlator/prog/src/include/adata.h aedit.h sizelimits.h
+rfilter.o: /usr/include/stdio.h /usr/include/features.h
+rfilter.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+rfilter.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+rfilter.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+rfilter.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+rfilter.o: /usr/include/_G_config.h /usr/include/wchar.h
+rfilter.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+rfilter.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+rfilter.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+rfilter.o: /usr/include/string.h aedata.h
+rfilter.o: /correlator/prog/src/include/adata.h aedit.h sizelimits.h flags.h
+run_com_file.o: /usr/include/stdio.h /usr/include/features.h
+run_com_file.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+run_com_file.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+run_com_file.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+run_com_file.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+run_com_file.o: /usr/include/_G_config.h /usr/include/wchar.h
+run_com_file.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+run_com_file.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+run_com_file.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+run_com_file.o: /usr/include/string.h /usr/include/sys/types.h
+run_com_file.o: /usr/include/time.h /usr/include/sys/stat.h
+run_com_file.o: /usr/include/bits/stat.h /usr/include/errno.h
+run_com_file.o: /usr/include/bits/errno.h /usr/include/linux/errno.h
+run_com_file.o: /usr/include/asm/errno.h aedata.h
+run_com_file.o: /correlator/prog/src/include/adata.h aedit.h sizelimits.h
+run_pscursor.o: /usr/include/stdio.h /usr/include/features.h
+run_pscursor.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+run_pscursor.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+run_pscursor.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+run_pscursor.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+run_pscursor.o: /usr/include/_G_config.h /usr/include/wchar.h
+run_pscursor.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+run_pscursor.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+run_pscursor.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+run_pscursor.o: /usr/include/string.h cpgplot.h aedata.h
+run_pscursor.o: /correlator/prog/src/include/adata.h psplot.h sizelimits.h
+ccread.o: /usr/include/stdio.h /usr/include/features.h
+ccread.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+ccread.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+ccread.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+ccread.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+ccread.o: /usr/include/_G_config.h /usr/include/wchar.h
+ccread.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+ccread.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+ccread.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+ccread.o: /usr/include/string.h /usr/include/stdlib.h
+ccread.o: /correlator/prog/src/include/ccfile.h
+set_baselines.o: /usr/include/stdio.h /usr/include/features.h
+set_baselines.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+set_baselines.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+set_baselines.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+set_baselines.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+set_baselines.o: /usr/include/_G_config.h /usr/include/wchar.h
+set_baselines.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+set_baselines.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+set_baselines.o: /usr/include/bits/stdio_lim.h
+set_baselines.o: /usr/include/bits/sys_errlist.h /usr/include/string.h
+set_baselines.o: /usr/include/ctype.h /usr/include/endian.h
+set_baselines.o: /usr/include/bits/endian.h aedit.h sizelimits.h
+set_fraction.o: /usr/include/stdio.h /usr/include/features.h
+set_fraction.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+set_fraction.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+set_fraction.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+set_fraction.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+set_fraction.o: /usr/include/_G_config.h /usr/include/wchar.h
+set_fraction.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+set_fraction.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+set_fraction.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+set_fraction.o: /usr/include/string.h /usr/include/ctype.h
+set_fraction.o: /usr/include/endian.h /usr/include/bits/endian.h aedit.h
+set_fraction.o: sizelimits.h
+set_frequencies.o: /usr/include/stdio.h /usr/include/features.h
+set_frequencies.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+set_frequencies.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+set_frequencies.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+set_frequencies.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+set_frequencies.o: /usr/include/_G_config.h /usr/include/wchar.h
+set_frequencies.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+set_frequencies.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+set_frequencies.o: /usr/include/bits/stdio_lim.h
+set_frequencies.o: /usr/include/bits/sys_errlist.h /usr/include/string.h
+set_frequencies.o: /usr/include/ctype.h /usr/include/endian.h
+set_frequencies.o: /usr/include/bits/endian.h aedit.h sizelimits.h
+set_mode.o: /usr/include/stdio.h /usr/include/features.h
+set_mode.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+set_mode.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+set_mode.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+set_mode.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+set_mode.o: /usr/include/_G_config.h /usr/include/wchar.h
+set_mode.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+set_mode.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+set_mode.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+set_mode.o: /usr/include/string.h /usr/include/ctype.h /usr/include/endian.h
+set_mode.o: /usr/include/bits/endian.h aedit.h sizelimits.h
+set_nfreq.o: /usr/include/stdio.h /usr/include/features.h
+set_nfreq.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+set_nfreq.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+set_nfreq.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+set_nfreq.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+set_nfreq.o: /usr/include/_G_config.h /usr/include/wchar.h
+set_nfreq.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+set_nfreq.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+set_nfreq.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+set_nfreq.o: /usr/include/string.h /usr/include/ctype.h /usr/include/endian.h
+set_nfreq.o: /usr/include/bits/endian.h aedit.h sizelimits.h
+set_prange.o: /usr/include/stdio.h /usr/include/features.h
+set_prange.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+set_prange.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+set_prange.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+set_prange.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+set_prange.o: /usr/include/_G_config.h /usr/include/wchar.h
+set_prange.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+set_prange.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+set_prange.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+set_prange.o: /usr/include/string.h /usr/include/ctype.h
+set_prange.o: /usr/include/endian.h /usr/include/bits/endian.h aedit.h
+set_prange.o: sizelimits.h usearray.h
+set_procrange.o: /usr/include/stdio.h /usr/include/features.h
+set_procrange.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+set_procrange.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+set_procrange.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+set_procrange.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+set_procrange.o: /usr/include/_G_config.h /usr/include/wchar.h
+set_procrange.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+set_procrange.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+set_procrange.o: /usr/include/bits/stdio_lim.h
+set_procrange.o: /usr/include/bits/sys_errlist.h /usr/include/string.h
+set_procrange.o: aedit.h sizelimits.h
+set_pscodes.o: /usr/include/string.h /usr/include/features.h
+set_pscodes.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+set_pscodes.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+set_pscodes.o: psplot.h sizelimits.h aedata.h
+set_pscodes.o: /correlator/prog/src/include/adata.h
+set_psparam.o: /usr/include/math.h /usr/include/features.h
+set_psparam.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+set_psparam.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h
+set_psparam.o: /usr/include/bits/mathcalls.h psplot.h sizelimits.h
+set_qcodes.o: /usr/include/stdio.h /usr/include/features.h
+set_qcodes.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+set_qcodes.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+set_qcodes.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+set_qcodes.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+set_qcodes.o: /usr/include/_G_config.h /usr/include/wchar.h
+set_qcodes.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+set_qcodes.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+set_qcodes.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+set_qcodes.o: /usr/include/string.h /usr/include/ctype.h
+set_qcodes.o: /usr/include/endian.h /usr/include/bits/endian.h aedit.h
+set_qcodes.o: sizelimits.h
+set_sources.o: /usr/include/stdio.h /usr/include/features.h
+set_sources.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+set_sources.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+set_sources.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+set_sources.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+set_sources.o: /usr/include/_G_config.h /usr/include/wchar.h
+set_sources.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+set_sources.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+set_sources.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+set_sources.o: /usr/include/string.h /usr/include/ctype.h
+set_sources.o: /usr/include/endian.h /usr/include/bits/endian.h aedit.h
+set_sources.o: sizelimits.h
+set_stations.o: /usr/include/stdio.h /usr/include/features.h
+set_stations.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+set_stations.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+set_stations.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+set_stations.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+set_stations.o: /usr/include/_G_config.h /usr/include/wchar.h
+set_stations.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+set_stations.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+set_stations.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+set_stations.o: /usr/include/string.h /usr/include/ctype.h
+set_stations.o: /usr/include/endian.h /usr/include/bits/endian.h aedit.h
+set_stations.o: sizelimits.h
+set_timerange.o: /usr/include/stdio.h /usr/include/features.h
+set_timerange.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+set_timerange.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+set_timerange.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+set_timerange.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+set_timerange.o: /usr/include/_G_config.h /usr/include/wchar.h
+set_timerange.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+set_timerange.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+set_timerange.o: /usr/include/bits/stdio_lim.h
+set_timerange.o: /usr/include/bits/sys_errlist.h /usr/include/string.h
+set_timerange.o: aedit.h sizelimits.h
+set_type.o: /usr/include/stdio.h /usr/include/features.h
+set_type.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+set_type.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+set_type.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+set_type.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+set_type.o: /usr/include/_G_config.h /usr/include/wchar.h
+set_type.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+set_type.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+set_type.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+set_type.o: /usr/include/string.h /usr/include/ctype.h /usr/include/endian.h
+set_type.o: /usr/include/bits/endian.h aedit.h sizelimits.h
+set_year.o: /usr/include/stdio.h /usr/include/features.h
+set_year.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+set_year.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+set_year.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+set_year.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+set_year.o: /usr/include/_G_config.h /usr/include/wchar.h
+set_year.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+set_year.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+set_year.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+set_year.o: /usr/include/string.h aedata.h
+set_year.o: /correlator/prog/src/include/adata.h
+setup_plot.o: /usr/include/stdio.h /usr/include/features.h
+setup_plot.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+setup_plot.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+setup_plot.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+setup_plot.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+setup_plot.o: /usr/include/_G_config.h /usr/include/wchar.h
+setup_plot.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+setup_plot.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+setup_plot.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+setup_plot.o: /usr/include/string.h /usr/include/math.h
+setup_plot.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h
+setup_plot.o: /usr/include/bits/mathcalls.h cpgplot.h aedit.h sizelimits.h
+setup_plot.o: pstruct.h summary.h
+setup_psarray.o: /usr/include/stdio.h /usr/include/features.h
+setup_psarray.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+setup_psarray.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+setup_psarray.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+setup_psarray.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+setup_psarray.o: /usr/include/_G_config.h /usr/include/wchar.h
+setup_psarray.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+setup_psarray.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+setup_psarray.o: /usr/include/bits/stdio_lim.h
+setup_psarray.o: /usr/include/bits/sys_errlist.h
+setup_psarray.o: /correlator/prog/src/include/ccfile.h psplot.h sizelimits.h
+setup_psarray.o: aedata.h /correlator/prog/src/include/adata.h
+setup_psplot.o: /usr/include/string.h /usr/include/features.h
+setup_psplot.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+setup_psplot.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+setup_psplot.o: cpgplot.h psplot.h sizelimits.h
+smatch.o: /usr/include/stdio.h /usr/include/features.h
+smatch.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+smatch.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+smatch.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+smatch.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+smatch.o: /usr/include/_G_config.h /usr/include/wchar.h
+smatch.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+smatch.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+smatch.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+smatch.o: /usr/include/string.h
+sorter.o: /usr/include/stdio.h /usr/include/features.h
+sorter.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+sorter.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+sorter.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+sorter.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+sorter.o: /usr/include/_G_config.h /usr/include/wchar.h
+sorter.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+sorter.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+sorter.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+sorter.o: /usr/include/string.h /usr/include/ctype.h /usr/include/endian.h
+sorter.o: /usr/include/bits/endian.h aedata.h
+sorter.o: /correlator/prog/src/include/adata.h sort.h
+summ_corel.o: /usr/include/stdio.h /usr/include/features.h
+summ_corel.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+summ_corel.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+summ_corel.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+summ_corel.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+summ_corel.o: /usr/include/_G_config.h /usr/include/wchar.h
+summ_corel.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+summ_corel.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+summ_corel.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+summ_corel.o: /usr/include/string.h aedata.h
+summ_corel.o: /correlator/prog/src/include/adata.h summary.h sizelimits.h
+summ_data.o: /usr/include/stdio.h /usr/include/features.h
+summ_data.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+summ_data.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+summ_data.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+summ_data.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+summ_data.o: /usr/include/_G_config.h /usr/include/wchar.h
+summ_data.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+summ_data.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+summ_data.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+summ_data.o: aedata.h /correlator/prog/src/include/adata.h summary.h
+summ_data.o: sizelimits.h
+summ_fringe.o: /usr/include/stdio.h /usr/include/features.h
+summ_fringe.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+summ_fringe.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+summ_fringe.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+summ_fringe.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+summ_fringe.o: /usr/include/_G_config.h /usr/include/wchar.h
+summ_fringe.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+summ_fringe.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+summ_fringe.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+summ_fringe.o: /usr/include/string.h aedata.h
+summ_fringe.o: /correlator/prog/src/include/adata.h summary.h sizelimits.h
+summ_root.o: /usr/include/stdio.h /usr/include/features.h
+summ_root.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+summ_root.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+summ_root.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+summ_root.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+summ_root.o: /usr/include/_G_config.h /usr/include/wchar.h
+summ_root.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+summ_root.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+summ_root.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+summ_root.o: /usr/include/string.h aedata.h
+summ_root.o: /correlator/prog/src/include/adata.h summary.h sizelimits.h
+symbol_key.o: /usr/include/stdio.h /usr/include/features.h
+symbol_key.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+symbol_key.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+symbol_key.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+symbol_key.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+symbol_key.o: /usr/include/_G_config.h /usr/include/wchar.h
+symbol_key.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+symbol_key.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+symbol_key.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+symbol_key.o: /usr/include/string.h cpgplot.h summary.h sizelimits.h
+symbol_key.o: pstruct.h
+unflag.o: /usr/include/stdio.h /usr/include/features.h
+unflag.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+unflag.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+unflag.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+unflag.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+unflag.o: /usr/include/_G_config.h /usr/include/wchar.h
+unflag.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+unflag.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+unflag.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+unflag.o: /usr/include/string.h /usr/include/ctype.h /usr/include/endian.h
+unflag.o: /usr/include/bits/endian.h aedata.h
+unflag.o: /correlator/prog/src/include/adata.h flags.h
+update_fqex.o: /usr/include/stdio.h /usr/include/features.h
+update_fqex.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+update_fqex.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+update_fqex.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+update_fqex.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+update_fqex.o: /usr/include/_G_config.h /usr/include/wchar.h
+update_fqex.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+update_fqex.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+update_fqex.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+update_fqex.o: /usr/include/string.h aedata.h
+update_fqex.o: /correlator/prog/src/include/adata.h summary.h sizelimits.h
+update_sinfo.o: /usr/include/stdio.h /usr/include/features.h
+update_sinfo.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+update_sinfo.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+update_sinfo.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+update_sinfo.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+update_sinfo.o: /usr/include/_G_config.h /usr/include/wchar.h
+update_sinfo.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+update_sinfo.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+update_sinfo.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+update_sinfo.o: /usr/include/string.h summary.h sizelimits.h
+write_data.o: /usr/include/stdio.h /usr/include/features.h
+write_data.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+write_data.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+write_data.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+write_data.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+write_data.o: /usr/include/_G_config.h /usr/include/wchar.h
+write_data.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+write_data.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+write_data.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+write_data.o: /usr/include/math.h /usr/include/bits/huge_val.h
+write_data.o: /usr/include/bits/mathdef.h /usr/include/bits/mathcalls.h
+write_data.o: /usr/include/sys/types.h /usr/include/time.h
+write_data.o: /usr/include/sys/stat.h /usr/include/bits/stat.h
+write_data.o: /usr/include/errno.h /usr/include/bits/errno.h
+write_data.o: /usr/include/linux/errno.h /usr/include/asm/errno.h aedata.h
+write_data.o: /correlator/prog/src/include/adata.h aedit.h sizelimits.h
+write_data.o: summary.h sort.h
+write_param.o: /usr/include/stdio.h /usr/include/features.h
+write_param.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+write_param.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+write_param.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+write_param.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+write_param.o: /usr/include/_G_config.h /usr/include/wchar.h
+write_param.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+write_param.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+write_param.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+write_param.o: /usr/include/string.h /usr/include/math.h
+write_param.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h
+write_param.o: /usr/include/bits/mathcalls.h /usr/include/sys/types.h
+write_param.o: /usr/include/time.h /usr/include/sys/stat.h
+write_param.o: /usr/include/bits/stat.h /usr/include/errno.h
+write_param.o: /usr/include/bits/errno.h /usr/include/linux/errno.h
+write_param.o: /usr/include/asm/errno.h aedata.h
+write_param.o: /correlator/prog/src/include/adata.h usearray.h
+write_prmline.o: /usr/include/stdio.h /usr/include/features.h
+write_prmline.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+write_prmline.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+write_prmline.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+write_prmline.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+write_prmline.o: /usr/include/_G_config.h /usr/include/wchar.h
+write_prmline.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+write_prmline.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+write_prmline.o: /usr/include/bits/stdio_lim.h
+write_prmline.o: /usr/include/bits/sys_errlist.h /usr/include/string.h
+write_prmline.o: aedata.h /correlator/prog/src/include/adata.h usearray.h
+write_psfile.o: /usr/include/stdio.h /usr/include/features.h
+write_psfile.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+write_psfile.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+write_psfile.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+write_psfile.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+write_psfile.o: /usr/include/_G_config.h /usr/include/wchar.h
+write_psfile.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+write_psfile.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+write_psfile.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+write_psfile.o: /usr/include/string.h /usr/include/sys/stat.h
+write_psfile.o: /usr/include/bits/stat.h /usr/include/errno.h
+write_psfile.o: /usr/include/bits/errno.h /usr/include/linux/errno.h
+write_psfile.o: /usr/include/asm/errno.h /usr/include/time.h psplot.h
+write_psfile.o: sizelimits.h
+zoom.o: aedit.h sizelimits.h aedata.h /correlator/prog/src/include/adata.h
+zoom.o: pstruct.h
+time_axis.o: aedit.h sizelimits.h pstruct.h summary.h
+set_device.o: /usr/include/stdio.h /usr/include/features.h
+set_device.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+set_device.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+set_device.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+set_device.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+set_device.o: /usr/include/_G_config.h /usr/include/wchar.h
+set_device.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+set_device.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+set_device.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+set_device.o: /usr/include/string.h /usr/include/ctype.h
+set_device.o: /usr/include/endian.h /usr/include/bits/endian.h aedit.h
+set_device.o: sizelimits.h
+auto_hardcopy.o: /usr/include/stdio.h /usr/include/features.h
+auto_hardcopy.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+auto_hardcopy.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+auto_hardcopy.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+auto_hardcopy.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+auto_hardcopy.o: /usr/include/_G_config.h /usr/include/wchar.h
+auto_hardcopy.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+auto_hardcopy.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+auto_hardcopy.o: /usr/include/bits/stdio_lim.h
+auto_hardcopy.o: /usr/include/bits/sys_errlist.h /usr/include/string.h
+auto_hardcopy.o: /usr/include/stdlib.h cpgplot.h aedit.h sizelimits.h
+edit_families.o: /usr/include/stdio.h /usr/include/features.h
+edit_families.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+edit_families.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+edit_families.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+edit_families.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+edit_families.o: /usr/include/_G_config.h /usr/include/wchar.h
+edit_families.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+edit_families.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+edit_families.o: /usr/include/bits/stdio_lim.h
+edit_families.o: /usr/include/bits/sys_errlist.h aedata.h
+edit_families.o: /correlator/prog/src/include/adata.h flags.h
+cross_link.o: /usr/include/stdio.h /usr/include/features.h
+cross_link.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+cross_link.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+cross_link.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+cross_link.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+cross_link.o: /usr/include/_G_config.h /usr/include/wchar.h
+cross_link.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+cross_link.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+cross_link.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+cross_link.o: aedata.h /correlator/prog/src/include/adata.h
+test1.o: /usr/include/stdio.h /usr/include/features.h
+test1.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+test1.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+test1.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+test1.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+test1.o: /usr/include/_G_config.h /usr/include/wchar.h
+test1.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+test1.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+test1.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+test1.o: aedata.h /correlator/prog/src/include/adata.h flags.h
+write_families.o: /usr/include/stdio.h /usr/include/features.h
+write_families.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+write_families.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+write_families.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+write_families.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+write_families.o: /usr/include/_G_config.h /usr/include/wchar.h
+write_families.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+write_families.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+write_families.o: /usr/include/bits/stdio_lim.h
+write_families.o: /usr/include/bits/sys_errlist.h aedit.h sizelimits.h
+write_families.o: aedata.h /correlator/prog/src/include/adata.h sort.h
+station_reduce.o: /usr/include/stdio.h /usr/include/features.h
+station_reduce.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+station_reduce.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+station_reduce.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+station_reduce.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+station_reduce.o: /usr/include/_G_config.h /usr/include/wchar.h
+station_reduce.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+station_reduce.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+station_reduce.o: /usr/include/bits/stdio_lim.h
+station_reduce.o: /usr/include/bits/sys_errlist.h /usr/include/string.h
+station_reduce.o: aedata.h /correlator/prog/src/include/adata.h flags.h
+aeclr_triangle.o: aedata.h /correlator/prog/src/include/adata.h
+aeclr_quad.o: aedata.h /correlator/prog/src/include/adata.h
+tarray_index.o: /usr/include/stdio.h /usr/include/features.h
+tarray_index.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+tarray_index.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+tarray_index.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+tarray_index.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+tarray_index.o: /usr/include/_G_config.h /usr/include/wchar.h
+tarray_index.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+tarray_index.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+tarray_index.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+tarray_index.o: /usr/include/string.h aedata.h
+tarray_index.o: /correlator/prog/src/include/adata.h
+qarray_index.o: /usr/include/stdio.h /usr/include/features.h
+qarray_index.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+qarray_index.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+qarray_index.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+qarray_index.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+qarray_index.o: /usr/include/_G_config.h /usr/include/wchar.h
+qarray_index.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+qarray_index.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+qarray_index.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+qarray_index.o: /usr/include/string.h aedata.h
+qarray_index.o: /correlator/prog/src/include/adata.h
+write_tdata.o: /usr/include/stdio.h /usr/include/features.h
+write_tdata.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+write_tdata.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+write_tdata.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+write_tdata.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+write_tdata.o: /usr/include/_G_config.h /usr/include/wchar.h
+write_tdata.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+write_tdata.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+write_tdata.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+write_tdata.o: /usr/include/math.h /usr/include/bits/huge_val.h
+write_tdata.o: /usr/include/bits/mathdef.h /usr/include/bits/mathcalls.h
+write_tdata.o: /usr/include/sys/types.h /usr/include/time.h
+write_tdata.o: /usr/include/sys/stat.h /usr/include/bits/stat.h
+write_tdata.o: /usr/include/errno.h /usr/include/bits/errno.h
+write_tdata.o: /usr/include/linux/errno.h /usr/include/asm/errno.h aedata.h
+write_tdata.o: /correlator/prog/src/include/adata.h aedit.h sizelimits.h
+write_tdata.o: summary.h
+clear_summ.o: /usr/include/stdio.h /usr/include/features.h
+clear_summ.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+clear_summ.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+clear_summ.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+clear_summ.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+clear_summ.o: /usr/include/_G_config.h /usr/include/wchar.h
+clear_summ.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+clear_summ.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+clear_summ.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+clear_summ.o: summary.h sizelimits.h
+alloc_btq.o: /usr/include/stdio.h /usr/include/features.h
+alloc_btq.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+alloc_btq.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+alloc_btq.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+alloc_btq.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+alloc_btq.o: /usr/include/_G_config.h /usr/include/wchar.h
+alloc_btq.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+alloc_btq.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+alloc_btq.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+alloc_btq.o: /usr/include/string.h /usr/include/stdlib.h summary.h
+alloc_btq.o: sizelimits.h
+fill_tdata.o: summary.h sizelimits.h aedata.h
+fill_tdata.o: /correlator/prog/src/include/adata.h /usr/include/stdio.h
+fill_tdata.o: /usr/include/features.h /usr/include/sys/cdefs.h
+fill_tdata.o: /usr/include/gnu/stubs.h
+fill_tdata.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+fill_tdata.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+fill_tdata.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+fill_tdata.o: /usr/include/_G_config.h /usr/include/wchar.h
+fill_tdata.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+fill_tdata.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+fill_tdata.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+fill_tdata.o: /usr/include/string.h
+clear_fqex.o: /usr/include/stdio.h /usr/include/features.h
+clear_fqex.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+clear_fqex.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+clear_fqex.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+clear_fqex.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+clear_fqex.o: /usr/include/_G_config.h /usr/include/wchar.h
+clear_fqex.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+clear_fqex.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+clear_fqex.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+clear_fqex.o: summary.h sizelimits.h
+summ_triangle.o: /usr/include/stdio.h /usr/include/features.h
+summ_triangle.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+summ_triangle.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+summ_triangle.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+summ_triangle.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+summ_triangle.o: /usr/include/_G_config.h /usr/include/wchar.h
+summ_triangle.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+summ_triangle.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+summ_triangle.o: /usr/include/bits/stdio_lim.h
+summ_triangle.o: /usr/include/bits/sys_errlist.h /usr/include/string.h
+summ_triangle.o: aedata.h /correlator/prog/src/include/adata.h summary.h
+summ_triangle.o: sizelimits.h
+summ_quad.o: /usr/include/stdio.h /usr/include/features.h
+summ_quad.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+summ_quad.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+summ_quad.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+summ_quad.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+summ_quad.o: /usr/include/_G_config.h /usr/include/wchar.h
+summ_quad.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+summ_quad.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+summ_quad.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+summ_quad.o: /usr/include/string.h aedata.h
+summ_quad.o: /correlator/prog/src/include/adata.h summary.h sizelimits.h
+init_summ.o: /usr/include/stdlib.h /usr/include/features.h
+init_summ.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+init_summ.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+init_summ.o: summary.h sizelimits.h
+pr_tsumm.o: /usr/include/stdio.h /usr/include/features.h
+pr_tsumm.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+pr_tsumm.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+pr_tsumm.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+pr_tsumm.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+pr_tsumm.o: /usr/include/_G_config.h /usr/include/wchar.h
+pr_tsumm.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+pr_tsumm.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+pr_tsumm.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+pr_tsumm.o: summary.h sizelimits.h
+set_triangles.o: /usr/include/stdio.h /usr/include/features.h
+set_triangles.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+set_triangles.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+set_triangles.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+set_triangles.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+set_triangles.o: /usr/include/_G_config.h /usr/include/wchar.h
+set_triangles.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+set_triangles.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+set_triangles.o: /usr/include/bits/stdio_lim.h
+set_triangles.o: /usr/include/bits/sys_errlist.h /usr/include/string.h
+set_triangles.o: /usr/include/ctype.h /usr/include/endian.h
+set_triangles.o: /usr/include/bits/endian.h aedit.h sizelimits.h
+set_quads.o: /usr/include/stdio.h /usr/include/features.h
+set_quads.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+set_quads.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+set_quads.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+set_quads.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+set_quads.o: /usr/include/_G_config.h /usr/include/wchar.h
+set_quads.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+set_quads.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+set_quads.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+set_quads.o: /usr/include/string.h /usr/include/ctype.h /usr/include/endian.h
+set_quads.o: /usr/include/bits/endian.h aedit.h sizelimits.h
+tfilter.o: /usr/include/stdio.h /usr/include/features.h
+tfilter.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+tfilter.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+tfilter.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+tfilter.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+tfilter.o: /usr/include/_G_config.h /usr/include/wchar.h
+tfilter.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+tfilter.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+tfilter.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+tfilter.o: /usr/include/string.h aedata.h
+tfilter.o: /correlator/prog/src/include/adata.h aedit.h sizelimits.h flags.h
+qfilter.o: /usr/include/stdio.h /usr/include/features.h
+qfilter.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+qfilter.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+qfilter.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+qfilter.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+qfilter.o: /usr/include/_G_config.h /usr/include/wchar.h
+qfilter.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+qfilter.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+qfilter.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+qfilter.o: /usr/include/string.h aedata.h
+qfilter.o: /correlator/prog/src/include/adata.h aedit.h sizelimits.h flags.h
+save.o: /usr/include/stdlib.h /usr/include/features.h
+save.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+save.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h aedata.h
+save.o: /correlator/prog/src/include/adata.h
+tricheck.o: /usr/include/string.h /usr/include/features.h
+tricheck.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+tricheck.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+tricheck.o: aedata.h /correlator/prog/src/include/adata.h
+edit_close.o: /usr/include/stdio.h /usr/include/features.h
+edit_close.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+edit_close.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+edit_close.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+edit_close.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+edit_close.o: /usr/include/_G_config.h /usr/include/wchar.h
+edit_close.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+edit_close.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+edit_close.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+edit_close.o: /usr/include/string.h aedata.h
+edit_close.o: /correlator/prog/src/include/adata.h flags.h summary.h
+edit_close.o: sizelimits.h
+parse_cmdline.o: /usr/include/stdio.h /usr/include/features.h
+parse_cmdline.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+parse_cmdline.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+parse_cmdline.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+parse_cmdline.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+parse_cmdline.o: /usr/include/_G_config.h /usr/include/wchar.h
+parse_cmdline.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+parse_cmdline.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+parse_cmdline.o: /usr/include/bits/stdio_lim.h
+parse_cmdline.o: /usr/include/bits/sys_errlist.h /usr/include/string.h
+parse_cmdline.o: /usr/include/sys/types.h /usr/include/time.h
+parse_cmdline.o: /usr/include/sys/stat.h /usr/include/bits/stat.h aedit.h
+parse_cmdline.o: sizelimits.h
+ps_freq_group.o: /usr/include/string.h /usr/include/features.h
+ps_freq_group.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+ps_freq_group.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+ps_freq_group.o: psplot.h sizelimits.h /correlator/prog/src/include/ccfile.h
+write_pshdr.o: /usr/include/stdio.h /usr/include/features.h
+write_pshdr.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+write_pshdr.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+write_pshdr.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+write_pshdr.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+write_pshdr.o: /usr/include/_G_config.h /usr/include/wchar.h
+write_pshdr.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+write_pshdr.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+write_pshdr.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+write_pshdr.o: /usr/include/string.h psplot.h sizelimits.h
+add_station.o: /usr/include/stdio.h /usr/include/features.h
+add_station.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+add_station.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+add_station.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+add_station.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+add_station.o: /usr/include/_G_config.h /usr/include/wchar.h
+add_station.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+add_station.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+add_station.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+add_station.o: /usr/include/string.h
+mk3_qf.o: /correlator/prog/src/include/adata.h
+fill4_parms.o: /usr/include/math.h /usr/include/features.h
+fill4_parms.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+fill4_parms.o: /usr/include/bits/huge_val.h /usr/include/bits/mathdef.h
+fill4_parms.o: /usr/include/bits/mathcalls.h summary.h sizelimits.h aedata.h
+fill4_parms.o: /correlator/prog/src/include/adata.h
+fill4_parms.o: /correlator/prog/src/include/mk4_data.h
+fill4_parms.o: /correlator/prog/src/include/mk4_sizes.h
+fill4_parms.o: /correlator/prog/src/include/mk4_records.h
+fill4_parms.o: /correlator/prog/src/include/type_000.h
+fill4_parms.o: /correlator/prog/src/include/type_100.h
+fill4_parms.o: /correlator/prog/src/include/mk4_typedefs.h
+fill4_parms.o: /correlator/prog/src/include/type_101.h
+fill4_parms.o: /correlator/prog/src/include/type_120.h
+fill4_parms.o: /correlator/prog/src/include/type_200.h
+fill4_parms.o: /correlator/prog/src/include/type_201.h
+fill4_parms.o: /correlator/prog/src/include/type_202.h
+fill4_parms.o: /correlator/prog/src/include/type_203.h
+fill4_parms.o: /correlator/prog/src/include/type_204.h
+fill4_parms.o: /correlator/prog/src/include/type_205.h
+fill4_parms.o: /correlator/prog/src/include/type_206.h
+fill4_parms.o: /correlator/prog/src/include/type_207.h
+fill4_parms.o: /correlator/prog/src/include/type_208.h
+fill4_parms.o: /correlator/prog/src/include/type_210.h
+fill4_parms.o: /correlator/prog/src/include/type_212.h
+fill4_parms.o: /correlator/prog/src/include/type_220.h
+fill4_parms.o: /correlator/prog/src/include/type_221.h
+fill4_parms.o: /correlator/prog/src/include/type_230.h
+fill4_parms.o: /correlator/prog/src/include/type_comp.h
+fill4_parms.o: /correlator/prog/src/include/type_300.h
+fill4_parms.o: /correlator/prog/src/include/type_301.h
+fill4_parms.o: /correlator/prog/src/include/type_302.h
+fill4_parms.o: /correlator/prog/src/include/type_303.h
+fill4_parms.o: /correlator/prog/src/include/type_304.h
+fill4_parms.o: /correlator/prog/src/include/type_305.h
+fill4_parms.o: /correlator/prog/src/include/type_306.h
+fill4_parms.o: /correlator/prog/src/include/type_307.h
+fill4_parms.o: /correlator/prog/src/include/type_308.h
+fill4_parms.o: /correlator/prog/src/include/type_309.h
+fill4_parms.o: /usr/include/sys/types.h /usr/include/bits/types.h
+fill4_parms.o: /usr/include/bits/wordsize.h
+fill4_parms.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+fill4_parms.o: /usr/include/bits/typesizes.h /usr/include/time.h
+fill4_parms.o: /correlator/prog/src/include/T1.h usearray.h
+psfile4.o: /usr/include/stdio.h /usr/include/features.h
+psfile4.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+psfile4.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+psfile4.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+psfile4.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+psfile4.o: /usr/include/_G_config.h /usr/include/wchar.h
+psfile4.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+psfile4.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+psfile4.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+psfile4.o: /usr/include/string.h /usr/include/sys/stat.h
+psfile4.o: /usr/include/bits/stat.h /usr/include/errno.h
+psfile4.o: /usr/include/bits/errno.h /usr/include/linux/errno.h
+psfile4.o: /usr/include/asm/errno.h aedata.h
+psfile4.o: /correlator/prog/src/include/adata.h
+psfile4.o: /correlator/prog/src/include/vex.h
+psfile4.o: /correlator/prog/src/include/mk4_typedefs.h
+psfile4.o: /correlator/prog/src/include/ovex.h
+psfile4.o: /correlator/prog/src/include/cvex.h
+psfile4.o: /correlator/prog/src/include/evex.h
+psfile4.o: /correlator/prog/src/include/ivex.h
+psfile4.o: /correlator/prog/src/include/svex.h
+psfile4.o: /correlator/prog/src/include/lvex.h psplot.h sizelimits.h
+psfile4.o: summary.h
+write_reproc.o: /usr/include/stdio.h /usr/include/features.h
+write_reproc.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+write_reproc.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+write_reproc.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+write_reproc.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+write_reproc.o: /usr/include/_G_config.h /usr/include/wchar.h
+write_reproc.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+write_reproc.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+write_reproc.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+write_reproc.o: /usr/include/string.h /usr/include/sys/stat.h
+write_reproc.o: /usr/include/bits/stat.h /usr/include/errno.h
+write_reproc.o: /usr/include/bits/errno.h /usr/include/linux/errno.h
+write_reproc.o: /usr/include/asm/errno.h /usr/include/time.h summary.h
+write_reproc.o: sizelimits.h /correlator/prog/src/include/adata.h psplot.h
+get_ps_indices4.o: /usr/include/stdio.h /usr/include/features.h
+get_ps_indices4.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+get_ps_indices4.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+get_ps_indices4.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+get_ps_indices4.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+get_ps_indices4.o: /usr/include/_G_config.h /usr/include/wchar.h
+get_ps_indices4.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+get_ps_indices4.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+get_ps_indices4.o: /usr/include/bits/stdio_lim.h
+get_ps_indices4.o: /usr/include/bits/sys_errlist.h /usr/include/string.h
+get_ps_indices4.o: psplot.h sizelimits.h aedata.h
+get_ps_indices4.o: /correlator/prog/src/include/adata.h summary.h
+mk3mk4.o: /usr/include/stdio.h /usr/include/features.h
+mk3mk4.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+mk3mk4.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+mk3mk4.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+mk3mk4.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+mk3mk4.o: /usr/include/_G_config.h /usr/include/wchar.h
+mk3mk4.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+mk3mk4.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+mk3mk4.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+mk3mk4.o: aedata.h /correlator/prog/src/include/adata.h
+psplot_defaults4.o: /usr/include/stdio.h /usr/include/features.h
+psplot_defaults4.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+psplot_defaults4.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+psplot_defaults4.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+psplot_defaults4.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+psplot_defaults4.o: /usr/include/_G_config.h /usr/include/wchar.h
+psplot_defaults4.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+psplot_defaults4.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+psplot_defaults4.o: /usr/include/bits/stdio_lim.h
+psplot_defaults4.o: /usr/include/bits/sys_errlist.h /usr/include/string.h
+psplot_defaults4.o: psplot.h sizelimits.h
+make_psarray4.o: /usr/include/stdio.h /usr/include/features.h
+make_psarray4.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+make_psarray4.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+make_psarray4.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+make_psarray4.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+make_psarray4.o: /usr/include/_G_config.h /usr/include/wchar.h
+make_psarray4.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+make_psarray4.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+make_psarray4.o: /usr/include/bits/stdio_lim.h
+make_psarray4.o: /usr/include/bits/sys_errlist.h /usr/include/string.h
+make_psarray4.o: psplot.h sizelimits.h
+psplot4.o: /usr/include/stdio.h /usr/include/features.h
+psplot4.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+psplot4.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+psplot4.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+psplot4.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+psplot4.o: /usr/include/_G_config.h /usr/include/wchar.h
+psplot4.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+psplot4.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+psplot4.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+psplot4.o: /usr/include/string.h /usr/include/sys/stat.h
+psplot4.o: /usr/include/bits/stat.h /usr/include/errno.h
+psplot4.o: /usr/include/bits/errno.h /usr/include/linux/errno.h
+psplot4.o: /usr/include/asm/errno.h psplot.h sizelimits.h aedata.h
+psplot4.o: /correlator/prog/src/include/adata.h
+psplot4.o: /correlator/prog/src/include/vex.h
+psplot4.o: /correlator/prog/src/include/mk4_typedefs.h
+psplot4.o: /correlator/prog/src/include/ovex.h
+psplot4.o: /correlator/prog/src/include/cvex.h
+psplot4.o: /correlator/prog/src/include/evex.h
+psplot4.o: /correlator/prog/src/include/ivex.h
+psplot4.o: /correlator/prog/src/include/svex.h
+psplot4.o: /correlator/prog/src/include/lvex.h summary.h
+set_pols.o: /usr/include/stdio.h /usr/include/features.h
+set_pols.o: /usr/include/sys/cdefs.h /usr/include/gnu/stubs.h
+set_pols.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stddef.h
+set_pols.o: /usr/include/bits/types.h /usr/include/bits/wordsize.h
+set_pols.o: /usr/include/bits/typesizes.h /usr/include/libio.h
+set_pols.o: /usr/include/_G_config.h /usr/include/wchar.h
+set_pols.o: /usr/include/bits/wchar.h /usr/include/gconv.h
+set_pols.o: /usr/lib/gcc-lib/i386-redhat-linux/3.2.3/include/stdarg.h
+set_pols.o: /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h
+set_pols.o: /usr/include/string.h /usr/include/ctype.h /usr/include/endian.h
+set_pols.o: /usr/include/bits/endian.h aedit.h sizelimits.h

@@ -1,0 +1,78 @@
+------------------------------------------------------------------------------
+Notes concerning new channel aliasing protocols and other current disruptions.
+------------------------------------------------------------------------------
+
+CHAN_IDS was implemented by Roger making this more complicated.  master_codes
+holds the mapping, but if chan_ids was used, cb_ptr->chid and cb_ptr->chid_rf
+take control. It is finally sorted out when make_passes() does the adjustment.
+
+freqs is wired pretty solidly into the parser state machine, so best option
+is to introduce a new keyword frqs and we can do as we like with that.
+Random notes relative to NOEMA:
+
+fcode() at start of parser.c returns the index of a 'c' in the (master or
+cb_ptr->chid) list.
+
+parsed_codes is set by CHAN_IDS_ and also with SAVE_CODES and refers to the
+codes read in for pc phases, etc.,  not freqs.
+
+STEP ONE:
+    make sure we've caught fcode processing (e.g. that ~ and % games works).
+    DONE -- pending testing & bug fixes.
+
+STEP TWO:
+ a. verify that alias channels can be created (yes)
+ b. create config file gyrations to clone a bunch of channels
+    The list of clones needs to be considered in parser.c
+    (everywhere as the index in master codes is used.)
+    the call to fcode can probably be replaced by a new function.
+    (done -- but pc phases go awol)
+ c. create per-channel passbands, notches, &c.
+
+STEP THREE:
+ b1. clean up various things
+ b2. implement display_channels to assist debugging.
+
+PAUSE FOR ALMA:
+    a basic implementation seems to work. Issues:
+x   1) frequencies are still shared, so MBD doesn't work
+    fixed; added += on rate_spectrum in search and divide
+        by peers.  However, the channel is now counted twice
+
+x   2) merely shifting frequencies causes chaos, as the
+x      frequency refers to the recorded data bad rather
+x      than what survived notching.  freq_corel probably
+x      needs a second frequency
+    forget that
+    3) need to implement clone_snr_check
+    4) much of the math in passband and notches should
+       happen in pre-correct:  precorrect stashes stuff
+       in param and it is silly to redo on every ap.
+    5) display_chans still insists on showing the clone
+       when there is only one channel.
+x   6) est_manual_phases.py goes nuts...
+    apparently -16 does NOT work well
+
+ c. sort out how to normalize correctly with full channels
+    (ok -- have to address this in bw editing....)
+    get normalization and MBD frequency assignment correct
+
+    we are closer.  in channel notch case need to adjust...
+
+xd. detail: check that MSB calculations use a correct freq
+x   in the presence of bw editing -- this applies not just to
+x   clones but other channels as well?
+    "frequency" is very deeply embedded.  All work in channel
+    is effectively registered at the DC edge.
+
+
+NOTE: chan_ids doesn't accept +/-  since +/- share a frequency.
+
+TEST:
+    need to test ad hoc phase files
+
+index, x_crc, x_slip_sync, y_crc, y_slip_sync are no longer coded,
+    so these should be ripped out from the control file.
+
+eof vim: nospell
+

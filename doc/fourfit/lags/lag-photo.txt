@@ -1,0 +1,97 @@
+
+From: Roger Cappallo <rjc@haystack.mit.edu>
+Date: Fri, 6 Oct 2017 11:15:24 -0400 (EDT)
+Subject: Re: vrot question
+To: "Geoff Crew" <gbc@haystack.mit.edu>
+Cc: "Roger Cappallo" <rjc@haystack.mit.edu>,
+        "John Barrett" <barrettj@haystack.mit.edu>,
+        "Vincent Fish" <vfish@haystack.mit.edu>
+
+Hi Geoff,
+
+Answers embedded below.
+
+> Hi Roger,
+>
+> The 180-deg sign flip on closure phase question has turned up again.
+> (Short story; we don't really know what causes it, but trivial EHT
+> closure triangles sometimes, for no apparent reason, end up at +/- 180
+> rather than 0.)
+>
+> Anyway, looking at vrot.c I find something I don't quite understand
+> and if you can answer by email, great, or else we can put some Friday
+> time onto it.
+>
+> vrot.c calculates (cexp(I * theta)) where theta is built of from
+> several pieces:
+>
+>   /* fringe rate * time from central epoch */
+>   ok
+>   // Residual mbd effect at this freq
+>   ok
+>   // Effect due to offset of lag where max lies
+>   huh?  I'm afraid I have no clue here....
+>
+>     theta += (param.nlags - status.max_delchan) * 0.125 * sb;
+>
+> That's 1/8 of the offset of the max delay channel from param.nlags
+> with +/- based on sb = +/-1 (note: in other contexts, sb = 0 or 1).
+>
+> "lag" is within the space of status.win_sb[0] and status.win_sb[1] which
+> I think are set to be within 0 and param.nlags*2 - 1, and perhaps
+> param.nlags corresponds to the middle of the sbd box, right?
+>
+
+Correct. Due to the 2X 0-padding prior to the first fft the sample spacing
+is actually 1/2 the real sample spacing. Thus nlags is at the middle of
+the lag space.
+
+Now, Nyquist tells us an offset of 1 sample corresponds to 180 degrees of
+phase at the upper band edge. Thus the interpolated 1/2 sample equates to
+90 degrees at the upper band edge. or a mean offset of 45 degrees, which
+is 1/8 of a rotation.
+
+(param.nlags - status.max_delchan) is just the residual delay of the
+best-fit lag in semi-samples.
+
+> So this is a correction of +/- 0 .. 1/8 turn.  (But I still don't
+> understand why.) Finally, we have the optimize closure logic (for
+> which I understand the comment about MBD v SBD) but:
+>
+>   /* effect of non-integral sbd iff SSB
+>    * correct phase to dc edge, based on sb delay */
+>
+> which is again that same 1/8 of delay relative to status.sbd_sep
+> (which is half the sample period) with +/- based on sideband.
+>
+> Finally, I note that when you doubled nlags for FX mode (between
+> revisions 1133 and 1136 in fourfit), param->nlags became double
+> the number of correlation lags (cdata->t100->nlags to
+> 2 * cdata->t100->nlags in fill_param.c) but vrot.c received no
+> changes.  In view of the fact I don't understand the above
+> corrections, I'll comment that I don't see why vrot wasn't also
+> adjusted at that time.  I'm guessing you only doubled the Fourier
+> space rather than both Fourier and Delay as the answer, but you
+> should confirm....
+>
+> --
+Doubling the lags for FX mode was just to put the FX processing into a
+consistent framework with the old XF processing. I'll email separately a
+whiteboard photo I took back when investigating this issue, then at some
+point we could discuss that.
+
+Roger
+
+
+From: Roger Cappallo <rjc@haystack.mit.edu>
+Date: Fri, 6 Oct 2017 11:31:05 -0400 (EDT)
+Subject: lag photo
+To: gbc@haystack.mit.edu, vfish@haystack.mit.edu, barrettj@haystack.mit.edu
+
+
+As promised and/or threatened, depending on your viewpoint, here was the
+drawing on whiteboard. I see looking at it now that the green color was
+faint. There is a conjugate & copy of the LSB upward after the 2n fft.
+Also, after the 4n fft there is a copy downward into the lower half of lag
+space.
+

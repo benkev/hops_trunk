@@ -1,0 +1,82 @@
+Some notes about updating DiFX 2.5 for future reference:
+
+Need to migrate; working on eht
+ x      d2m4 rootcode fix -> 2.5 for 2.5.2
+ x      hops rootcode fix -> 2.5 for 2.5.2
+ x      polconvert -> 2.5 for 2.5.2
+ x      ehtc code -> 2.5 for 2.5.2
+ x      mpifxcorr/trunk/utils:
+            startdifx & genmachines
+            propate -> 2.5 for 2.5.2
+
+# first making plans
+cd DiFX-2.5.1
+svn log -v --stop-on-copy
+    => Tag first 2.5 series release: 2.5.1
+    => bump version number in setup.csh and setup.bash
+    + a few other nits
+
+# now for doing the dance
+cd DiFX-2.5
+    cd applications/difx2mark4
+    svn log -v --stop-on-copy
+    # r7785 copy from /applications/difx2mark4/trunk:7784
+    svn --dry-run merge ^/applications/difx2mark4/trunk .
+        U    src/createType3s.c
+        U    src/root_id.c
+        U    src/fill_fblock.c
+        U    src/createRoot.c
+        U    src/difx2mark4.c
+        U    src/difx2mark4.h
+    svn merge ^/applications/difx2mark4/trunk .
+    --- Recording mergeinfo for merge of r7785 through r8184 into '.':
+    commit
+
+    cd applications/hops
+    svn log -v --stop-on-copy
+    # r7790 copy from /applications/hops/trunk:7789
+    # r7885 & r7995 full updates
+    # r7994: 3.16, r8104: 3.17, r8149: 3.18
+    svn --dry-run merge ^/applications/hops/trunk .
+    # pretty much everything
+    svn merge ^/applications/hops/trunk .
+    --- Recording mergeinfo for merge of r7995 through r8185 into '.':
+    commit
+
+    cd applications/polconvert
+    svn log -v --stop-on-copy
+    # r7808 copy from /applications/polconvert/trunk:7807
+    # r7964 changes for 1.4.2
+    svn --dry-run merge ^/applications/polconvert/trunk .
+    # all PP scripts and most of src code
+    svn merge ^/applications/polconvert/trunk .
+    --- Recording mergeinfo for merge of r7964 through r8186 into '.':
+    commit
+
+    cd sites/Haystack/ehtc
+    svn log -v --stop-on-copy
+    # r7967 copy from /sites/Haystack/ehtc:7967
+    svn --dry-run merge ^/sites/Haystack/ehtc .
+    # the whole cycle4 v cycle5 thing
+    svn merge ^/sites/Haystack/ehtc .
+    --- Recording mergeinfo for merge of r7970 through r8187 into '.':
+    commit
+
+    cd mpifxcorr/utils
+    svn log -v --stop-on-copy
+    # from /mpifxcorr/trunk:7751, but then:
+    # changes to genmachines and startdifx
+    svn diff ^/master_tags/DiFX-2.5/mpifxcorr/utils ^/mpifxcorr/trunk/utils
+    svn --dry-run merge ^/mpifxcorr/trunk/utils .
+        U    genmachines
+        C    startdifx
+    svn merge ^/mpifxcorr/trunk/utils .
+        tf   on startdifx
+    --- Recording mergeinfo for merge of r7752 through r8188 into '.':
+    diff startdifx ../../../../mpifxcorr/trunk/utils/startdifx
+    # just shows $..$ diffs
+    commit
+
+
+
+

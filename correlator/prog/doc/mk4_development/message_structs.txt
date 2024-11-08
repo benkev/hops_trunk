@@ -1,0 +1,496 @@
+/*******************************************************************************
+*                                                                              *
+*    ***    ******  ******  *****  **  **  *****   **  **  **       ***        *
+*   ** **   **  **  **  **  **     *** **  **  **  **   ****       ** **       *
+*  *******  ******  ******  *****  ******  **  **  **    **       *******      *
+*  **   **  **      **      **     ** ***  **  **  **   ****      **   **      *
+*  **   **  **      **      *****  **  **  *****   **  **  **     **   **      *
+*                                                                              *
+*******************************************************************************/
+
+
+/*******************************************************************************
+* message_structs.h -- define specific message formats for Mark 4 correlator   *
+*                                                                              *
+* original version                                             rjc  95.6.14    *
+* new format; added messages from RJC's 95.6.23 conductor memo jab  95.12.27   *
+* modify format somewhat; add more messages                    rjc  96.11.25   *
+* update messages to reflect changes in system architecture    rjc  98.7.8     *
+*                                               last updated:       99.5.10    *
+*******************************************************************************/
+
+#include "mk4_sizes.h"
+#include "mk4_typedefs.h"
+
+#define MAX_LEN_ERR    128              /* max text length in Error_Message   */
+
+/*******************************************************************************
+*                                                                              *
+*                 g e n e r a l i z e d  s t r u c t u r e s                   *
+*                                                                              *
+*******************************************************************************/
+
+struct header
+  {
+  U32 msg_code;                      /* msg-specific code(see message_codes.h)*/
+  U32 task_id;                       /* number specific to each task          */
+  };
+
+struct su_chan
+  {
+  char chan_name[8];                 /* 8 char. name identifying each channel */
+  char station;                      /* source station for this channel       */
+  U16 ch_status;                     /* channel status code                   */
+  };
+
+                                     /* channel status code definitions       */
+enum ch_status_codes
+  {
+  CHANNEL_INACTIVE = 0,              /* channel is currently not active       */
+  CHANNEL_NOT_SYNCED,                /* channel active, but not synced        */
+  CHANNEL_SYNCED,                    /* channel sync status is AOK            */
+  CHANNEL_UNDER_REPAIR,              /* TRM's are repairing this channel      */
+  CHANNEL_MIXED_TRACK_STATUS,        /* contributing tracks have mixed stati  */
+  CHANNEL_DELAY_BUFF_OVERRUN         /* DMM is currently in overrun (NYI)     */
+  };
+
+struct su_entry
+  {
+  U32 task_id;                       /* task_id for this SU's current task    */
+  U16 su_status;                     /* various SU global status bits         */
+  U16 su_init_flags;                 /* status flags upon initialization      */
+  U8 stream;                         /* current stream for this SU            */
+  char station;                      /* station code (master code if mult. stn*/
+  char vsn[8];                       /* volume serial number of tape          */
+  char checksum[4];                  /* checksum             "   "            */
+  char pass[4];                      /* tape pass of curr. scan (null term.)  */
+  U8 speed_up;                       /* ratio of ROT/COT {1,2,4,8,16}         */
+  U16 current_position;              /* current tape position (feet)   word 30*/ 
+  U16 supply_reel;                   /* est. footage on supply (upper) reel 31*/
+  U16 takeup_reel;                   /*  "      "     " takeup (lower)   "  32*/
+  U16 head_pos_command;              /* commanded head pos. in kA      word 41*/
+  U16 head_position;                 /* current head pos. in kA        word 42*/
+  U16 dpu_gsw;                       /* GSW of the tape drive (DPU)    word 73*/
+  U16 dpu_error_flags;               /* error flag word for the DPU         74*/
+  U16 current_speed;                 /* actual (as read) tape speed 0.01 ipsB5*/
+  U16 playback_speed;                /* speed for playback of data (0.01 ips) */
+  double recent_rot;                 /* ROT timestamp from most recent msg.   */
+  double recent_tot;                 /* recently read TOT                     */
+  double sample_rate;                /* formatter sample rate (Hz)            */
+  double start_rot;                  /* scheduled starting ROT                */
+  double stop_rot;                   /*    "      ending   ROT                */
+  struct su_chan channels[16];
+  };
+
+                                     /* global su_status bit definitions      */
+#define INITIALIZED   0x0001
+#define CONFIGURED    0x0002
+#define TAPE_MOUNTED  0x0004
+#define POSING_TAPE   0x0008
+#define PEAKING_HDS   0x0010
+#define VALID_VSN     0x0020
+#define FINDING_TOT   0x0040
+#define NO_GOOD_TOT   0x0080
+#define FOUND_TOT     0x0100
+#define SYNCHING      0x0200
+#define SYNCED        0x0400
+#define SCAN_COMPLETE 0x0800
+
+                                     /* stream variable special value         */
+#define NO_STREAM     0xff           /* no stream currently defined for SU    */
+
+struct su_table
+  {
+  struct su_entry su_s[MAX_NUM_SU];   /* array index is actual SU number      */
+  };
+
+struct snake_head_table
+  {
+  int dummy;
+  };
+
+struct block_allocation_table
+  {
+  int dummy;
+  };
+
+
+/*******************************************************************************
+*                                                                              *
+*                 t o / f r o m    g e n a r o o t                             *
+*                                                                              *
+*******************************************************************************/
+
+
+
+struct Generate_Root                  /* conductor --> genaroot               */
+  {                                   /* generate a new root at specified time*/
+  struct header bin_head;             /* generic binary message info.         */
+  char ekey[MAX_LEN_KEY];             /* evex key = experiment number         */
+  char scan_id[MAX_LEN_KEY];          /* ovex key = identifier of desired scan*/
+  char init_key[MAX_LEN_KEY];         /* ivex key = init. key currently active*/
+  char corr_mode[MAX_LEN_KEY];        /* cvex key = correlator mode (or null) */
+  char stations[MAX_NUM_STN];         /* string containing 1 char station IDs */
+  U16 ap_length;                      /* accumulation period (ms of ROT)      */
+  U16 mirror_flags;                   /* controls for mirroring               */
+  }; 
+
+struct Root_Complete                  /* genaroot --> conductor               */
+  {                                   /* root file has been generated         */
+  struct header bin_head;             /* generic binary message info.         */
+  char root_filename[MAX_LEN_FILNAM]; /* string w/ complete path to root file */
+  }; 
+
+struct Root_Failure                   /* genaroot --> conductor               */
+  {                                   /* root file has not been generated     */
+  struct header bin_head;             /* generic binary message info.         */
+  U16 return_code;                    /* identifies exact nature of the error */
+  }; 
+
+
+
+
+
+/*******************************************************************************
+*                                                                              *
+*                 t o / f r o m    c o r r m a n                               *
+*                                                                              *
+*******************************************************************************/
+
+struct Initialize_Correlator          /* conductor --> corrman                */
+  {                                   /* controls writing of corr. out. data  */
+  struct header bin_head;             /* generic binary message info.         */
+  char ivex_key[MAX_LEN_KEY];         /* key into ivex file                   */
+  };
+
+struct Correlator_Initialized         /* corrman --> conductor                */
+  {                                   /* reports back result of initialization*/
+  struct header bin_head;             /* generic binary message info.         */
+                                      /* meat of this message TBD by kad      */
+  };
+
+struct Configure_Correlator           /* conductor --> corrman                */
+  {                                   /* prepare correlator to start task     */
+  struct header bin_head;             /* generic binary message info.         */
+  char root_filename[MAX_LEN_FILNAM]; /* name of correlator config. file      */
+  char ref_station_order[MAX_NUM_STN];/* string of stns; 1st of pair is ref.  */
+  struct su_table sut;                /* config. of SU output channels        */
+  double configure_cot;               /* COT at which to configure correlator
+                                         -- not currently implemented         */
+  U8 stream;                          /* stream that this task is in          */
+  }; 
+
+struct Cu_Configuration               /* corrman  -->  conductor              */
+  {                                   /* report successful CU configuration   */
+  struct header bin_head;             /* generic binary message info.         */
+  struct snake_head_table sht;
+  struct block_allocation_table bat;
+  }; 
+
+struct Cu_Resource_Error              /* corrman  -->  conductor              */
+  {                                   /* report unsuccessful CU configure req.*/
+  struct header bin_head;             /* generic binary message info.         */
+  U16 return_code;                    /* identifies the type of error         */
+  }; 
+
+struct Correlator_Abort               /* conductor --> corrman                */
+  {                                   /* shutdown current correlation         */
+  struct header bin_head;             /* generic binary message info.         */
+  U16 abort_flags;                    /* details of CU abort request          */
+  char station;                       /* iff single station to be removed     */
+  };
+
+                                      /* abort flag bit definitions           */
+#define FLUSH_FILE     1              /* do not write current output file     */
+#define ALL_STREAMS    2              /* stop correlations for all streams    */
+#define ABORT_STATION  4              /* shutdown baselines involving station */
+
+
+
+/*******************************************************************************
+*                                                                              *
+*                 t o / f r o m    s u m                                       *
+*                                                                              *
+*******************************************************************************/
+
+struct Initialize_Sus                 /* conductor --> SU manager             */
+  {                                   /* ask SU mgr. to init. requested SU's  */
+  struct header bin_head;             /* generic binary message info.         */
+  char ivex_key[MAX_LEN_KEY];         /* key into ivex file                   */
+  U8 su_list[MAX_NUM_SU];             /* Boolean array of SU's to be init'd   */
+  }; 
+
+struct Sus_Initialized                /* SUM --> conductor                    */
+  {                                   /* report the init. status of all SU's  */
+  struct header bin_head;             /* generic binary message info.         */
+  U16 su_init_flags[MAX_NUM_SU];      /* init. status bits for each SU        */
+  }; 
+
+struct Configure_Sus                  /* conductor --> SU manager             */
+  {                                   /* ask SU mgr. to configure all drives  */
+  struct header bin_head;             /* generic binary message info.         */
+  char root_filename[MAX_LEN_FILNAM]; /* string w/ complete path to root file */
+  U8 stream;                          /* stream that this task is in (0..3)   */
+  }; 
+
+struct Sus_Configured                 /* SU manager --> conductor             */
+  {                                   /* confirm successful SU configuration  */
+  struct header bin_head;             /* generic binary message info.         */
+  struct su_table sut;                /* config. of SU output channels        */
+  };
+
+struct Cant_Mount_Tape                /* SU manager --> conductor             */
+  {                                   /* single tape can't be found/mounted   */
+  struct header bin_head;             /* generic binary message info.         */
+  U16 return_code;                    /* specifies exact nature of failure    */
+  char station;                       /* correlation station identifier       */
+  }; 
+
+struct Pos_To_Tot                     /* conductor --> SU manager             */
+  {                                   /* position all tapes to 1st good TOT   */
+  struct header bin_head;             /* generic binary message info.         */
+  }; 
+
+struct Repos_To_Tot                   /* opera --> SU manager                 */
+  {                                   /* try to reposition an SU to a TOT     */
+  struct header bin_head;             /* generic binary message info.         */
+  U8 su;                              /* the SU# (0..15) to be repositioned   */
+  }; 
+
+struct Valid_Time                     /* SUM --> conductor                    */
+  {                                   /* reports good time found on 1 station */
+  struct header bin_head;             /* generic binary message info.         */
+  double first_useable_tot;           /* earliest TOT found in this task      */
+  U8 su;                              /* SU# (0..15) on which this time found */
+  }; 
+
+struct Cant_Find_Time                 /* SUM --> conductor                    */
+  {                                   /* SU has given up looking for good time*/
+  struct header bin_head;             /* generic binary message info.         */
+  double bad_tot;                     /* failing TOT as returned by SU        */
+  U16  failure_code;                  /* Code defining reason for failure     */
+  char station;                       /* correlation station identifier       */
+  U8 su;                              /* number of failing SU (0..15)         */
+  }; 
+
+                                      /* failure_code bit definitions         */
+#define TIME_OOR     0x0001           /* time out of range                    */
+#define BAD_DIGITS   0x0002           /* invalid time digits returned by SU   */
+
+struct Synchronize_Tapes              /* conductor --> SUM                    */
+  {                                   /* initiate ROT-queued startup of tapes */
+  struct header bin_head;             /* generic binary message info.         */
+  double tape_start_rot[MAX_NUM_SU];  /* ROT at which to start each drive     */
+  }; 
+
+struct Dpu_Command                    /* opera, etc. <--> SU manager          */
+  {                                   /* transport command or monitor response*/
+  struct header bin_head;             /* generic binary message info.         */
+  char rw;                            /* r = read or w = write                */
+  U8 su;                              /* station unit number (0..15)          */
+  U8 address;                         /* command address (0..0xFF)            */
+  U16 value;                          /* command or monitor value             */
+  }; 
+
+struct Send_Tape_Info                 /* opera --> SUM                        */
+  {                                   /* initiate periodic status reports     */
+  struct header bin_head;             /* generic binary message info.         */
+  U16 interval;                       /* send stati every interval secs. if>0 */
+  };                                  /* once if = 0; stop sending if < 0     */
+
+struct Tape_Info                      /* SUM --> opera                        */
+  {                                   /* periodic message of tape stati       */
+  struct header bin_head;             /* generic binary message info.         */
+  struct su_table sut;                /* current info. about all tapes & SU's */
+  }; 
+
+struct End_Task                       /* conductor --> SUM, etc.              */
+  {                                   /* task has ended; do cleanup, etc.     */
+  struct header bin_head;             /* generic binary message info.         */
+  };
+
+
+
+/*******************************************************************************
+*                                                                              *
+*                 t o / f r o m    r o t m a n                                 *
+*                                                                              *
+*******************************************************************************/
+
+struct Set_Cot_Clock                  /* conductor --> rotman                 */
+  {                                   /* sets/transmits master COT clock      */
+  struct header bin_head;             /* generic binary message info.         */
+  double initial_cot;                 /* epoch to which COT is set            */
+  int set;                            /* 0|1 = don't|do set rotman's COT      */
+  int broadcast;                      /* 0|1 = don't|do broadcast COT         */
+  };
+
+struct Start_Rot_Clock                /* conductor --> rotman                 */
+  {                                   /* begin ROT clock with specified time  */
+  struct header bin_head;             /* generic binary message info.         */
+  double starting_cot;                /* epoch at which to start clock (COT)  */
+  double initial_rot;                 /* ROT with which to start the clock    */
+  double ending_rot;                  /* epoch at which to stop clock (ROT)   */
+  U8 rot_rate;                        /* secs/ROT tick (1,2,4,8,16)           */
+  U8 stream;                          /* stream for this clock (0..3)         */
+  };  
+
+struct Send_Times                     /* anyone --> rotman                    */
+  {                                   /* request current times (periodically) */
+  struct header bin_head;             /* generic binary message info.         */
+  int interval;                       /* if >0, send times every interval COT */
+  };                                  /* secs, =0 send once, <0 stop sending  */
+
+struct Current_Times                  /* rotman --> anyone                    */
+  {                                   /* current clock readings               */
+  struct header bin_head;             /* generic binary message info.         */
+  double cot;                         /* correlator time (in short ROT format)*/
+  double rot[4];                      /* ROT for each of 4 streams            */
+  };  
+
+
+
+
+/*******************************************************************************
+*                                                                              *
+*                 t o / f r o m    o p e r a                                   *
+*                                                                              *
+*******************************************************************************/
+
+struct Initialize_Hardware            /* opera  -->  conductor                */
+  {                                   /* single task correlation request      */
+  struct header bin_head;             /* generic binary message info.         */
+  char ivex_key[MAX_LEN_KEY];         /* key into ivex file                   */
+  U8 correlator;                      /* 0|1 = don't|do initialize correlator */
+  U8 su_list[MAX_NUM_SU];             /* which SU's to initialize (0|1 = n|y) */
+  }; 
+
+struct Remove_Station                 /* opera  -->  conductor                */
+  {                                   /* or conductor --> SUM                 */
+  struct header bin_head;             /* generic binary message info.         */
+  char station;                       /* correlation station identifier       */
+  }; 
+
+struct Send_Cond_Status               /* opera  -->  conductor                */
+  {                                   /* request current status of tasks      */
+  struct header bin_head;             /* generic binary message info.         */
+  U16 interval;                       /* send stati every interval secs. if>0 */
+  };                                  /* =0 send once, <0 stop sending        */
+
+struct Cond_Status                    /* conductor --> opera                  */
+  {                                   /* response to status query             */
+  struct header bin_head;             /* generic binary message info.         */
+  U16 status[4];                      /* current status,  indexed by stream#  */
+  U16 fsm_state[4];                   /* finite state machine state, by str#  */
+  }; 
+                                      /* status bit definitions               */
+                                      /* bits 1..0: 0=off 1=green 2=yel 3=red */
+
+struct Mount_Request                  /* SUM  --> opera                       */
+  {                                   /* request for operator to mount tape   */
+  struct header bin_head;             /* generic binary message info.         */
+  char volser[9];                     /* volume serial # of requested tape    */
+  char slot[9];                       /* string containing library slot       */
+  char station;                       /* station ID                           */
+  };
+
+struct Start_Stream                   /* opera --> conductor                  */
+  {                                   /* begin execution of a task stream file*/
+  struct header bin_head;             /* generic binary message info.         */
+  U8 stream_num;                      /* which stream? (0..3)                 */
+  char stream_filename[MAX_LEN_FILNAM];/* abs. pathname or rel. to $STREAMDIR */
+  }; 
+
+struct Hold_Stream                    /* opera --> conductor                  */
+  {                                   /* put taskstream file on hold          */
+  struct header bin_head;             /* generic binary message info.         */
+  U8 stream_num;                      /* which stream? (0..3)                 */
+  }; 
+
+struct Stop_Stream                    /* opera --> conductor                  */
+  {                                   /* discontinue use of a taskstream file */
+  struct header bin_head;             /* generic binary message info.         */
+  U8 stream_num;                      /* which stream? (0..3)                 */
+  }; 
+
+struct Reorder_Streams                /* opera --> conductor                  */
+  {                                   /* change the priority order of streams */
+  struct header bin_head;             /* generic binary message info.         */
+  U8 stream_order[4];                 /* precedence order, high to low (0..3) */
+  }; 
+
+
+/*******************************************************************************
+*                                                                              *
+*                 m i s c e l l a n y                                          *
+*                                                                              *
+*******************************************************************************/
+
+struct Binary_Message
+  {
+  struct header bin_head;             /* generic binary message info.         */
+  }; 
+
+struct Terminate_Self                 /* anyone --> anyone                    */
+  {                                   /* request program to self-terminate    */
+  struct header bin_head;             /* generic binary message info.         */
+  U16 flags;                          /* control details of shutdown          */
+  }; 
+
+struct Program_Control                /* anyone --> anyone                    */
+  {                                   /* request program to change behaviour  */
+  struct header bin_head;             /* generic binary message info.         */
+  int msg_level;                      /* verbosity control (-3..3)            */
+  }; 
+
+struct Error_Message                  /* anyone --> anyone                    */
+  {                                   /* response to status query             */
+  struct header bin_head;             /* generic binary message info.         */
+  U16 errnum;                         /* error message number                 */
+  char text[MAX_LEN_ERR];             /* ASCII string of error message text   */
+  }; 
+
+
+/*******************************************************************************
+*                                                                              *
+*                 EVN-style (EVN doc #42) message to set ROT's                 *
+*                                                                              *
+* Note 1: does *not* use the J-K (Ball-Dudevoir) messaging system              *
+* Note 2: due to EVN msg alignment, some doubles are on 4 byte boundaries,     *
+*         which we work around by using a U32 array of two elements instead    *
+*******************************************************************************/
+
+struct Set_Rot
+    {
+    U32 msg_type;                       /* action request = 0x10              */
+    U32 msg_id;                         /* task_id for this ROT clock         */
+    U32 ref_id;                         /*   --unused--                       */
+    U32 msg_src1;                       /*   --unused--                       */
+    U32 msg_src2;                       /*   --unused--                       */
+    U32 msg_dest1;                      /*   --unused--                       */
+    U32 msg_dest2;                      /*   --unused--                       */
+/*  double time_stamp_sysclks;          /* COT on next systick - sanity check */
+    U32 time_stamp_sysclks[2];          /* COT on next systick - sanity check */
+    U32 time_stamp_date;                /*   --unused--                       */
+/*  double full_rot_sysclks;            /*   --unused--                       */
+    U32 full_rot_sysclks[2];            /*   --unused--                       */
+    U32 full_rot_date;                  /*   --unused--                       */
+    U32 msg_size;                       /* length = 0x7C                      */
+    U32 action_code;                    /* SET_ROT = 0x10001                  */
+    U32 queueing_flags;                 /*   set to 0                         */
+/*  double obey_rot;                    /*   --unused--                       */
+    U32 obey_rot[2];                    /*   --unused--                       */
+/*  double end_rot;                     /*   --unused--                       */
+    U32 end_rot[2];                     /*   --unused--                       */
+/*  double repeat_interval;             /*   --unused--                       */
+    U32 repeat_interval[2];             /*   --unused--                       */
+    U32 num_ent;                        /*   --unused--                       */
+    U32 offset;                         /*   --unused--                       */
+    U32 su_array;                       /* stream if (0..3); 4 => set COT     */
+/*  double rot;                         /* set ROT to this at next systick;   */
+    U32 rot[2];                         /* if su_array=4 set COT instead      */
+    U32 rot_year;                       /*   --unused--                       */
+/*  double rot_rate;                    /* ROT inc. per systick (in sysclks)  */
+    U32 rot_rate[2];                    /* ROT inc. per systick (in sysclks)  */
+    U32 dummy;                          /*   --unused--                       */
+    };

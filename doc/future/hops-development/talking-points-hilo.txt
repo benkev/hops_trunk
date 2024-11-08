@@ -1,0 +1,81 @@
+What should be mentioned at HILO?
+
+* a slide on MSRI resources to enable HOPS to work with an ngEHT
+    (whatever that might turn out to be)
+
+    o MSRI timeline and rough new HOPS timeline
+    o N (stations) more than doubles, 128 Gbps, 2 GHz to 8 GHz, and
+      simultaneous 230/345 GHz, perhaps
+
+* a slide on what's broken in current HOPS that is hard to fix
+    (we've almost come to the end of what one can do with band-aids)
+
+    o max channels (labelling is busted)
+    o no full complex bandpass corrections (a bandaid to come in any case)
+    o single-baseline fringes are both a virtue and a problem
+        - station-based phases and delays are difficult to get to
+        - HOPS has been shown to outperform AIPS
+    o fourfit is a one-shot process, so multi-step processing is hard
+    o user interface can be a challenge (control file syntax is arcane)
+    o internal code has 30 years of history in it:
+        - not modular
+        - was written for hardware correlators (mk4 data types)
+        - also for computers that no longer exist (non-linux)
+        - only adapted for software correlators which allow more flexibility
+    o plotting and results are not independent, and PGPLOT is obsolete
+
+* a slide on new features that should be enabled
+
+    o global fringe solutions
+    o a more human-friendly interface (Python, perhaps)
+    o allow distributed computing and/or parallelization (threads, OpenMPI)
+    o plug-in modules or hooks to allow novel customizations as needed
+    o strategy for iterative calibration and fringing
+    o improved data formats
+    o enable better exchange with other analysis packages
+        - FITS-IDI?
+        - CASA MS?
+        - enables better use of HOPS with simulated data from
+          simulation packages providing data in these forms
+        - HDF5? [*]
+    o more flexible plotting system
+        - single summary plot is fine if everything is 'ok'
+        - no current useful capability for serious investigation
+
+* a slide on things we are likely to do in the new HOPS
+
+    o maintain the existing tools "as is" for serious regression
+    o increase to more channels and eliminate magic sizing numbers
+    o new control file format (e.g. a restricted python code or config)
+    o new internal data formats (more rational, not externally visible,
+        involving new structures or objects, i.e. internal details)
+    o new disk data formats 'mk4' -> 'hops', similar ideas
+        - machine/compiler independent little-endian
+        - well defined, more rational data types
+        - new root file format (ovex is ancient history)
+        - preserve the current m4py-type capability
+        - translators tools to exchange with mk4, and maybe other formats
+    o fix what's broken
+    o not gratuitously break the current pipelines, but allow them
+      to be simplified (and easy to port to new HOPS)
+    o implement what is most important to be enabled
+    o mostly likely to be a mix of C, C++ and python
+    o more canonical adaptation to unix/linux environment
+
+* a slide to solicit comments and suggestions
+
+    o don't bother saying 'just use tool x'
+    o tell us what you think is missing
+    o differentiate between 'gotta haves' and 'things to be enabled'
+      (there is not alot of money here, but future community support
+       could provide some of what is not done immediately)
+
+-------------------------------------------
+- other things
+    o supported OS: linux, MacOS?, ...?
+    o it turns out littleendian won, bigendian went the way of the dodo bird
+
+[*] https://astrocompute.wordpress.com/2014/10/07/astronomical-data-formats-past-present-and-future-adass-bof-session/
+    https://astrocompute.wordpress.com/2014/11/12/is-hdf5-a-good-format-to-replace-uvfits/
+    etc...
+

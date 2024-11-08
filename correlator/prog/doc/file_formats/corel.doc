@@ -1,0 +1,736 @@
+                    COREL DATA FILE OUTPUT FORMAT        <910619.1934>
+    
+------------------------------------- 
+        
+             COMMENTS ON MARK III DATA FILE STRUCTURE 
+    
+      The Mark III data file structure is somewhat non-standard in order
+to gain the necessary flexibility for correlator operations.
+      The only difference between standard HP files and Mark III files  
+is that Mark III files may have __extents of arbitrary type and size__. 
+Standard HP files require that all file extents be the same type and
+size as the file root.  The creation and management of the Mark III files 
+is handled by the Haystack-written routines CRETX, OPENX, PURGX, instead
+of the corresponding HP routines CREAT, OPEN, PURGE.  There are _no 
+changes to the HP operating system.  Currently, the 'X'-routines (in file 
+&XTNTS on the tape I sent you) work independently of the HP program 
+D.RTR which normally manages FMP directories.  Hence there is some
+possibility of a collision between the 'X'-routines and D.RTR.  For that
+reason, we normally try not to mix standard HP file types and Mark III
+data files on the same FMP cartridge. 
+      We have arbitrarily chosen extent types for Mark III files to be in 
+the range 50-59.  Currently, however, we use only types 50-52, as follows:
+      Type 50 - Mark III data file root (extent #0).  The root
+                contains all information necessary to process 
+                all baselines of a single observation.  It also 
+                contains a table of contents to the raw correlator data 
+                in Type 51 extents.  The Type 50 root must ALWAYS be
+                present.
+      Type 51 - 'COREL' extent containing raw correlator data from
+                one baseline.  A multiple-baseline pass through the 
+                correlator will create a Type 51 extent for _each 
+                baseline processed.  Multiple passes through the
+                correlator will simply create more Type 51 extents. 
+                Multiple Type 51 extents may exist for the same 
+                baseline (this might happen, for example, if several
+                correlator passes were required to process all the
+                tracks, so that each Type 51 extent contains data 
+                from different tracks).  When FRNGE is run, it can
+                be instructed to retrieve any subset of the raw 
+                correlator data desired, making the correlation and 
+                FRNGE operations highly flexible. 
+      Type 52 - 'FRNGE' extent containing FRNGE output data for one 
+                baseline.  Each time FRNGE is run (on a single baseline)
+                one Type 52 extent is created. FRNGE may be run 
+                multiple times (presumably with different parameters) 
+                on any baseline.
+Type 51 and Type 52 extents may be mixed in any order. Only one root may
+exist and it must be Type 50.  All extents are treated as random-access 
+files.
+      This file structure keeps ALL of the data from a single observation 
+(all baselines) intact in a single data file.  The structure allows 
+further processing, either COREL or FRNGE, at any time, which simply
+add more extents to the file.  The detailed formats of the Type 50 and
+Type 51 extents are explained in file "COREL, while the format of Type 52 
+extents is explained in file "FRNGE.
+      The Mark III data files are compatible with all standard FMGR 
+commands _except ST,DU, and CO.  For purposes of managing Mark III
+data files, these FMGR commands have effectively been replaced by 
+three programs: 
+      1) SAVEM - a generalized FMP-file to mag-tape archiving program 
+                 that treats Mark III data files properly.  Standard
+                 HP FMP files are stored as one tape file per FMP file. 
+                 Mark III files are stored as one tape file per extent. 
+                 The SAVEM tape format is a highly-efficient binary 
+                 format which is suitable for archiving large volumes 
+                 of data.  The SAVEM tape format is explained in file 
+                 "SAVEM.
+      2) GETEM - program to restore files from SAVEM-format tape to disc. 
+                 Mark III data files are restored to their original 
+                 multiple-extent structure.  Mark III file extents may
+                 be restored selectively either by extent type or 
+                 extent# (GETEM uses the sixth subparameter of a file 
+                 namr, normally unused by HP, to specify extent#) if
+                 desired.  The Type 50 root of a Mark III data file 
+                 must always be restored. 
+      3) XC    - (formerly called FC) a general FMP file copy program 
+                 that may be used to move Mark III data files from
+                 one FMP cartridge to another.
+The Mark III 'A' and 'B' tapes are written using program SAVEM. 
+A-tapes contain the _entire Mark III data files, including the Type 50
+root plus all Type 51 and Type 52 extents.  Each A-tape has a corresponding 
+B-tape, which is identical to the A-tape _except that the Type 51 extents 
+(raw correlator data) are not written to the B-tape.  Thus, the B-tapes 
+are generally much shorter than the A-tapes.  Note that the B-tape is 
+simply a _subset of data from the A-tape, and is identical in format to 
+the A-tapes.  A-tapes are used to restore raw correlator data 
+for refringing, should that be necessary.  B-tapes are normally 
+distributed to users of Mark III data since they contain all of 
+the information necessary for further astronomy and geodesy processing. 
+    
+------------------------------------
+      
+                     TYPE 50 ROOT EXTENT
+  
+The Type 50 root extent contains all the information necessary to set 
+up the correlator for correlation processing and also tabulates information 
+about the processing configuration.  The records in the Type 50 root are
+all 128 words long, and the first word of each record identifies its type.
+The Type 10XX records contain global information spanning ALL baselines 
+setup in the run.  There is a SEPARATE set of Type 2XXX records for EACH
+baseline. 
+  
+ Root Extent: 
+    Record Type     Description 
+      10XX         Global Descriptor Record(s)
+                   Contains basic description of baselines, source, observation 
+                      time, etc.
+                   May have continuations.
+  
+      20XX         Baseline Index Record
+                   Contains index of all COREL extents in this file for a 
+                      particular baseline.  This information is contained 
+                      in a table with 18 16-bit-word entries per correlator 
+                      channel.
+                   Each Type 20XX record may hold information for up to 6 
+                      correlator channels.  Information for additional
+                      correlator channels in contained in continuation records
+                      where XX is incremented by 1 for each record up to a
+                      maximum of 99.  First Baseline Index record for a particular
+                      baseline has XX=0.
+                   Each baseline has its own set of Type 20XX records, which
+                      may in general be mixed with records from other baselines 
+                      and of other record types, although the Type 20XX records 
+                      for a given baseline will be in order of continuation#. 
+  
+      2100         ID ASCII Record
+                   Contains all ASCII information for a particular baseline.
+                   Has no continuation records. 
+  
+      2200         ID Double-Precision Record 
+                   Contains station parameters for one baseline.
+                   Has no continuation records. 
+  
+      2300         ID Double-Precision Record 
+                   Contains baseline and source parameters for one baseline.
+                   Has no continuation records. 
+  
+      24XX         ID Double-Precision Record 
+                   Contains RF frequency tables for a particular baseline.
+                   Each Type 23XX contains entries for up to 28 frequencies.
+                   XX is the record continuation number.
+  
+      25XX         ID Double-Precision Record 
+                   Contains phase-calibration frequencies tables for a
+                      particular baseline, organized by recorder track#.
+                   Each Type 24XX record contains up to 28 phase-cal freqs. 
+                   XX is the continuation #.
+  
+      2600         ID Double-Precision Record 
+                   Contains computed a priori delay, delay rate, fringe phase,
+                      etc, plus a variety of parameters needed by COREL for 
+                      correlation of one particular baseline. 
+                   Has no continuation records. 
+    
+      27XX         ID Double-Integer Record 
+                   Contains LO offsets for each frequency for each station
+                   in baseline. 
+                   XX is the continuation number. 
+  
+      280X         'Ad hoc' Data Record 
+                   Contains data entered in $ADHOC section of #Sxxxx file.
+                   Data is on a per-station basis (X=0 for reference stat,
+                   X=1 for remote stat).  Both R*8 and I*2 data types 
+                   are allowed. 
+  
+ ---------------------------------
+  
+                        DETAILED FORMATS
+  
+  I*2 
+   1        10XX       Record Identifier
+                       XX=continuation# 
+   2          #        COREL version number and format type 
+                         Bits 15-9: # of conversions between HP & IEEE
+                                    formats that this file has undergone
+                                 8: 0 - current format is HP
+                                    1 - current format is IEEE
+                               7-0: COREL version number
+   3                   Last extent # created by either COREL or FRNGE 
+                       (ONLY in Type 1000 record, not in continuations) 
+   4        NBASE      # baselines included in this observation 
+                       UTC start time of observation: 
+   5        ISYR          Year
+   6        ISDOY         Day of Year 
+   7        ISMON         Month 
+   8        ISDOM         Day of Month
+   9        ISHR          Hour
+  10        ISMIN         Minute
+  11        ISSEC         Second
+  12        LSEC       Maximum scan length on any baseline (seconds)
+  13-16                ASCII observing program name (A8)
+  17-20                ASCII run name (e.g. 273-1421) 
+  21-24                ASCII source name (A8) 
+  25-28  (Version <=2) ASCII date (e.g. 23 Jan78) 
+  25-27  (Version >=3) Original 6-char file name
+  28     (Version >=3) Frequency sequence code (A2) 
+  29                   Root creation date YYDDD where YY=09 for 1979
+  30                   Root creation time:
+                         Bits 15-12: SS/4 
+                              11-0:  HHMM 
+  31                   Experiment serial# (corresponds to number on 
+                          #Sxxxx and #Pxxxx files)
+  32                   Checksum of time/date stamp (*<YYMMDD.HHMM>),
+                       if any, in first line of #Sxxxx file 
+  33-128   BINFO(12,8) Baseline information array for up to 8 baselines.
+                       Baselines are numbered 1 thru 8 in Type 1000 record, 
+                       9-16 in Type 1001, etc.
+                  1-4  ASCII name of ref station for this baseline. 
+                  5-8  ASCII name of remote station for this baseline.
+                   9   2-char ASCII baseline identifier which occurs in 
+                       word 3 of all other root records 
+                  10   Acquisition system hardware ID codes 
+                         Bits 15-8 Reference station
+                               7-0 Remote station 
+                  11   Scan duration (sec) for this baseline; 
+                       if =0, use scan duration in word 12
+                  12   Record# of Type 2000 record for this baseline, 
+                       or -1 if this baseline is not contained in root
+                             (i.e. no correlatable data)
+                       or -2 if this baseline has been deleted from root (NYI)
+  
+ -------------------------------------
+  
+ The Type 20XX record(s) provide a detailed index of correlation data.
+A separate set of Type 20XX records exist for each baseline described in
+record Type 1000.  Each operating correlator module during a COREL processing 
+pass creates an 18-word entry in the cross-reference table IXREF. Subsequent
+processings of the same baseline utilizing the same root file extends these 
+tables, assigning a new index# to the data from each correlator module. 
+The specification of a baseline and an index# are necessary and sufficient
+to identify the data from a particular correlator module during a particular
+COREL processing pass.  Note that the same data may be processed several times
+using the same root extent, however all such processings must use the 
+a prioris already calculated in the root extent.
+  
+  I*2 
+   1        20XX       Record Identifier
+                       XX=continuation #
+   2        IBASE      Baseline # 
+   3                   2-char ASCII baseline ID 
+   4        IHPOS1     Head position offset (microns) for ref station 
+                       or 10000B (-32768) if low density head 
+         UTC time for which apriori calculated (approx run midpoint): 
+   5        IEYR          Year
+   6        IEDOY         Day of Year 
+   7        IEMON         Month 
+   8        IEDOM         Day of Month
+   9        IEHR          Hour
+  10        IEMIN         Minute
+  11        IESEC         Second
+  12        IHPOS2     Head position offset (microns) for rem station 
+                       or 10000B (-32768) if low density head 
+  13        NFP        #frames/parameter-period used in correlation 
+  14        KTPASS     "Effective" tape pass# (A2)
+                         Bits 15-8 Reference station tape 
+                               7-0 Remote station tape
+                       (prior to 850313, this word was NPP, #PP's/AP, 
+                        which has now been hardwired to 1)
+  15        NLAGS/KSEL Phase incrment update-rate select/Number lags
+                          Bits 15-8: NLAGS (legal values are 8,16,32, and 
+                                            0 for backward compatibility) 
+                                7-0: KSEL  (default value =4, which 
+                                            corresponds to phase-update 
+                                            every 2**4 bits)
+  16        KMODE      Correlation mode 
+                          Bit 0 - hardware FB correction active 
+                              1 - use 3-level phase-cal extractor 
+                              2 - unused
+                              3 - spectral line mode
+                              4 - pulsar mode 
+                              5 - tape pre-sync (sync tapes before
+                                  scheduled start time of scan) 
+                              6 - global debug output to data file
+                              7 - swap even/odd track selectors for rem stat
+                              8 - 'ad hoc' correction mode active (set by VROOT)
+                                  (i.e. Type 2800 record(s) exist)
+                          Bit 9   Enable resync error discard.  
+                          Bit 10  Enable nosync error discard.  
+                          Bit 11  Enable last block parity error trap.  
+                          Bits 15-12  Last block's parity 
+                                      error threshold for discarding data.
+  17        NTRKS      #tracks recorded in this scan
+                       (first NTRKS entries in IXREF table give complete setup) 
+  18        LSTIDX     Highest index# used in this baseline.
+  19        ITPASS     Tape pass# identifier (A2) 
+                         Bits 15-8 Reference station tape 
+                               7-0 Remote station tape
+  20                   Recording mode (A2) [e.g. 2B means bandwidth=2MHz mode B]
+  21-128    IXREF(18,6) Correlation cross-ref table for up to 6 correlator channels 
+                   1   Assigned index #.
+                         <0 indicates unused or deleted 
+                          0 indicates end of IXREF table
+                   2   Extent # in which correlation data corresponding to this 
+                       index# is contained. 
+                   3   Physical correlator slot# (100*crate#+module#) 
+                   4   Ref station tape track # 
+                   5   Rem station tape track # 
+                   6   Freq index # corresponding to proper entry in
+                       RF freq table in Type 24XX record(s).
+                       This number set negative if LSB. 
+                       The same index # may be used to get the phase-cal
+                       for this track from record Type 2500.
+                   7   "Partner track" # on Ref station tape, where "partner track" 
+                       is track taken on opposite sideband of same video converter. 
+                       Set =0 if no partner track.
+                   8   Track-pair ID (A2) 
+                       (if single-character, it is left-justified)
+                   9   Bits 15-8  Correlator tape drive# for Ref station tape 
+                             7-0  Correlator tape drive# for Rem station tape 
+                                  (Version >=3) 
+                  10   Processing post-mortem (Version >=3) 
+                       Bits 0-1 are module-specific:
+                             Bit 0 - Module taken off-line due to no X-clock  
+                             Bit 1 - Module taken off-line due to no Y-clock  
+                       Bits 2-15 are baseline-global [taken from BIP(1)]: 
+                          Bits 2-7 indicate correlator status at various  
+                                   key points of correlator operation   
+                             Bit 2 - Indicates that tapes were succesfully  
+                                     sync'ed and correlator was started.  
+                             Bit 3 - Correlator shutdown request came from  
+                                     some external source other than  
+                                     normal internal shutdown due to end of 
+                                     scheduled observation  
+                             Bit 4 - Indicates that baseline was successfully 
+                                     shutdown by the correlator handler 
+                             Bit 5 - Indicates data transfer request from 
+                                     scratch disc to permanent data file
+                                     has been queued
+                             Bit 6 - Data transfer to permanent file was  
+                                     completed. 
+                             Bit 7 - Processing of the baseline was 
+                                     terminated (regardless of normal or  
+                                     abnormal processing) 
+                          Bits 10-14 indicate error conditions resulting  
+                                    in premature baseline shutdown  
+                             Bit 10- Processing of baseline was terminated  
+                                     by a 'RU,VSTOP'  
+                             Bit 11- 0-indicates bits 12,13,14 apply to 
+                                       'reference' station tape 
+                                     1-indicates bits 12,13,14 apply to 
+                                       'remote' station tape  
+                             Bit 12- baseline processing terminated due to  
+                                     tape ID code conflict  
+                             Bit 13- baseline processing terminated due to  
+                                     'tape time beyond end-of-run'  
+                             Bit 14- baseline processing terminated due to  
+                                     'tape stopped' 
+                  11   Delay offset (bits) added to a priori delay
+                  12   COREL processing date in format YYDDD where
+                       YY=09 is 1979. 
+                  13   COREL processing time in format HHMM 
+                  14   Unused 
+                  15   Correlator module serial# (+ for MkIII,- for MkIIIA) 
+                  16   Pulsar gate-on in milli-periods. 
+                  17   Pulsar gate-off in milli-periods.
+                  18   COREL termination code (A1)
+                           'Self-termination' codes:  
+                              Z -  No data correlated   
+                              0 -  0-10% of schedule data processed 
+                              1 - 10-20% of schedule data processed 
+                              2 - 20-30% of schedule data processed 
+                              3 - 30-40% of schedule data processed 
+                              4 - 40-50% of schedule data processed 
+                              5 - 50-60% of schedule data processed 
+                              6 - 60-70% of schedule data processed 
+                              7 - 70-80% of schedule data processed 
+                              8 - 80-90% of schedule data processed 
+                              9 - 90-100% of schedule data processed  
+                           'Operator-terminated' codes: 
+                              A - Missing tape  
+                              B - No data on tape or unreadable 
+                              C - Unreadable tape (obsolete)
+                              D - Wrong data on tape
+                              E - Physical tape or reel damage
+                              F - Tape drive problems   
+                              G - LT file error 
+                              H - Wrong tape mounted  
+                              J - I goofed!   
+                              K - #Sxxxx file error 
+                              R - Fringe Search 
+                              S - Tape sync problems
+                              T - Test correlation  
+                              O - Other 
+      The 'goodness' of termination codes is assigned the following order:  
+                Low quality   ABCDEFGHJKRSTOZ0123456789   High quality  
+  
+------------------------------------------
+  
+  I*2 
+   1        2100       Record Identifier
+   2        IBASE      Baseline#
+   3                   2-char ASCII baseline identifier 
+   4                   Unused 
+  5-8                  ASCII Ref station name (A8)
+  9-12                 ASCII Rem station name (A8)
+ 13-16                 ASCII source name (A8) 
+ 17-20                 Unused 
+ 21-24                 ASCII date (e.g. 23JAN.78) 
+ 25-28                 ASCII observing program name (A8)
+ 29-32                 ASCII run name (default DDD-HHMM)
+ 33-36                 ASCII COREL processing date (e.g. 25JAN.78)
+ 37-40                 COREL program revision level (e.g. 23DEC.79) 
+                       Note: All data processed w/atmos prior to REV 28FEB.80 
+                             has bug in delay rate a priori (atmos was added
+                             1 Jan 80, so this problem affects only data
+                             processed between 01Jan80 and 27Feb80 inclusive).
+ 41-44                 ASCII Ref station 8-char tape label (e.g. HS000248)
+ 45-48                 ASCII Rem station 8-char tape label
+ 49-52                 Ref station occupation code (4A2)
+ 53-56                 Rem station occupation code (4A2)
+ 57-128                ASCII comments in string format (i.e. word 57 is set 
+                         to number of characters in the comment). 
+  
+   Note: All unused locations in words 5-128 will be filled with ASCII
+         spaces, except word 57, which will be set =0 if no ASCII comments. 
+  
+--------------------------------------------
+  
+  I*2    R*8
+   1           2200      Record Identifier
+   2           IBASE     Baseline#
+   3                     2-char ASCII baseline identifier 
+   4           ICTYP1    Coordinate type for Ref station coords 
+   5           ICTYP2    Coordinate type for Rem station coords 
+                            0 - X,Y,Z (usec)
+                            1 - Longitude (DDMMSS.SS) 
+                                Latitude  (DDMMSS.SS) 
+                                Elevation (meters)
+   6-8                   Unused 
+        Station Parameters: 
+          3-4  COORD1(2) X(meters) or Longitude(dddmmss.s) by station 
+          5-6  COORD2(2) Y(meters) or Latitude(ddmmss.s) by station 
+          7-8  COORD3(2) Z(meters) or Elevation(meters) by station. 
+                         X,Y,Z for right-handed coord system with Z aligned 
+                         with earth rotation axis and X thru Greenwich
+                         meridian.
+          9-10 DETAB(2)  Clock sync by station (usec) 
+                            >0 indicates clock running early
+                            <0 indicates clock running late 
+         11-12 DITAB(2)  Instrumental delay (usec) by station 
+         13-14 DRTAB(2)  Offset clock rate (sec/sec) by station 
+                            >0 indicates clock running fast 
+         15-16 ZENATM(2) Zenith atmosphere by station (nsec)
+         17-18 DEPOCH(2) Clock epoch by station (dddhhmm) 
+   The following X,Y,Z are the computed station positions in a LEFT-HANDED
+   coord system with Z aligned with earth rotation axis and X thru the
+   Greenwich meridian.
+         19-20 X(2)      X by station (usec)
+         21-22 Y(2)      Y by station (usec)
+         23-24 Z(2)      Z by station (usec)
+           25  VLIGHT    Velocity of light (meters/sec) 
+         26-32           Unused 
+  
+------------------------------------------------- 
+  
+  I*2    R*8
+   1           2300      Record Identifier
+   2           IBASE     Baseline#
+   3                     2-char ASCII baseline identifier 
+  4-8                    Unused 
+        Baseline Parameters: (BX,BY,BZ form left-hand coord set)
+           3   BX        Baseline X (usec)
+           4   BY        Baseline Y (usec)
+           5   BZ        Baseline Z (usec)
+           6   BLEN      Baseline length (usec) 
+        Source Position Parameters: 
+           7   RAIN      RA (HHMMSS.SS) of EPOCH
+           8   DECIN     Source declination (DDMMSS.SS) at EPOCH
+           9   EPOCIN    Epoch of RAIN,DECIN (e.g. 1950.0)
+          10   RA        RA (HHMMSS.SS) of date of observation
+          11   DEC       Declination (DDMMSS.SS) of date of observation 
+                      Precession and nutation constants:
+          ****** old definition ** (version < 3) *******
+          12   A         Besselian Day Number A (arcsec)
+          13   B         Besselian Day Number B (arcsec)
+          14   C         Besselian Day Number C (arcsec)
+          15   D         Besselian Day Number D (arcsec)
+          16   E         Besselian Day Number E (sec) 
+          17   STM00  Sidereal time at 0000 hrs UTC at Greenwich (HHMMSS.SS)
+          18   STM24  Sidereal time at 2400 hrs UTC at Greenwich (HHMMSS.SS)
+          *******new definiton**************************
+         12-15 PPHASE  Earth-centered rotational phase polynomial coeffs. 
+                       for Pulsars. Units are rotations/sec**n. (n=0..3)
+          16   PEPOCH  Evaluation Epoch for the above derivs. (msec. since BOY) 
+          17   PDISPR  Pulsar dispersion measure (as defined by Taylor &
+                       Manchester, A.J. 80, 794.) 
+          18   Unused 
+          **********************************************
+        Other relevant parameters:
+          19   SRATE  Sample rate (bits/sec)
+          20   UT1OF  UT1-UTC (sec), generally from USNO rapid service
+          21   TWOPI  8*arctan(1) 
+          22   RARAD(2)  Derivative of apparent RA  wrt UT (rad/sec)
+          23   DECRAD(2) Derivative of apparent DEC wrt UT (rad/sec)
+          24   SIDTM(1)  Greenwich app. sidereal time at epoch (rad)
+          25   SIDTM(2)  Derivative of G.A.S.T. wrt UT (rad/sec)
+          26   WOB(1)    X component of polar motion (arc-sec)
+          27   WOB(2)    Y component of polar motion (arc-sec)
+          28   USCALE    RA scaling ratio (apparent vs. 1950.0) 
+          29   JACOB(1,1) Partial of app. RA  wrt 1950.0 RA 
+          30   JACOB(2,1) Partial of app. RA  wrt 1950.0 DEC
+          31   JACOB(1,2) Partial of app. DEC wrt 1950.0 RA 
+          32   JACOB(2,2) Partial of app. DEC wrt 1950.0 DEC
+  
+----------------------------------------------- 
+  
+  I*2    R*8
+   1           24XX      Record Identifier. XX=Continuation#
+   2           IBASE     Baseline # 
+   3                     2-char ASCII baseline identifier 
+   4           NFR       #RF frequencies in table in this record
+   5           NFREQ     Total # RF frequencies 
+   6           LOFST     0 - no LO offsets (no Type 2700 record)
+                         1 - LO offsets exits (Type 2700 record exists) 
+  7-8                    Unused 
+         3-30  FRQTAB(28)    RF frequency (Hz) at baseband in video for each
+                             of up to 28 frequencies (>0 for USB, <0 for LSB).
+        31-32                Unused 
+  
+------------------------------------------------
+  
+  I*2    R*8
+   1           25XX      Record Identifier.  XX=Continuation# 
+   2           IBASE     Baseline#
+   3                     2-char ASCII baseline identifier 
+   4           NPC       # of phase-cal frequencies given in this record
+   5           NPCFRQ    Total # phase-cal freqs
+  6-8                    Unused 
+        3-30   PCFREQ(28)    Table of phase-cal frequencies (Hz) in same
+                             order as FRQTAB in record type 2400. 
+                             Phase-cal freq is assumed to be the same for 
+                             Zero indicates no phase-cal.ions 1&2.
+       31-32                 Unused 
+  
+------------------------------------------------
+  
+  I*2    R*8
+   1           2600      Record Type Identifier 
+   2           IBASE     Baseline#
+   3                     2-char ASCII baseline identifier 
+   4                     Unused 
+          2    DACELT    Total a priori acceleration (usec/sec/sec) at PRT
+          3    DELAYT    Total a priori delay (usec) at Processing Ref Time 
+          4    DRATET    Total a priori delay rate (usec/sec) at Proc Ref Time
+          5    PHSDD     Second time derivative of PHSITE  (rot / sec**2) 
+          6    U         Fringes/arcsec East-West at PRT at 1 GHz 
+                         (uses source position of date) 
+          7    V         Fringes/arcsec North-South at PRT at 1 GHz 
+          8    UF        mHz/arcsec/GHz in increasing RA
+                         (uses source position of date) 
+          9    VF        mHz/arcsec/GHz North 
+        10-11  AZ(2)     Azimuth (deg) by station at PRT
+        12-13  EL(2)     Elevation (deg) by station at PRT
+         14    GHA       Greenwich Hour Angle (deg) of source at PRT
+             The following parameters are precomputed for benefit of VLB1B: 
+         15    TIME0     Processing Reference Time in msec
+         16    UTOST1    Sidereal rate (radians/UT msec)
+         17    BQA       Invariant source/baseline parameter (usec) 
+         18    BQB       Invariant source/baseline parameter (usec) 
+         19    BQC       Invariant source/baseline parameter (usec) 
+         20    DHADT     Hour angle rate (rad/sec)-rate computation 
+         21    BTR0      Ref station a priori clock rate (sec/sec)
+         22    EPOCH0    Reference station a priori clock sync error
+                         at TIME0 (msec)
+         23    BTE0      A priori clock sync error at Processing Reference Time 
+                         (usec).   >0 indicates remote-station clock is early.
+         24    BTR       A priori clock rate difference between reference and 
+                         remote stations (usec/sec) 
+         25    BTI       A priori instrumental delay difference between 
+                         reference and remote station (usec)
+         26    TWOPI
+             Parameters 27-30 all refer to the 1950.0 coordinate axes.
+         27    U0        Fringes/arcsec E-W at PRT at 1 GHz 
+         28    V0        Fringes/arcsec N-S at PRT at 1 GHz 
+         29    UF0       Time derivative of U0 (mHz/arcsec/GHz) 
+         30    VF0       Time derivative of V0 (mHz/arcsec/GHz) 
+         31    PHSITE    Pulsar rot. phase at ref. site (rotations) 
+         32    PHSDOT    Time derivative of PHSITE      (rot / sec) 
+    
+----------------------------------------------- 
+  
+  I*2    I*4
+   1           27XX      Record Identifier. XX=Continuation#
+                         (Note that Type 27xx records will exist only 
+                          if LO offsets are present.) 
+   2           IBASE     Baseline # 
+   3                     2-char ASCII baseline identifier 
+   4           NFR       # frequency pairs in table in this record
+   5           NFREQ     Total # RF frequencies 
+  6-8                    Unused 
+         5-60  LOFSTB(2,28)  LO offset (mHz) for reference and remote stations, 
+                             respectively, corresponding to respective entries
+                             in Type 24XX records.  Sum of entry in Type 24XX 
+                             record and ref-station LO offset give RF 
+                             frequency translated to DC at ref station, signed
+                             according to sideband (<0-LSB,>0-USB). 
+        61-64                Unused 
+  
+  
+------------------------------------------------------- 
+  
+  I*2    R*8
+   1           280X      Record Type Identifier (X=0 ref stat; X=1 rem stat)
+   2           IBASE     Baseline#
+   3                     2-char ASCII baseline identifier 
+   4                     Unused 
+   5           IATYPE    'Ad hoc' type (0-255)
+   6           NA        #R*8 parameters
+   7           NI        #I*2 parameters
+   8                     Unused 
+          3   APARMS(NA) R*8 parameters (length NA*4 words) 
+        3+NA  IPARMS(NI) I*2 parameters (length NI words) 
+  
+------------------------------------------------------- 
+------------------------------------------------------- 
+  
+                TYPE 51 CORRELATOR DATA EXTENT
+      
+Each 128-word record in a Type 51 extent contains the output from two 
+module services, each in the same format.  Only data from one baseline
+is contained in a given Type 51 extent.  The data may be mixed in time
+order (but generally is not). 
+  
+  I*2    R*4
+   1                     Bit  15:   1 
+                              14:   Set =1 if overrun in AP arrays has occurred.
+                              13-8: Baseline # (modulo 64)
+                               7-0: Index # 
+   2                     Bit  15: 
+                                   Mk 3:   Fringe rate sign bit (0 indicates positive)  
+                                           [Taken from IPASS(9) bit 7]  
+                                           Note: Since the Mk 3 rotator only rotates in 
+                                           the positive direction, a negative fringe rate 
+                                           implies that the correlation coefficients are
+                                           the complex-conjugate of the true coefficients.
+                                   Mk 3A:  Reserved (set to 0)
+                              14:   Correlate suppress [taken from IPASS(9) bit 6]
+                                      Caused by:
+                                       1) Fringe rate going thru zero during AP 
+                                       2) Sync-recovery in progress 
+                                       3) PPW array overrun 
+                              13:   Tapes out-of-sync (Version >=3) 
+                              12:   A priori array overrun
+                            11-8:   Correlator mode [taken from IPASS(9) bits 4-0]: 
+                                    Bits 10-8 
+                                       0 - Cross-corr x*y 
+                                       1 - Auto-corr  x*x 
+                                       2 - Auto-corr  y*y 
+                                       3 - Cross-corr test
+                                       4 - Multiply xsin & xcos 
+                                       5 - Multiply xsin & xcos (same as 4) 
+                                       6 - Multiply ysin & ycos 
+                                       7 - Multiply test
+                                    Bit 11
+                                       0 - 8-channel complex correlation
+                                       1 - 16-channel real correlation
+                             7-0:   Correlator status OR'ed for all PP's in AP
+                                    Bit 7 - No PP update
+                                        6 - Dump AP data flag 
+                                        5 - Y Slipped Sync
+                                        4 - X Slipped Sync
+                                        3 - No Y Sync 
+                                        2 - No X Sync 
+                                        1 - No Y Clock
+                                        0 - No X Clock
+                         Note:If word 2=-1, this record is a debug record and 
+                              should be ignored.
+ MkIII: 
+   3                     Bits 15-10 Unused
+                               9-8 (NYI): 
+                                    00 - hardware fractional-bit in use.
+                                    01 - software fractional-bit in use.
+                                    10 - Hardware rotator held at zero degrees
+                                         throughout AP. 
+                                         FPHASE indicates a priori fringe phase 
+                                         at middle of AP. 
+ MkIIIA:
+   3                     'General status' returned from correlator module 
+   4           IBSHFT    (Version >=4)  
+                         Normal mode: 
+                           bit/shift rate (absolute)
+                           (relevant only for hardware FB correction) 
+                              Bit  15     Reserved
+                              Bits 14-11  integer part
+                              Bits 10-0   fractional remainder
+                         Pulsar mode (KMODE bit4=1):
+                              Bits 15-11  Fraction of AP where pulse center 
+                                          lies (normalized to 32).
+                              Bits 10-0   Fraction of pulse in AP (normalized 
+                                          to 2048). 
+  5-6    3     TIME      Bits 32-4: BCD MMSS.SSS at END of last PP in AP
+                                 3: (Version>=3)
+                                    Error-correction attempt initiated
+                                 2: time disagreement between tape time and 
+                                    expected tape time  (Version >=3).
+                                    May also indicate no 'passed-data', 
+                                    caused by a communications error. 
+                                 1: CRCC error in remote-station sync block 
+                                 0: CRCC error in ref-station sync block
+MkIII:
+  7-8    4 III:FPHASE    Bits 23-0: Final rotator phase at end of AP
+MkIIIA: 
+   7                     Bits 15-8: #X-discard frames 
+                               7-0: #Y-discard frames 
+   8                     Bits 15-8: #X-resync frames
+                               7-0: #Y-resync frames
+MkIII:
+  9-10   5     DELAYZ    Double-integer delay (bits) for the Z-data stream
+                         [i.e. bit offset of Y-data (wrt X-data) for phase-cal
+                         rotator: >0 indicates phase-cal processing starts on 
+                         LATER data in Y-data stream]. EXCLUDES any delay 
+                         offset specified in Type 2000 record.
+MkIIIA: 
+  9-10   5     DELAYZ    Same as for MkIII except modulo 20000
+ 11-12   6     FBIT      Single-precision fractional bit shift at center
+                         of AP (bits) 
+    
+                   ---All remaining numbers are I*4 format--- 
+ 13-44 7-22    XCOR(2,8) 8*(Coscor,Sincor) in order of decreasing delay 
+ 45-46  23     Total# bits correlated in cosine channel of correlator 
+ 47-48  24     Total# bits correlated in sine channel of correlator 
+ 49-50  25     X phase-cal cosine correlation 
+ 51-52  26     X phase-cal sine correlation 
+ 53-54  27     X phase-cal total# bits correlated 
+ 55-56  28     X error count -- #bytes with parity error
+ 57-58  29     Y phase-cal cosine correlation 
+ 59-60  30     Y phase-cal sine correlation 
+ 61-62  31     Y phase-cal total# bits correlated 
+ 63-64  32     Y error count -- #bytes with parity error
+      
+----------------------------------------------------- 
+----------------------------------------------------- 
+    
+                TYPE 52 FRNGE OUTPUT EXTENT 
+    
+See file "FRNGE for detailed format specifications. 
