@@ -74,12 +74,10 @@ endif
 # this is sine qua non, except in special cases
 if HAVE_HOPS
 HOPSDIRS = help include scripts sub postproc correlator
-HOPSDATA = data
 TAR_HOPS = hops
 DCF_HOPS =
 else
 HOPSDIRS =
-HOPSDATA =
 TAR_HOPS = h
 DCF_HOPS = --disable-hops
 endif
@@ -130,7 +128,6 @@ SUBDIRS = . $(HOPSDIRS) \
 	  $(DIFXDIRS) \
 	  $(DEVLDIRS) \
 	  $(MARK5DIRS) \
-	  $(HOPSDATA) \
 	  $(VXMLDIRS) \
 	  $(OMPIDIRS) \
 	  $(D2M4DIRS) \

@@ -1189,9 +1189,6 @@ if [test "$have_hops" = true] ; then
         scripts/Makefile
         correlator/Makefile
         correlator/CorAsc2/Makefile
-        data/Makefile
-        data/ff_testdata/Makefile
-        data/ae_testdata/Makefile
         postproc/Makefile
         postproc/adump/Makefile
         postproc/aedit/Makefile
@@ -1233,9 +1230,6 @@ if [test "$have_hops" = true] ; then
         [scripts/tpcplot],
         [chmod +x scripts/tpcplot]
     )
-    if [test $have_python = "true"] ; then
-        AC_CONFIG_FILES([data/ff_testdata/hopstestsuite.py])
-    fi
 fi
 
 # this was under development, but is now available by default
