@@ -1,0 +1,33 @@
+diff --git a/chops/source/python_src/ffcontrol_module/ffcontrol/ffcontrol.py.in \
+           b/chops/source/python_src/ffcontrol_module/ffcontrol/ffcontrol.py.in
+index faf9456..084dd7a 100644
+--- a/chops/source/python_src/ffcontrol_module/ffcontrol/ffcontrol.py.in
++++ b/chops/source/python_src/ffcontrol_module/ffcontrol/ffcontrol.py.in
+@@ -172,7 +172,8 @@ c_block._fields_ = [
+     ('gen_cf_record', ctypes.c_int ),
+     ('nnotches', ctypes.c_int ),
+     ('notches', (ctypes.c_double * 2) * MAXNOTCH ),
+-    ('chan_notches', (ctypes.c_double) * MAXNOTCH + 1),
++#    ('chan_notches', (ctypes.c_double) * MAXNOTCH + 1),
++    ('chan_notches', (ctypes.c_double) * (MAXNOTCH + 1)),
+     ('t_cohere', ctypes.c_double),
+     ('ionosphere', dstats ),
+     ('delay_offs', dstats * MAXFREQ),
+@@ -190,11 +191,14 @@ c_block._fields_ = [
+     ('weak_channel', ctypes.c_double),
+     ('pc_amp_hcode', ctypes.c_double),
+     ('fmatch_bw_pct', ctypes.c_double),
+-    ('chid', ctypes.c_char * MAXFREQ + 1),
++#    ('chid', ctypes.c_char * MAXFREQ + 1),
++    ('chid', ctypes.c_char * (MAXFREQ + 1)),
+     ('chid_rf', ctypes.c_double * MAXFREQ),
+-    ('clones', (ctypes.c_char * MAXFREQ/2) * 2 + 1),
++#    ('clones', (ctypes.c_char * MAXFREQ/2) * 2 + 1),
++    ('clones', (ctypes.c_char * (MAXFREQ//2 + 1)) * 2),
+     ('clone_snr_chk', ctypes.c_int),
+-    ('display_chans', (ctypes.c_char * MAXFREQ) + 5),
++#    ('display_chans', (ctypes.c_char * MAXFREQ) + 5),
++    ('display_chans', ctypes.c_char * (MAXFREQ + 5)),
+     ('vbp_correct', ctypes.c_int),
+     ('vbp_fit', ctypes.c_int),
+     ('vbp_coeffs', dstats * 5),
