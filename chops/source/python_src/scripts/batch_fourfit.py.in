@@ -24,8 +24,8 @@ def main():
         )
 
     parser.add_argument('control_file', help='the control file to be applied to all scans')
-    parser.add_argument('stations', help='concatenated string of single character codes for all stations to be fringe fit')
-    parser.add_argument('pol_products', help='comma separated list of polarization-products to be fringe fit')
+    parser.add_argument('stations', help='concatenated string of single character codes for all stations to be fringe fit, e.g. HEIG')
+    parser.add_argument('pol_products', help='comma separated list of polarization-products to be fringe fit, e.g. LR,RL,LL+RR')
     parser.add_argument('experiment_directory', help='relative path to directory containing experiment data')
 
     parser.add_argument('-n', '--num-proc', type=int, dest='num_proc', help='number of concurrent fourfit jobs to run, default=1', default=1)
@@ -65,8 +65,21 @@ def main():
 
     #pol product:
     for pp in polprods:
-        if pp not in ['XX', 'YY', 'XY', 'YX', 'I']:
-            print("error: ", pp, "not understood, polarization products must be an element from: {XX, YY, XY, YX, I}")
+        #
+        # 20250115, L. Benkevitch
+        #
+        # These polarization products do not take into account
+        # the circular pps created by PolConvert:
+        #
+        # if pp not in ['XX', 'YY', 'XY', 'YX', 'I']:
+        #     print("error: ", pp, "not understood, polarization products must be an element from: {XX, YY, XY, YX, I}")
+        #
+        # Below, the circular polarization products,
+        #    'LL', 'LR', 'RL', 'RR', and 'LL+RR' (circular analog of
+        #    pseudo-Stokes 'I' in linear pps) are added:
+        #
+        if pp not in ['XX', 'YY', 'XY', 'YX', 'I', 'LL', 'LR', 'RL', 'RR', 'LL+RR']:
+            print("error: ", pp, "not understood, polarization products must be an element from: {XX, YY, XY, YX, I, LL, LR, RL, RR, LL+RR}")
             sys.exit(1)
 
     #force all fringe files generated to save the control file
